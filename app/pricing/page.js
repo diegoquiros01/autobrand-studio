@@ -76,24 +76,19 @@ export default function Pricing() {
   const handleCheckout = async (planName) => {
     setLoadingPlan(planName);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        router.push("/login?redirect=pricing&plan=" + planName);
-        setLoadingPlan(null);
-        return;
-      }
       const priceId = planName === "Professional"
         ? "price_1TGRHAFZXtgfLmPe79t0RPn6"
         : "price_1TGRHYFZXtgfLmPealbgoQLu";
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ priceId, userId: user.id, email: user.email }),
+        body: JSON.stringify({ priceId, userId: "", email: "" }),
       });
       const data = await res.json();
       if (data.url) window.location.href = data.url;
+      else console.error("No URL from Stripe:", data);
     } catch(e) {
-      console.error(e);
+      console.error("Checkout error:", e);
     }
     setLoadingPlan(null);
   };
