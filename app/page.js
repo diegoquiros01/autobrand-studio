@@ -73,58 +73,58 @@ export default function Landing() {
   };
 
   const S = {
-    nav: { display:"flex", alignItems:"center", padding:"0 32px", height:62, borderBottom:"1px solid #F0F0F0", background:"#fff", position:"sticky", top:0, zIndex:100 },
+    nav: { display:"flex", alignItems:"center", padding:"0 32px", height:62, borderBottom:"1px solid #F0F0F0", background:"#0D0D1F", position:"sticky", top:0, zIndex:100 },
     logoIcon: { width:30, height:30, background:"#7950F2", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:12, fontWeight:500 },
-    logoText: { fontSize:15, fontWeight:500, color:"#0A0A0A" },
-    navLink: { padding:"6px 13px", borderRadius:8, fontSize:13, color:"#555", cursor:"pointer", background:"none", border:"none", fontFamily:"Inter, sans-serif" },
+    logoText: { fontSize:15, fontWeight:500, color:"#fff" },
+    navLink: { padding:"6px 13px", borderRadius:8, fontSize:13, color:"rgba(255,255,255,0.55)", cursor:"pointer", background:"none", border:"none", fontFamily:"Inter, sans-serif" },
     navCta: { padding:"8px 18px", background:"#7950F2", color:"#fff", border:"none", borderRadius:8, fontSize:13, fontWeight:500, cursor:"pointer", fontFamily:"Inter, sans-serif" },
-    sectionBadge: { display:"inline-block", background:"#F3F0FF", color:"#5B21B6", fontSize:11, fontWeight:500, padding:"4px 12px", borderRadius:20, marginBottom:12 },
+    sectionBadge: { display:"inline-block", background:"rgba(121,80,242,0.15)", color:"#A78BFA", fontSize:11, fontWeight:500, padding:"4px 12px", borderRadius:20, marginBottom:12 },
     btnPrimary: { padding:"13px 28px", background:"#7950F2", color:"#fff", border:"none", borderRadius:10, fontSize:15, fontWeight:500, cursor:"pointer", fontFamily:"Inter, sans-serif" },
-    btnSecondary: { padding:"12px 24px", background:"#fff", color:"#0A0A0A", border:"1.5px solid #E0E0E0", borderRadius:10, fontSize:15, fontWeight:500, cursor:"pointer", fontFamily:"Inter, sans-serif" },
+    btnSecondary: { padding:"12px 24px", background:"#0D0D1F", color:"#fff", border:"1.5px solid #E0E0E0", borderRadius:10, fontSize:15, fontWeight:500, cursor:"pointer", fontFamily:"Inter, sans-serif" },
   };
 
   return (
-    <div style={{ minHeight:"100vh", background:"#fff", fontFamily:"Inter, sans-serif" }}>
+    <div style={{ minHeight:"100vh", background:"#0D0D1F", fontFamily:"Inter, sans-serif" }}>
       <nav style={S.nav}>
         <div style={{ display:"flex", alignItems:"center", gap:9, cursor:"pointer" }} onClick={() => router.push("/")}>
           <div style={S.logoIcon}>Ai</div>
-          <span style={S.logoText}>Ai<span style={{ color:"#7950F2" }}>Studio</span>Brand</span>
+          <span style={S.logoText}>Ai<span style={{ color:"#A78BFA" }}>Studio</span>Brand</span>
         </div>
         <div style={{ display:"flex", gap:4, marginLeft:"auto", alignItems:"center" }}>
           <button style={S.navLink} onClick={() => router.push("/")}>{t.home}</button>
           <button style={S.navLink} onClick={() => router.push("/pricing")}>{t.pricing}</button>
           <button style={S.navLink} onClick={() => router.push("/contacto")}>{t.contact}</button>
-          <div style={{ display:"flex", background:"#F5F5F5", borderRadius:8, padding:3, gap:2, marginLeft:8 }}>
+          <div style={{ display:"flex", background:"rgba(255,255,255,0.06)", borderRadius:8, padding:3, gap:2, marginLeft:8 }}>
             <button onClick={() => setLanguage("en")} style={{ padding:"5px 10px", borderRadius:6, fontSize:12, fontWeight:500, cursor:"pointer", background: lang==="en" ? "#fff" : "transparent", border:"none", fontFamily:"Inter, sans-serif", color: lang==="en" ? "#0A0A0A" : "#888" }}>EN</button>
             <button onClick={() => setLanguage("es")} style={{ padding:"5px 10px", borderRadius:6, fontSize:12, fontWeight:500, cursor:"pointer", background: lang==="es" ? "#fff" : "transparent", border:"none", fontFamily:"Inter, sans-serif", color: lang==="es" ? "#0A0A0A" : "#888" }}>ES</button>
           </div>
-          <button style={{ padding:"7px 16px", background:"#fff", color:"#0A0A0A", border:"1.5px solid #E0E0E0", borderRadius:8, fontSize:13, fontWeight:500, cursor:"pointer", marginLeft:4 }} onClick={() => router.push("/login")}>{t.signin}</button>
+          <button style={{ padding:"7px 16px", background:"#0D0D1F", color:"#fff", border:"1.5px solid #E0E0E0", borderRadius:8, fontSize:13, fontWeight:500, cursor:"pointer", marginLeft:4 }} onClick={() => router.push("/login")}>{t.signin}</button>
           <button style={S.navCta} onClick={() => router.push("/login")}>{t.startFree}</button>
         </div>
       </nav>
 
-      <div style={{ padding:"56px 40px", background:"#fff" }}>
+      <div style={{ padding:"56px 40px", background:"#0D0D1F" }}>
         <div style={{ maxWidth:1000, margin:"0 auto", display:"grid", gridTemplateColumns:"1fr 1fr", gap:48, alignItems:"center" }}>
           <div style={{ textAlign:"left" }}>
-            <div style={{ display:"inline-flex", alignItems:"center", gap:6, background:"#F3F0FF", color:"#5B21B6", fontSize:12, fontWeight:500, padding:"5px 13px", borderRadius:20, marginBottom:22 }}>
+            <div style={{ display:"inline-flex", alignItems:"center", gap:6, background:"rgba(121,80,242,0.15)", color:"#A78BFA", fontSize:12, fontWeight:500, padding:"5px 13px", borderRadius:20, marginBottom:22 }}>
               <span style={{ width:6, height:6, borderRadius:"50%", background:"#7950F2", display:"inline-block" }}></span>
               {t.badge}
             </div>
-            <h1 style={{ fontSize:42, fontWeight:500, color:"#0A0A0A", lineHeight:1.12, letterSpacing:"-0.03em", marginBottom:16 }}>
+            <h1 style={{ fontSize:42, fontWeight:500, color:"#fff", lineHeight:1.12, letterSpacing:"-0.03em", marginBottom:16 }}>
               {t.title1}<br />
-              <span style={{ color:"#7950F2" }}>{t.title2}</span>
+              <span style={{ color:"#A78BFA" }}>{t.title2}</span>
             </h1>
-            <p style={{ fontSize:16, color:"#666", lineHeight:1.7, marginBottom:28 }}>{t.sub}</p>
+            <p style={{ fontSize:16, color:"rgba(255,255,255,0.5)", lineHeight:1.7, marginBottom:28 }}>{t.sub}</p>
             <div style={{ display:"flex", gap:10, marginBottom:14 }}>
               <button style={S.btnPrimary} onClick={() => router.push("/login")}>{t.btn1}</button>
               <button style={S.btnSecondary} onClick={() => router.push("/generar")}>{t.btn2}</button>
             </div>
-            <div style={{ fontSize:12, color:"#999" }}>{t.note}</div>
+            <div style={{ fontSize:12, color:"rgba(255,255,255,0.3)" }}>{t.note}</div>
             <div style={{ display:"flex", gap:24, marginTop:28 }}>
               {t.stats.map((s, i) => (
                 <div key={i}>
-                  <div style={{ fontSize:22, fontWeight:500, color:"#7950F2", letterSpacing:"-0.02em" }}>{s.num}</div>
-                  <div style={{ fontSize:11, color:"#999", marginTop:2 }}>{s.label}</div>
+                  <div style={{ fontSize:22, fontWeight:500, color:"#A78BFA", letterSpacing:"-0.02em" }}>{s.num}</div>
+                  <div style={{ fontSize:11, color:"rgba(255,255,255,0.3)", marginTop:2 }}>{s.label}</div>
                 </div>
               ))}
             </div>
@@ -157,32 +157,32 @@ export default function Landing() {
         </div>
       </div>
 
-      <div id="features" style={{ padding:"64px 32px", background:"#FAFAFA" }}>
+      <div id="features" style={{ padding:"64px 32px", background:"#0A0A18" }}>
         <div style={{ maxWidth:900, margin:"0 auto" }}>
           <div style={S.sectionBadge}>{t.featBadge}</div>
-          <h2 style={{ fontSize:28, fontWeight:500, color:"#0A0A0A", letterSpacing:"-0.02em", marginBottom:10 }}>{t.featTitle}</h2>
-          <p style={{ fontSize:15, color:"#666", lineHeight:1.65, maxWidth:500, marginBottom:40 }}>{t.featSub}</p>
+          <h2 style={{ fontSize:28, fontWeight:500, color:"#fff", letterSpacing:"-0.02em", marginBottom:10 }}>{t.featTitle}</h2>
+          <p style={{ fontSize:15, color:"rgba(255,255,255,0.5)", lineHeight:1.65, maxWidth:500, marginBottom:40 }}>{t.featSub}</p>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(3, minmax(0,1fr))", gap:12 }}>
             {t.features.map((f, i) => (
-              <div key={i} style={{ background:"#fff", border:"0.5px solid #E8E8E8", borderRadius:14, padding:22 }}>
+              <div key={i} style={{ background:"#0D0D1F", border:"0.5px solid #E8E8E8", borderRadius:14, padding:22 }}>
                 <div style={{ width:36, height:36, borderRadius:9, display:"flex", alignItems:"center", justifyContent:"center", fontSize:16, marginBottom:12, background:f.color, color:f.tc }}>{f.icon}</div>
-                <div style={{ fontSize:14, fontWeight:500, color:"#0A0A0A", marginBottom:6 }}>{f.title}</div>
-                <div style={{ fontSize:13, color:"#666", lineHeight:1.6 }}>{f.desc}</div>
+                <div style={{ fontSize:14, fontWeight:500, color:"#fff", marginBottom:6 }}>{f.title}</div>
+                <div style={{ fontSize:13, color:"rgba(255,255,255,0.5)", lineHeight:1.6 }}>{f.desc}</div>
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      <div style={{ padding:"64px 32px", background:"#fff" }}>
+      <div style={{ padding:"64px 32px", background:"#0D0D1F" }}>
         <div style={{ maxWidth:900, margin:"0 auto" }}>
           <div style={S.sectionBadge}>{t.howBadge}</div>
-          <h2 style={{ fontSize:28, fontWeight:500, color:"#0A0A0A", letterSpacing:"-0.02em", marginBottom:0 }}>{t.howTitle}</h2>
+          <h2 style={{ fontSize:28, fontWeight:500, color:"#fff", letterSpacing:"-0.02em", marginBottom:0 }}>{t.howTitle}</h2>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(3, minmax(0,1fr))", gap:0, marginTop:40 }}>
             {t.steps.map((s, i) => (
-              <div key={i} style={{ padding:"28px 24px", borderRight: i < 2 ? "0.5px solid #F0F0F0" : "none" }}>
+              <div key={i} style={{ padding:"28px 24px", borderRight: i < 2 ? "1px solid rgba(255,255,255,0.06)" : "none" }}>
                 <div style={{ fontSize:36, fontWeight:500, color:"#E8E4FE", letterSpacing:"-0.04em", marginBottom:14 }}>{s.n}</div>
-                <div style={{ fontSize:15, fontWeight:500, color:"#0A0A0A", marginBottom:8 }}>{s.t}</div>
+                <div style={{ fontSize:15, fontWeight:500, color:"#fff", marginBottom:8 }}>{s.t}</div>
                 <div style={{ fontSize:13, color:"#777", lineHeight:1.65 }}>{s.d}</div>
               </div>
             ))}
@@ -193,21 +193,21 @@ export default function Landing() {
       <div style={{ padding:"72px 32px", background:"#7950F2", textAlign:"center" }}>
         <h2 style={{ fontSize:32, fontWeight:500, color:"#fff", letterSpacing:"-0.02em", marginBottom:12 }}>{t.ctaTitle}</h2>
         <p style={{ fontSize:15, color:"rgba(255,255,255,0.75)", marginBottom:28 }}>{t.ctaSub}</p>
-        <button style={{ padding:"14px 32px", background:"#fff", color:"#7950F2", border:"none", borderRadius:10, fontSize:15, fontWeight:500, cursor:"pointer", fontFamily:"Inter, sans-serif" }} onClick={() => router.push("/login")}>
+        <button style={{ padding:"14px 32px", background:"#0D0D1F", color:"#7950F2", border:"none", borderRadius:10, fontSize:15, fontWeight:500, cursor:"pointer", fontFamily:"Inter, sans-serif" }} onClick={() => router.push("/login")}>
           {t.ctaBtn}
         </button>
         <div style={{ fontSize:12, color:"rgba(255,255,255,0.55)", marginTop:12 }}>{t.ctaNote}</div>
       </div>
 
-      <div style={{ padding:32, borderTop:"0.5px solid #F0F0F0", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+      <div style={{ padding:32, borderTop:"1px solid rgba(255,255,255,0.08)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
         <div style={{ display:"flex", alignItems:"center", gap:9 }}>
           <div style={{ width:26, height:26, background:"#7950F2", borderRadius:7, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:11, fontWeight:500 }}>Ai</div>
           <div>
-            <div style={{ fontSize:13, fontWeight:500, color:"#0A0A0A" }}>Ai<span style={{ color:"#7950F2" }}>Studio</span>Brand</div>
-            <div style={{ fontSize:12, color:"#999", marginTop:2 }}>{t.footerTag}</div>
+            <div style={{ fontSize:13, fontWeight:500, color:"#fff" }}>Ai<span style={{ color:"#A78BFA" }}>Studio</span>Brand</div>
+            <div style={{ fontSize:12, color:"rgba(255,255,255,0.3)", marginTop:2 }}>{t.footerTag}</div>
           </div>
         </div>
-        <div style={{ fontSize:12, color:"#bbb" }}>{t.footerRights}</div>
+        <div style={{ fontSize:12, color:"rgba(255,255,255,0.25)" }}>{t.footerRights}</div>
       </div>
     </div>
   );

@@ -87,21 +87,21 @@ export default function Contacto() {
     setSending(false);
   };
 
-  const inp = { width:"100%", border:"1.5px solid #E8E8E8", borderRadius:8, padding:"11px 13px", fontSize:14, fontFamily:"Inter, sans-serif", background:"#FAFAFA", color:"#0A0A0A", outline:"none" };
-  const nav = { display:"flex", alignItems:"center", padding:"0 32px", height:62, borderBottom:"1px solid #F0F0F0", background:"#fff", position:"sticky", top:0, zIndex:100 };
+  const inp = { width:"100%", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, padding:"11px 13px", fontSize:14, fontFamily:"Inter, sans-serif", background:"#0A0A18", color:"#fff", outline:"none" };
+  const nav = { display:"flex", alignItems:"center", padding:"0 32px", height:62, borderBottom:"1px solid rgba(255,255,255,0.08)", background:"#111122", position:"sticky", top:0, zIndex:100 };
 
   return (
-    <div style={{ minHeight:"100vh", background:"#fff", fontFamily:"Inter, sans-serif" }}>
+    <div style={{ minHeight:"100vh", background:"#0D0D1F", fontFamily:"Inter, sans-serif" }}>
       <nav style={nav}>
         <div style={{ display:"flex", alignItems:"center", gap:9, cursor:"pointer" }} onClick={() => router.push("/")}>
           <div style={{ width:30, height:30, background:"#7950F2", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:12, fontWeight:500 }}>Ai</div>
-          <span style={{ fontSize:15, fontWeight:500, color:"#0A0A0A" }}>Ai<span style={{ color:"#7950F2" }}>Studio</span>Brand</span>
+          <span style={{ fontSize:15, fontWeight:500, color:"#fff" }}>Ai<span style={{ color:"#7950F2" }}>Studio</span>Brand</span>
         </div>
         <div style={{ display:"flex", gap:4, marginLeft:"auto", alignItems:"center" }}>
-          <button onClick={() => router.push("/")} style={{ padding:"6px 13px", borderRadius:8, fontSize:13, color:"#555", cursor:"pointer", background:"none", border:"none", fontFamily:"Inter, sans-serif" }}>{lang === "en" ? "Home" : "Inicio"}</button>
-          <button onClick={() => router.push("/pricing")} style={{ padding:"6px 13px", borderRadius:8, fontSize:13, color:"#555", cursor:"pointer", background:"none", border:"none", fontFamily:"Inter, sans-serif" }}>{lang === "en" ? "Pricing" : "Precios"}</button>
+          <button onClick={() => router.push("/")} style={{ padding:"6px 13px", borderRadius:8, fontSize:13, color:"rgba(255,255,255,0.55)", cursor:"pointer", background:"none", border:"none", fontFamily:"Inter, sans-serif" }}>{lang === "en" ? "Home" : "Inicio"}</button>
+          <button onClick={() => router.push("/pricing")} style={{ padding:"6px 13px", borderRadius:8, fontSize:13, color:"rgba(255,255,255,0.55)", cursor:"pointer", background:"none", border:"none", fontFamily:"Inter, sans-serif" }}>{lang === "en" ? "Pricing" : "Precios"}</button>
           <button onClick={() => router.push("/contacto")} style={{ padding:"6px 13px", borderRadius:8, fontSize:13, color:"#7950F2", cursor:"pointer", background:"#F3F0FF", border:"none", fontFamily:"Inter, sans-serif", fontWeight:500 }}>{lang === "en" ? "Contact" : "Contacto"}</button>
-          <div style={{ display:"flex", background:"#F5F5F5", borderRadius:8, padding:3, gap:2, marginLeft:8 }}>
+          <div style={{ display:"flex", background:"rgba(255,255,255,0.06)", borderRadius:8, padding:3, gap:2, marginLeft:8 }}>
             <button onClick={() => { setLang("es"); localStorage.setItem("lang", "es"); }} style={{ padding:"5px 10px", borderRadius:6, fontSize:12, fontWeight:500, cursor:"pointer", background: lang==="es" ? "#fff" : "transparent", border:"none", fontFamily:"Inter, sans-serif", color: lang==="es" ? "#0A0A0A" : "#888" }}>ES</button>
             <button onClick={() => { setLang("en"); localStorage.setItem("lang", "en"); }} style={{ padding:"5px 10px", borderRadius:6, fontSize:12, fontWeight:500, cursor:"pointer", background: lang==="en" ? "#fff" : "transparent", border:"none", fontFamily:"Inter, sans-serif", color: lang==="en" ? "#0A0A0A" : "#888" }}>EN</button>
           </div>
@@ -113,40 +113,40 @@ export default function Contacto() {
 
       <div style={{ maxWidth:960, margin:"0 auto", padding:"64px 32px" }}>
         <div style={{ textAlign:"center", marginBottom:52 }}>
-          <div style={{ display:"inline-block", background:"#F3F0FF", color:"#5B21B6", fontSize:11, fontWeight:500, padding:"4px 12px", borderRadius:20, marginBottom:12 }}>{t.badge}</div>
-          <h1 style={{ fontSize:38, fontWeight:500, color:"#0A0A0A", letterSpacing:"-0.03em", marginBottom:10 }}>{t.title}</h1>
-          <p style={{ fontSize:15, color:"#666", maxWidth:480, margin:"0 auto" }}>{t.sub}</p>
+          <div style={{ display:"inline-block", background:"rgba(121,80,242,0.15)", color:"#A78BFA", fontSize:11, fontWeight:500, padding:"4px 12px", borderRadius:20, marginBottom:12 }}>{t.badge}</div>
+          <h1 style={{ fontSize:38, fontWeight:500, color:"#fff", letterSpacing:"-0.03em", marginBottom:10 }}>{t.title}</h1>
+          <p style={{ fontSize:15, color:"rgba(255,255,255,0.5)", maxWidth:480, margin:"0 auto" }}>{t.sub}</p>
         </div>
 
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:40, alignItems:"start" }}>
           <div>
             {sent ? (
-              <div style={{ background:"#F0FFF4", border:"1.5px solid #86EFAC", borderRadius:16, padding:"40px 32px", textAlign:"center" }}>
+              <div style={{ background:"rgba(64,192,87,0.08)", border:"1.5px solid #86EFAC", borderRadius:16, padding:"40px 32px", textAlign:"center" }}>
                 <div style={{ fontSize:40, marginBottom:16, color:"#16A34A" }}>✓</div>
-                <h2 style={{ fontSize:20, fontWeight:500, color:"#0A0A0A", marginBottom:8 }}>{t.successTitle}</h2>
-                <p style={{ fontSize:14, color:"#666" }}>{t.successSub}</p>
+                <h2 style={{ fontSize:20, fontWeight:500, color:"#fff", marginBottom:8 }}>{t.successTitle}</h2>
+                <p style={{ fontSize:14, color:"rgba(255,255,255,0.5)" }}>{t.successSub}</p>
                 <button onClick={() => { setSent(false); setForm({ name:"", email:"", subject:"", message:"" }); }} style={{ marginTop:20, padding:"10px 20px", background:"#7950F2", color:"#fff", border:"none", borderRadius:8, fontSize:13, fontWeight:500, cursor:"pointer" }}>
                   {lang === "es" ? "Enviar otro mensaje" : "Send another message"}
                 </button>
               </div>
             ) : (
-              <div style={{ background:"#fff", border:"1.5px solid #EAEAEA", borderRadius:16, padding:28, boxShadow:"0 2px 16px rgba(0,0,0,0.05)" }}>
+              <div style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:16, padding:28, boxShadow:"0 2px 16px rgba(0,0,0,0.05)" }}>
                 <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14, marginBottom:14 }}>
                   <div>
-                    <label style={{ fontSize:13, fontWeight:500, color:"#333", display:"block", marginBottom:6 }}>{t.nameLabel}</label>
+                    <label style={{ fontSize:13, fontWeight:500, color:"rgba(255,255,255,0.8)", display:"block", marginBottom:6 }}>{t.nameLabel}</label>
                     <input style={inp} type="text" placeholder={t.namePlaceholder} value={form.name} onChange={e => setForm({...form, name:e.target.value})} />
                   </div>
                   <div>
-                    <label style={{ fontSize:13, fontWeight:500, color:"#333", display:"block", marginBottom:6 }}>{t.emailLabel}</label>
+                    <label style={{ fontSize:13, fontWeight:500, color:"rgba(255,255,255,0.8)", display:"block", marginBottom:6 }}>{t.emailLabel}</label>
                     <input style={inp} type="email" placeholder={t.emailPlaceholder} value={form.email} onChange={e => setForm({...form, email:e.target.value})} />
                   </div>
                 </div>
                 <div style={{ marginBottom:14 }}>
-                  <label style={{ fontSize:13, fontWeight:500, color:"#333", display:"block", marginBottom:6 }}>{t.subjectLabel}</label>
+                  <label style={{ fontSize:13, fontWeight:500, color:"rgba(255,255,255,0.8)", display:"block", marginBottom:6 }}>{t.subjectLabel}</label>
                   <input style={inp} type="text" placeholder={t.subjectPlaceholder} value={form.subject} onChange={e => setForm({...form, subject:e.target.value})} />
                 </div>
                 <div style={{ marginBottom:20 }}>
-                  <label style={{ fontSize:13, fontWeight:500, color:"#333", display:"block", marginBottom:6 }}>{t.messageLabel}</label>
+                  <label style={{ fontSize:13, fontWeight:500, color:"rgba(255,255,255,0.8)", display:"block", marginBottom:6 }}>{t.messageLabel}</label>
                   <textarea style={{ ...inp, minHeight:140, resize:"none" }} placeholder={t.messagePlaceholder} value={form.message} onChange={e => setForm({...form, message:e.target.value})} />
                 </div>
                 <button
@@ -161,29 +161,29 @@ export default function Contacto() {
           </div>
 
           <div>
-            <div style={{ background:"#FAFAFA", border:"0.5px solid #E8E8E8", borderRadius:16, padding:28, marginBottom:20 }}>
-              <h3 style={{ fontSize:16, fontWeight:500, color:"#0A0A0A", marginBottom:20 }}>{t.infoTitle}</h3>
+            <div style={{ background:"#0A0A18", border:"1px solid rgba(255,255,255,0.08)", borderRadius:16, padding:28, marginBottom:20 }}>
+              <h3 style={{ fontSize:16, fontWeight:500, color:"#fff", marginBottom:20 }}>{t.infoTitle}</h3>
               {t.infoItems.map((item, i) => (
                 <div key={i} style={{ display:"flex", alignItems:"center", gap:14, marginBottom:18 }}>
                   <div style={{ width:38, height:38, background:"#F3F0FF", borderRadius:9, display:"flex", alignItems:"center", justifyContent:"center", color:"#7950F2", fontSize:16, flexShrink:0 }}>{item.icon}</div>
                   <div>
-                    <div style={{ fontSize:11, fontWeight:500, color:"#999", textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:2 }}>{item.label}</div>
-                    <div style={{ fontSize:13.5, color:"#0A0A0A", fontWeight:500 }}>{item.value}</div>
+                    <div style={{ fontSize:11, fontWeight:500, color:"rgba(255,255,255,0.3)", textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:2 }}>{item.label}</div>
+                    <div style={{ fontSize:13.5, color:"#fff", fontWeight:500 }}>{item.value}</div>
                   </div>
                 </div>
               ))}
             </div>
 
-            <div style={{ background:"#fff", border:"0.5px solid #E8E8E8", borderRadius:16, padding:28 }}>
-              <h3 style={{ fontSize:16, fontWeight:500, color:"#0A0A0A", marginBottom:16 }}>{t.faqTitle}</h3>
+            <div style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:16, padding:28 }}>
+              <h3 style={{ fontSize:16, fontWeight:500, color:"#fff", marginBottom:16 }}>{t.faqTitle}</h3>
               {t.faqs.map((faq, i) => (
                 <div key={i} style={{ borderBottom: i < t.faqs.length - 1 ? "0.5px solid #F0F0F0" : "none" }}>
                   <button onClick={() => setOpenFaq(openFaq === i ? null : i)} style={{ width:"100%", padding:"13px 0", display:"flex", alignItems:"center", justifyContent:"space-between", background:"none", border:"none", cursor:"pointer", fontFamily:"Inter, sans-serif", textAlign:"left" }}>
-                    <span style={{ fontSize:13.5, fontWeight:500, color:"#0A0A0A" }}>{faq.q}</span>
-                    <span style={{ fontSize:16, color:"#999", transform: openFaq === i ? "rotate(45deg)" : "none", transition:"transform 0.15s", flexShrink:0 }}>+</span>
+                    <span style={{ fontSize:13.5, fontWeight:500, color:"#fff" }}>{faq.q}</span>
+                    <span style={{ fontSize:16, color:"rgba(255,255,255,0.3)", transform: openFaq === i ? "rotate(45deg)" : "none", transition:"transform 0.15s", flexShrink:0 }}>+</span>
                   </button>
                   {openFaq === i && (
-                    <div style={{ paddingBottom:13, fontSize:13, color:"#666", lineHeight:1.7 }}>{faq.a}</div>
+                    <div style={{ paddingBottom:13, fontSize:13, color:"rgba(255,255,255,0.5)", lineHeight:1.7 }}>{faq.a}</div>
                   )}
                 </div>
               ))}
@@ -195,9 +195,9 @@ export default function Contacto() {
       <div style={{ padding:32, borderTop:"0.5px solid #F0F0F0", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
         <div style={{ display:"flex", alignItems:"center", gap:9 }}>
           <div style={{ width:26, height:26, background:"#7950F2", borderRadius:7, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:11, fontWeight:500 }}>Ai</div>
-          <span style={{ fontSize:13, fontWeight:500, color:"#0A0A0A" }}>Ai<span style={{ color:"#7950F2" }}>Studio</span>Brand</span>
+          <span style={{ fontSize:13, fontWeight:500, color:"#fff" }}>Ai<span style={{ color:"#7950F2" }}>Studio</span>Brand</span>
         </div>
-        <div style={{ fontSize:12, color:"#bbb" }}>2025 AiStudioBrand.</div>
+        <div style={{ fontSize:12, color:"rgba(255,255,255,0.25)" }}>2025 AiStudioBrand.</div>
       </div>
     </div>
   );
