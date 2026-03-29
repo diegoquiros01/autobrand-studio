@@ -150,9 +150,11 @@ export default function Generar() {
           <div style={{ width:32, height:32, background:D.purple, borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:500, fontSize:13 }}>Ai</div>
           <span style={{ fontSize:16, fontWeight:500, color:D.text }}>Ai<span style={{ color:D.purpleLight }}>Studio</span>Brand</span>
         </div>
-        <div style={{ display:"flex", gap:8, marginLeft:"auto" }}>
+        <div style={{ display:"flex", gap:8, marginLeft:"auto", alignItems:"center" }}>
           <button onClick={() => router.push("/biblioteca")} style={{ padding:"7px 14px", borderRadius:8, fontSize:13, color:D.text2, cursor:"pointer", background:"none", border:"none" }}>Mi biblioteca</button>
           <button onClick={() => router.push("/brand-profile")} style={{ padding:"7px 14px", borderRadius:8, fontSize:13, color:D.text2, cursor:"pointer", background:"none", border:"none" }}>Brand Profile</button>
+          <button onClick={() => router.push("/cuenta")} style={{ padding:"7px 14px", borderRadius:8, fontSize:13, color:D.text2, cursor:"pointer", background:"none", border:"none" }}>Mi cuenta</button>
+          <button onClick={async () => { await supabase.auth.signOut(); router.push("/"); }} style={{ padding:"7px 14px", borderRadius:8, fontSize:12, color:"rgba(255,255,255,0.3)", cursor:"pointer", background:"none", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8 }}>Salir</button>
         </div>
       </nav>
 
