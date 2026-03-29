@@ -24,15 +24,21 @@ export default function Biblioteca() {
 
   const loadAssets = async (userId) => {
     setLoading(true);
-    const { data, error } = await supabase.storage
-      .from("assets")
-      .list(userId + "/", { sortBy: { column: "created_at", order: "desc" } });
-    if (data) {
-      const withUrls = await Promise.all(data.map(async (file) => {
-        const { data: urlData } = supabase.storage.from("assets").getPublicUrl(userId + "/" + file.name);
-        return { ...file, url: urlData.publicUrl };
-      }));
-      setAssets(withUrls);
+    try {
+      const { data, error } = await supabase.storage
+        .from("assets")
+        .list(userId + "/resultados/", { sortBy: { column: "created_at", order: "desc" } });
+      if (data && data.length > 0) {
+        const withUrls = await Promise.all(data.map(async (file) => {
+          const { data: urlData } = supabase.storage.from("assets").getPublicUrl(userId + "/resultados/" + file.name);
+          return { ...file, url: urlData.publicUrl };
+        }));
+        setAssets(withUrls.filter(a => a.url));
+      } else {
+        setAssets([]);
+      }
+    } catch (e) {
+      setAssets([]);
     }
     setLoading(false);
   };
@@ -54,7 +60,7 @@ export default function Biblioteca() {
 
   const deleteAsset = async (fileName) => {
     if (!user) return;
-    const path = user.id + "/" + fileName;
+    const path = user.id + "/resultados/" + fileName;
     await supabase.storage.from("assets").remove([path]);
     loadAssets(user.id);
   };
@@ -80,12 +86,7 @@ export default function Biblioteca() {
             <h1 style={{ fontSize:26, fontWeight:500, color:"#fff", marginBottom:6, letterSpacing:"-0.02em" }}>Biblioteca de assets</h1>
             <p style={{ fontSize:14, color:"rgba(255,255,255,0.4)" }}>Tus fotos, logos y referencias visuales. AiStudioBrand los usa al generar contenido.</p>
           </div>
-          <button
-            onClick={() => fileRef.current.click()}
-            style={{ padding:"10px 20px", background:"#7950F2", color:"#fff", border:"none", borderRadius:9, fontSize:13.5, fontWeight:500, cursor:"pointer" }}
-          >
-            + Subir assets
-          </button>
+  
         </div>
 
         <input
