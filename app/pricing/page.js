@@ -70,6 +70,27 @@ export default function Pricing() {
     if (saved) setLang(saved);
   }, []);
   const [openFaq, setOpenFaq] = useState(null);
+  const [loadingPlan, setLoadingPlan] = useState(null);
+
+  const handleCheckout = async (planName) => {
+    setLoadingPlan(planName);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      const priceId = planName === "Professional"
+        ? process.env.NEXT_PUBLIC_STRIPE_PROFESSIONAL_PRICE_ID || "price_1TGRHAFZXtgfLmPe79t0RPn6"
+        : "price_1TGRHYFZXtgfLmPealbgoQLu";
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ priceId, userId: user?.id || "", email: user?.email || "" }),
+      });
+      const data = await res.json();
+      if (data.url) window.location.href = data.url;
+    } catch(e) {
+      console.error(e);
+    }
+    setLoadingPlan(null);
+  };
   const t = content[lang];
 
   const nav = { display:"flex", alignItems:"center", padding:"0 32px", height:62, borderBottom:"1px solid rgba(255,255,255,0.08)", background:"#111122", position:"sticky", top:0, zIndex:100 };
