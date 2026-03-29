@@ -15,7 +15,7 @@ export default function Generar() {
   const [selected, setSelected] = useState(null);
   const [editedCopy, setEditedCopy] = useState("");
   const [referencias, setReferencias] = useState([]);
-  const [talento, setTalento] = useState(null);
+  const [talentos, setTalentos] = useState([]);
   const [generatingImg, setGeneratingImg] = useState(false);
   const [resultado, setResultado] = useState(null);
   const [savedToLibrary, setSavedToLibrary] = useState(false);
@@ -66,8 +66,12 @@ export default function Generar() {
     setReferencias(arr);
   };
 
-  const handleTalento = (file) => {
-    setTalento({ file, url: URL.createObjectURL(file) });
+  const handleTalentos = (files) => {
+    const arr = Array.from(files).slice(0, 3).map(f => ({
+      file: f,
+      url: URL.createObjectURL(f),
+    }));
+    setTalentos(prev => [...prev, ...arr].slice(0, 3));
   };
 
   const toBase64 = (file) => new Promise((res, rej) => {
@@ -106,10 +110,12 @@ export default function Generar() {
         data: await toBase64(r.file),
         mimeType: r.file.type,
       })));
-      const talBase64 = talento ? {
-        data: await toBase64(talento.file),
-        mimeType: talento.file.type,
-      } : null;
+      const talBase64 = talentos.length > 0
+        ? await Promise.all(talentos.map(async t => ({
+            data: await toBase64(t.file),
+            mimeType: t.file.type,
+          })))
+        : [];
 
       const res = await fetch("/api/generate-image", {
         method: "POST",
@@ -118,7 +124,7 @@ export default function Generar() {
           prompt: prop.hook + ". " + prop.copy,
           brandProfile,
           referencias: refBase64,
-          talento: talBase64,
+          talentos: talBase64,
           editedCopy,
         }),
       });
@@ -319,21 +325,27 @@ export default function Generar() {
             <h1 style={{ fontSize:22, fontWeight:500, color:"#0A0A0A", marginBottom:4, letterSpacing:"-0.02em" }}>Foto de talento</h1>
             <p style={{ fontSize:13.5, color:"#888", marginBottom:24 }}>Sube una foto tuya o de una persona para incluirla en la imagen — o salta este paso</p>
 
-            <input ref={talentInput} type="file" accept="image/*" style={{ display:"none" }} onChange={e => handleTalento(e.target.files[0])} />
+            <input ref={talentInput} type="file" accept="image/*" multiple style={{ display:"none" }} onChange={e => handleTalentos(e.target.files)} />
 
             {skippedTalent ? (
               <div style={{ border:"2px dashed #F0F0F0", borderRadius:14, padding:"48px 20px", textAlign:"center", marginBottom:16, background:"#F9F9F9", opacity:0.5 }}>
                 <div style={{ fontSize:36, opacity:0.2, marginBottom:12 }}>◎</div>
                 <div style={{ fontSize:14, color:"#bbb", fontWeight:500 }}>Paso omitido</div>
               </div>
-            ) : talento ? (
+            ) : talentos.length > 0 ? (
               <div style={{ marginBottom:16 }}>
-                <div style={{ borderRadius:14, overflow:"hidden", border:"1.5px solid #7950F2", marginBottom:10, maxWidth:280, margin:"0 auto 12px" }}>
-                  <img src={talento.url} alt="" style={{ width:"100%", aspectRatio:"1", objectFit:"cover", display:"block" }} />
+                <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:10, marginBottom:12 }}>
+                  {talentos.map((t, i) => (
+                    <div key={i} style={{ position:"relative" }}>
+                      <img src={t.url} alt="" style={{ width:"100%", aspectRatio:"1", objectFit:"cover", display:"block", borderRadius:10, border:"1.5px solid #7950F2" }} />
+                      <button onClick={() => setTalentos(prev => prev.filter((_, j) => j !== i))} style={{ position:"absolute", top:4, right:4, width:20, height:20, borderRadius:"50%", background:"#DC2626", border:"none", color:"#fff", fontSize:11, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center" }}>x</button>
+                    </div>
+                  ))}
+                  {talentos.length < 3 && (
+                    <div onClick={() => talentInput.current.click()} style={{ aspectRatio:"1", border:"2px dashed #E0E0E0", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", fontSize:24, color:"#ccc" }}>+</div>
+                  )}
                 </div>
-                <button onClick={() => setTalento(null)} style={{ display:"block", margin:"0 auto", padding:"7px 16px", background:"none", border:"1.5px solid #E0E0E0", borderRadius:8, fontSize:12, color:"#888", cursor:"pointer" }}>
-                  Cambiar foto
-                </button>
+                <div style={{ fontSize:12, color:"#999", textAlign:"center" }}>{talentos.length}/3 fotos · Haz clic en + para agregar más</div>
               </div>
             ) : (
               <div
@@ -355,7 +367,7 @@ export default function Generar() {
             >
               {generatingImg ? "Generando imagen con IA..." : "Generar imagen final →"}
             </button>
-            <button onClick={() => { setSkippedTalent(true); setTalento(null); generarImagen(); }} disabled={generatingImg} style={{ ...skipBtn, cursor: generatingImg ? "not-allowed" : "pointer" }}>
+            <button onClick={() => { setSkippedTalent(true); setTalentos([]); generarImagen(); }} disabled={generatingImg} style={{ ...skipBtn, cursor: generatingImg ? "not-allowed" : "pointer" }}>
               {generatingImg ? "Generando..." : "Generar sin foto de talento"}
             </button>
 
@@ -408,7 +420,7 @@ export default function Generar() {
                 )}
 
                 <div style={{ display:"flex", gap:8 }}>
-                  <button onClick={() => { setStep(1); setProposals([]); setSelected(null); setPrompt(""); setReferencias([]); setTalento(null); setResultado(null); setSavedToLibrary(false); setSkippedRef(false); setSkippedTalent(false); }} style={{ flex:1, padding:10, border:"1.5px solid #E0E0E0", borderRadius:8, fontSize:13, fontWeight:500, cursor:"pointer", background:"#fff", color:"#333", fontFamily:"Inter, sans-serif" }}>
+                  <button onClick={() => { setStep(1); setProposals([]); setSelected(null); setPrompt(""); setReferencias([]); setTalentos([]); setResultado(null); setSavedToLibrary(false); setSkippedRef(false); setSkippedTalent(false); }} style={{ flex:1, padding:10, border:"1.5px solid #E0E0E0", borderRadius:8, fontSize:13, fontWeight:500, cursor:"pointer", background:"#fff", color:"#333", fontFamily:"Inter, sans-serif" }}>
                     Nueva pieza
                   </button>
                   <button onClick={() => router.push("/biblioteca")} style={{ flex:1, padding:10, border:"none", borderRadius:8, fontSize:13, fontWeight:500, cursor:"pointer", background:"#7950F2", color:"#fff", fontFamily:"Inter, sans-serif" }}>
