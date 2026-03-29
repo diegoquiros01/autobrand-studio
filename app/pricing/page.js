@@ -139,8 +139,8 @@ export default function Pricing() {
               {p.feats.map((f, j) => (
                 <div key={j} style={priceFeat}><span style={{ color:"#40C057", fontSize:13 }}>✓</span> {f}</div>
               ))}
-              <button style={p.featured ? priceBtnP : priceBtn} onClick={() => router.push("/login")}>
-                {i === 0 ? t.cta1 : i === 1 ? t.cta2 : t.cta3}
+              <button style={p.featured ? priceBtnP : priceBtn} onClick={() => i === 0 ? router.push("/login") : handleCheckout(p.name)} disabled={loadingPlan === p.name}>
+                {loadingPlan === p.name ? "..." : i === 0 ? t.cta1 : i === 1 ? t.cta2 : t.cta3}
               </button>
             </div>
           ))}
