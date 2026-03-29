@@ -1,10 +1,12 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../lib/supabase";
 
 export default function Login() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [mode, setMode] = useState("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -18,8 +20,14 @@ export default function Login() {
     setLoading(true);
     setError("");
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) setError(error.message);
-    else router.push("/");
+    if (error) {
+      setError(error.message);
+    } else {
+      const redirect = searchParams.get("redirect");
+      const plan = searchParams.get("plan");
+      if (redirect === "pricing") router.push("/pricing");
+      else router.push("/");
+    }
     setLoading(false);
   };
 
@@ -34,7 +42,11 @@ export default function Login() {
       if (data.user) {
         await supabase.from("profiles").insert({ id: data.user.id, email, nombre });
       }
-      setSuccess("Cuenta creada. Revisa tu email para confirmar.");
+      const redirect = searchParams.get("redirect");
+      if (redirect === "pricing") {
+        setTimeout(() => router.push("/pricing"), 1000);
+      }
+      setSuccess("Cuenta creada exitosamente.");
     }
     setLoading(false);
   };
