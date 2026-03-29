@@ -327,7 +327,7 @@ export default function Generar() {
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:20, alignItems:"start", filter: showTrialModal ? "blur(4px)" : "none", pointerEvents: showTrialModal ? "none" : "auto" }}>
               <div>
                 <img src={"data:" + resultado.mimeType + ";base64," + resultado.image} alt="Imagen generada" style={{ width:"100%", borderRadius:14, display:"block", border:"1px solid " + D.border }} />
-                {!showTrialModal && (
+                {savedToLibrary && (
                   <button onClick={() => { const a = document.createElement("a"); a.href = "data:" + resultado.mimeType + ";base64," + resultado.image; a.download = "aistudiobrand.png"; a.click(); }}
                     style={{ width:"100%", padding:11, background:"rgba(255,255,255,0.06)", color:D.text2, border:"1px solid " + D.border, borderRadius:9, fontSize:13, fontWeight:500, cursor:"pointer", marginTop:10, fontFamily:"Inter, sans-serif" }}>
                     Descargar imagen
@@ -344,10 +344,17 @@ export default function Generar() {
                     Guardado en tu biblioteca
                   </div>
                 )}
-                {!showTrialModal && (
+                {savedToLibrary ? (
                   <div style={{ display:"flex", gap:8 }}>
                     <button onClick={resetAll} style={{ flex:1, padding:10, border:"1px solid " + D.border, borderRadius:8, fontSize:13, fontWeight:500, cursor:"pointer", background:"transparent", color:D.text2, fontFamily:"Inter, sans-serif" }}>Nueva pieza</button>
                     <button onClick={() => router.push("/biblioteca")} style={{ flex:1, padding:10, border:"none", borderRadius:8, fontSize:13, fontWeight:500, cursor:"pointer", background:D.purple, color:"#fff", fontFamily:"Inter, sans-serif" }}>Ver biblioteca</button>
+                  </div>
+                ) : (
+                  <div style={{ background:"rgba(121,80,242,0.1)", border:"1px solid rgba(121,80,242,0.25)", borderRadius:10, padding:"14px 16px", textAlign:"center" }}>
+                    <div style={{ fontSize:13, color:D.purpleLight, marginBottom:10, fontWeight:500 }}>Crea una cuenta para descargar y guardar esta pieza</div>
+                    <button onClick={() => router.push("/login")} style={{ width:"100%", padding:11, background:D.purple, color:"#fff", border:"none", borderRadius:9, fontSize:13.5, fontWeight:500, cursor:"pointer", fontFamily:"Inter, sans-serif" }}>
+                      Crear cuenta gratis →
+                    </button>
                   </div>
                 )}
               </div>
@@ -365,7 +372,7 @@ export default function Generar() {
             <button onClick={() => router.push("/login")} style={{ width:"100%", padding:13, background:"linear-gradient(135deg,#7950F2,#4C6EF5)", color:"#fff", border:"none", borderRadius:10, fontSize:15, fontWeight:500, cursor:"pointer", fontFamily:"Inter, sans-serif", marginBottom:10 }}>
               Crear cuenta gratis
             </button>
-            <button onClick={() => setShowTrialModal(false)} style={{ width:"100%", padding:12, background:"transparent", color:"rgba(255,255,255,0.2)", border:"none", borderRadius:10, fontSize:13, cursor:"pointer", fontFamily:"Inter, sans-serif" }}>
+            <button onClick={() => { setShowTrialModal(false); }} style={{ width:"100%", padding:12, background:"transparent", color:"rgba(255,255,255,0.2)", border:"none", borderRadius:10, fontSize:13, cursor:"pointer", fontFamily:"Inter, sans-serif" }}>
               Solo ver el resultado (sin guardar)
             </button>
             <div style={{ fontSize:11, color:D.text3, marginTop:12 }}>Sin tarjeta de credito - 20 generaciones gratis</div>
