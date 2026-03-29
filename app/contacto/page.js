@@ -67,7 +67,12 @@ const content = {
 
 export default function Contacto() {
   const router = useRouter();
-  const [lang, setLang] = useState("es");
+  const [lang, setLang] = useState("en");
+
+  useEffect(() => {
+    const saved = localStorage.getItem("lang");
+    if (saved) setLang(saved);
+  }, []);
   const [form, setForm] = useState({ name:"", email:"", subject:"", message:"" });
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
@@ -93,19 +98,12 @@ export default function Contacto() {
           <span style={{ fontSize:15, fontWeight:500, color:"#0A0A0A" }}>Ai<span style={{ color:"#7950F2" }}>Studio</span>Brand</span>
         </div>
         <div style={{ display:"flex", gap:4, marginLeft:"auto", alignItems:"center" }}>
-          {t.nav.map((item, i) => (
-            <button key={i} onClick={() => {
-              if (i === 0) router.push("/");
-              else if (i === 1) router.push("/#features");
-              else if (i === 2) router.push("/pricing");
-              else if (i === 3) router.push("/contacto");
-            }} style={{ padding:"6px 13px", borderRadius:8, fontSize:13, color: i === 3 ? "#7950F2" : "#555", cursor:"pointer", background: i === 3 ? "#F3F0FF" : "none", border:"none", fontFamily:"Inter, sans-serif", fontWeight: i === 3 ? 500 : 400 }}>
-              {item}
-            </button>
-          ))}
+          <button onClick={() => router.push("/")} style={{ padding:"6px 13px", borderRadius:8, fontSize:13, color:"#555", cursor:"pointer", background:"none", border:"none", fontFamily:"Inter, sans-serif" }}>{lang === "en" ? "Home" : "Inicio"}</button>
+          <button onClick={() => router.push("/pricing")} style={{ padding:"6px 13px", borderRadius:8, fontSize:13, color:"#555", cursor:"pointer", background:"none", border:"none", fontFamily:"Inter, sans-serif" }}>{lang === "en" ? "Pricing" : "Precios"}</button>
+          <button onClick={() => router.push("/contacto")} style={{ padding:"6px 13px", borderRadius:8, fontSize:13, color:"#7950F2", cursor:"pointer", background:"#F3F0FF", border:"none", fontFamily:"Inter, sans-serif", fontWeight:500 }}>{lang === "en" ? "Contact" : "Contacto"}</button>
           <div style={{ display:"flex", background:"#F5F5F5", borderRadius:8, padding:3, gap:2, marginLeft:8 }}>
-            <button onClick={() => setLang("es")} style={{ padding:"5px 10px", borderRadius:6, fontSize:12, fontWeight:500, cursor:"pointer", background: lang==="es" ? "#fff" : "transparent", border:"none", fontFamily:"Inter, sans-serif", color: lang==="es" ? "#0A0A0A" : "#888" }}>ES</button>
-            <button onClick={() => setLang("en")} style={{ padding:"5px 10px", borderRadius:6, fontSize:12, fontWeight:500, cursor:"pointer", background: lang==="en" ? "#fff" : "transparent", border:"none", fontFamily:"Inter, sans-serif", color: lang==="en" ? "#0A0A0A" : "#888" }}>EN</button>
+            <button onClick={() => { setLang("es"); localStorage.setItem("lang", "es"); }} style={{ padding:"5px 10px", borderRadius:6, fontSize:12, fontWeight:500, cursor:"pointer", background: lang==="es" ? "#fff" : "transparent", border:"none", fontFamily:"Inter, sans-serif", color: lang==="es" ? "#0A0A0A" : "#888" }}>ES</button>
+            <button onClick={() => { setLang("en"); localStorage.setItem("lang", "en"); }} style={{ padding:"5px 10px", borderRadius:6, fontSize:12, fontWeight:500, cursor:"pointer", background: lang==="en" ? "#fff" : "transparent", border:"none", fontFamily:"Inter, sans-serif", color: lang==="en" ? "#0A0A0A" : "#888" }}>EN</button>
           </div>
           <button onClick={() => router.push("/login")} style={{ padding:"8px 18px", background:"#7950F2", color:"#fff", border:"none", borderRadius:8, fontSize:13, fontWeight:500, cursor:"pointer", fontFamily:"Inter, sans-serif", marginLeft:4 }}>
             {lang === "es" ? "Empieza gratis" : "Start free"}

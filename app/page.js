@@ -1,10 +1,15 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 export default function Landing() {
   const router = useRouter();
   const [lang, setLang] = useState("en");
+
+  useEffect(() => {
+    const saved = localStorage.getItem("lang");
+    if (saved) setLang(saved);
+  }, []);
 
   const S = {
     nav: { display:"flex", alignItems:"center", padding:"0 32px", height:62, borderBottom:"1px solid #F0F0F0", background:"#fff", position:"sticky", top:0, zIndex:100 },
@@ -46,8 +51,8 @@ export default function Landing() {
           <button style={S.navLink} onClick={() => router.push("/pricing")}>{lang === "en" ? "Pricing" : "Precios"}</button>
           <button style={S.navLink} onClick={() => router.push("/contacto")}>{lang === "en" ? "Contact" : "Contacto"}</button>
           <div style={{ display:"flex", background:"#F5F5F5", borderRadius:8, padding:3, gap:2, marginLeft:8 }}>
-            <button onClick={() => setLang("en")} style={{ padding:"5px 10px", borderRadius:6, fontSize:12, fontWeight:500, cursor:"pointer", background: lang==="en" ? "#fff" : "transparent", border:"none", fontFamily:"Inter, sans-serif", color: lang==="en" ? "#0A0A0A" : "#888" }}>EN</button>
-            <button onClick={() => setLang("es")} style={{ padding:"5px 10px", borderRadius:6, fontSize:12, fontWeight:500, cursor:"pointer", background: lang==="es" ? "#fff" : "transparent", border:"none", fontFamily:"Inter, sans-serif", color: lang==="es" ? "#0A0A0A" : "#888" }}>ES</button>
+            <button onClick={() => { setLang("en"); localStorage.setItem("lang", "en"); }} style={{ padding:"5px 10px", borderRadius:6, fontSize:12, fontWeight:500, cursor:"pointer", background: lang==="en" ? "#fff" : "transparent", border:"none", fontFamily:"Inter, sans-serif", color: lang==="en" ? "#0A0A0A" : "#888" }}>EN</button>
+            <button onClick={() => { setLang("es"); localStorage.setItem("lang", "es"); }} style={{ padding:"5px 10px", borderRadius:6, fontSize:12, fontWeight:500, cursor:"pointer", background: lang==="es" ? "#fff" : "transparent", border:"none", fontFamily:"Inter, sans-serif", color: lang==="es" ? "#0A0A0A" : "#888" }}>ES</button>
           </div>
           <button style={{ padding:"7px 16px", background:"#fff", color:"#0A0A0A", border:"1.5px solid #E0E0E0", borderRadius:8, fontSize:13, fontWeight:500, cursor:"pointer", marginLeft:4 }} onClick={() => router.push("/login")}>{lang === "en" ? "Sign in" : "Iniciar sesión"}</button>
           <button style={S.navCta} onClick={() => router.push("/login")}>{lang === "en" ? "Start free" : "Empieza gratis"}</button>
@@ -55,18 +60,18 @@ export default function Landing() {
       </nav>
 
       <div style={{ padding:"72px 32px 56px", textAlign:"center", maxWidth:780, margin:"0 auto" }}>
-        <div style={S.heroBadge}><span style={{ width:6, height:6, borderRadius:"50%", background:"#7950F2", display:"inline-block" }}></span> IA que aprende tu marca</div>
+        <div style={S.heroBadge}><span style={{ width:6, height:6, borderRadius:"50%", background:"#7950F2", display:"inline-block" }}></span> {lang === "en" ? "AI that learns your brand" : "IA que aprende tu marca"}</div>
         <h1 style={{ fontSize:42, fontWeight:500, color:"#0A0A0A", lineHeight:1.12, letterSpacing:"-0.03em", marginBottom:16 }}>
-          Contenido que suena<br /><span style={{ color:"#7950F2" }}>exactamente como tú</span>
+          {lang === "en" ? "Content that sounds" : "Contenido que suena"}<br /><span style={{ color:"#7950F2" }}>{lang === "en" ? "exactly like you" : "exactamente como tú"}</span>
         </h1>
         <p style={{ fontSize:16, color:"#666", lineHeight:1.7, maxWidth:520, margin:"0 auto 32px" }}>
-          AiStudioBrand aprende el ADN de tu marca y genera contenido para Instagram en segundos — alineado a tu estilo, tono y audiencia bicultural.
+          {lang === "en" ? "AiStudioBrand learns your brand DNA and generates Instagram content in seconds — aligned to your style, tone and bicultural audience." : "AiStudioBrand aprende el ADN de tu marca y genera contenido para Instagram en segundos — alineado a tu estilo, tono y audiencia bicultural."}
         </p>
         <div style={{ display:"flex", gap:10, justifyContent:"center", flexWrap:"wrap", marginBottom:14 }}>
-          <button style={S.btnPrimary} onClick={() => router.push("/login")}>Empieza gratis</button>
+          <button style={S.btnPrimary} onClick={() => router.push("/login")}>{lang === "en" ? "Start free" : "Empieza gratis"}</button>
           <button style={S.btnSecondary} onClick={() => router.push("/generar")}>Ver el generador</button>
         </div>
-        <div style={{ fontSize:12, color:"#999" }}>20 generaciones gratis · Sin tarjeta de crédito</div>
+        <div style={{ fontSize:12, color:"#999" }}>{lang === "en" ? "20 free generations · No credit card required" : "20 generaciones gratis · Sin tarjeta de crédito"}</div>
       </div>
 
       <div style={{ maxWidth:680, margin:"0 auto", padding:"0 32px 64px" }}>
@@ -110,9 +115,9 @@ export default function Landing() {
 
       <div id="features" style={{ padding:"64px 32px", background:"#FAFAFA" }}>
         <div style={{ maxWidth:900, margin:"0 auto" }}>
-          <div style={S.sectionBadge}>Funcionalidades</div>
-          <h2 style={{ fontSize:28, fontWeight:500, color:"#0A0A0A", letterSpacing:"-0.02em", marginBottom:10 }}>Todo lo que necesitas para escalar</h2>
-          <p style={{ fontSize:15, color:"#666", lineHeight:1.65, maxWidth:500, marginBottom:40 }}>Disenado para creadoras biculturales que quieren producir contenido profesional sin depender de un equipo.</p>
+          <div style={S.sectionBadge}>{lang === "en" ? "Features" : "Funcionalidades"}</div>
+          <h2 style={{ fontSize:28, fontWeight:500, color:"#0A0A0A", letterSpacing:"-0.02em", marginBottom:10 }}>{lang === "en" ? "Everything you need to scale" : "Todo lo que necesitas para escalar"}</h2>
+          <p style={{ fontSize:15, color:"#666", lineHeight:1.65, maxWidth:500, marginBottom:40 }}>{lang === "en" ? "Designed for bicultural creators who want to produce professional content without depending on a team." : "Diseñado para creadoras biculturales que quieren producir contenido profesional sin depender de un equipo."}</p>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(3, minmax(0,1fr))", gap:12 }}>
             {features.map((f, i) => (
               <div key={i} style={S.featCard}>
@@ -127,8 +132,8 @@ export default function Landing() {
 
       <div style={{ padding:"64px 32px", background:"#fff" }}>
         <div style={{ maxWidth:900, margin:"0 auto" }}>
-          <div style={S.sectionBadge}>Como funciona</div>
-          <h2 style={{ fontSize:28, fontWeight:500, color:"#0A0A0A", letterSpacing:"-0.02em", marginBottom:0 }}>Tres pasos para empezar</h2>
+          <div style={S.sectionBadge}>{lang === "en" ? "How it works" : "Cómo funciona"}</div>
+          <h2 style={{ fontSize:28, fontWeight:500, color:"#0A0A0A", letterSpacing:"-0.02em", marginBottom:0 }}>{lang === "en" ? "Three steps to get started" : "Tres pasos para empezar"}</h2>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(3, minmax(0,1fr))", gap:0, marginTop:40 }}>
             {[
               { n:"01", t:"Conecta tu marca", d:"Vincula tu Instagram o sube tu contenido existente. AiStudioBrand analiza todo y construye tu perfil de marca automáticamente." },
@@ -145,46 +150,13 @@ export default function Landing() {
         </div>
       </div>
 
-      <div id="pricing" style={{ padding:"64px 32px", background:"#FAFAFA" }}>
-        <div style={{ maxWidth:860, margin:"0 auto" }}>
-          <div style={{ textAlign:"center" }}>
-            <div style={S.sectionBadge}>Precios</div>
-            <h2 style={{ fontSize:28, fontWeight:500, color:"#0A0A0A", letterSpacing:"-0.02em", marginBottom:8 }}>Elige tu plan</h2>
-            <p style={{ fontSize:14, color:"#777" }}>Empieza gratis. Escala cuando lo necesites.</p>
-          </div>
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(3, minmax(0,1fr))", gap:12, marginTop:40 }}>
-            {[
-              { name:"Free", price:"$0", per:"para siempre", gens:"100 generaciones / mes", feats:["Brand Profile basico","5 propuestas por prompt","Biblioteca de assets","Soporte por email"], featured:false },
-              { name:"Professional", price:"$149", per:"por mes", gens:"500 generaciones / mes", feats:["Todo lo del plan Free","Brand Profile avanzado con IA","Generacion de imagenes","Calendario de contenido","Soporte prioritario"], featured:true },
-              { name:"Enterprise", price:"$199", per:"por mes", gens:"5,000 generaciones / mes", feats:["Todo lo del Professional","Hasta 10 marcas activas","API access","Account manager dedicado","Onboarding personalizado"], featured:false },
-            ].map((p, i) => (
-              <div key={i} style={p.featured ? S.priceCardFeat : S.priceCard}>
-                {p.featured && <div style={{ position:"absolute", top:-11, left:"50%", transform:"translateX(-50%)", background:"#7950F2", color:"#fff", fontSize:11, fontWeight:500, padding:"3px 12px", borderRadius:20, whiteSpace:"nowrap" }}>Mas popular</div>}
-                <div style={{ fontSize:12, fontWeight:500, color:"#888", textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:10 }}>{p.name}</div>
-                <div style={{ fontSize:32, fontWeight:500, color:"#0A0A0A", letterSpacing:"-0.04em", marginBottom:4 }}>{p.price}</div>
-                <div style={{ fontSize:13, color:"#999", marginBottom:10 }}>{p.per}</div>
-                <div style={{ display:"inline-block", background:"#F3F0FF", color:"#5B21B6", fontSize:11, fontWeight:500, padding:"3px 10px", borderRadius:20, marginBottom:16 }}>{p.gens}</div>
-                <div style={{ height:"0.5px", background:"#F0F0F0", margin:"14px 0" }}></div>
-                {p.feats.map((f, j) => (
-                  <div key={j} style={S.priceFeat}><span style={{ color:"#40C057" }}>checkmark</span> {f}</div>
-                ))}
-                <button style={p.featured ? S.priceBtnP : S.priceBtn} onClick={() => router.push("/login")}>
-                  {p.featured ? "Empezar prueba gratis" : p.name === "Free" ? "Empezar gratis" : "Contactar ventas"}
-                </button>
-              </div>
-            ))}
-          </div>
-          <div style={{ textAlign:"center", fontSize:12, color:"#999", marginTop:20 }}>Las primeras 20 generaciones son gratis sin registro · Sin tarjeta de credito</div>
-        </div>
-      </div>
-
       <div style={{ padding:"72px 32px", background:"#7950F2", textAlign:"center" }}>
-        <h2 style={{ fontSize:32, fontWeight:500, color:"#fff", letterSpacing:"-0.02em", marginBottom:12 }}>Lista para empezar?</h2>
-        <p style={{ fontSize:15, color:"rgba(255,255,255,0.75)", marginBottom:28 }}>Unete a las primeras creadoras que estan usando AiStudioBrand para escalar su contenido.</p>
+        <h2 style={{ fontSize:32, fontWeight:500, color:"#fff", letterSpacing:"-0.02em", marginBottom:12 }}>{lang === "en" ? "Ready to get started?" : "Lista para empezar?"}</h2>
+        <p style={{ fontSize:15, color:"rgba(255,255,255,0.75)", marginBottom:28 }}>{lang === "en" ? "Join the first creators using AiStudioBrand to scale their content." : "Únete a las primeras creadoras que están usando AiStudioBrand para escalar su contenido."}</p>
         <button style={{ padding:"14px 32px", background:"#fff", color:"#7950F2", border:"none", borderRadius:10, fontSize:15, fontWeight:500, cursor:"pointer", fontFamily:"Inter, sans-serif" }} onClick={() => router.push("/login")}>
-          Crear cuenta gratis
+          {lang === "en" ? "Create free account" : "Crear cuenta gratis"}
         </button>
-        <div style={{ fontSize:12, color:"rgba(255,255,255,0.55)", marginTop:12 }}>20 generaciones gratis · Sin tarjeta de credito</div>
+        <div style={{ fontSize:12, color:"rgba(255,255,255,0.55)", marginTop:12 }}>{lang === "en" ? "20 free generations · No credit card required" : "20 generaciones gratis · Sin tarjeta de crédito"}</div>
       </div>
 
       <div style={{ padding:32, borderTop:"0.5px solid #F0F0F0", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
@@ -192,10 +164,10 @@ export default function Landing() {
           <div style={{ width:26, height:26, background:"#7950F2", borderRadius:7, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:11, fontWeight:500 }}>Ai</div>
           <div>
             <div style={{ fontSize:13, fontWeight:500, color:"#0A0A0A" }}>Ai<span style={{ color:"#7950F2" }}>Studio</span>Brand</div>
-            <div style={{ fontSize:12, color:"#999", marginTop:2 }}>Contenido que suena como tú.</div>
+            <div style={{ fontSize:12, color:"#999", marginTop:2 }}>{lang === "en" ? "Content that sounds like you." : "Contenido que suena como tú."}</div>
           </div>
         </div>
-        <div style={{ fontSize:12, color:"#bbb" }}>2025 AiStudioBrand. Todos los derechos reservados.</div>
+        <div style={{ fontSize:12, color:"#bbb" }}>{lang === "en" ? "2025 AiStudioBrand. All rights reserved." : "2025 AiStudioBrand. Todos los derechos reservados."}</div>
       </div>
     </div>
   );

@@ -19,9 +19,9 @@ const content = {
     perMonth: "por mes",
     gens: "generaciones / mes",
     plans: [
-      { name:"Free", price:"$0", gens:"100", period:"para siempre", feats:["Brand Profile básico","5 propuestas por prompt","Generación de copy con IA","Biblioteca de assets","Soporte por email"], featured:false },
-      { name:"Professional", price:"$149", gens:"500", period:"por mes", feats:["Todo lo del plan Free","Brand Profile avanzado con IA","Generación de imágenes con Gemini","Calendario de contenido","Analytics e insights","Soporte prioritario"], featured:true },
-      { name:"Enterprise", price:"$199", gens:"5,000", period:"por mes", feats:["Todo lo del Professional","Hasta 10 marcas activas","API access","Account manager dedicado","Onboarding personalizado","SLA garantizado"], featured:false },
+      { name:"Free", price:"$0", gens:"20", period:"para siempre", feats:["Brand Profile básico","Solo paso 1 de generación","Copy con IA (5 propuestas)","Biblioteca: últimas 10 piezas","Soporte por email"], featured:false },
+      { name:"Professional", price:"$49", gens:"200", period:"por mes", feats:["Todo lo del plan Free","Flujo completo 3 pasos","Referencias visuales","Foto de talento en imagen","Brand Profile avanzado con IA","Biblioteca ilimitada","Soporte prioritario"], featured:true },
+      { name:"Enterprise", price:"$175", gens:"1,000", period:"por mes", feats:["Todo lo del Professional","Hasta 5 marcas activas","Calendario de contenido con IA","Analytics de performance","Account manager dedicado","Onboarding personalizado"], featured:false },
     ],
     faqTitle: "Preguntas frecuentes",
     faqs: [
@@ -47,9 +47,9 @@ const content = {
     perMonth: "per month",
     gens: "generations / month",
     plans: [
-      { name:"Free", price:"$0", gens:"100", period:"forever", feats:["Basic Brand Profile","5 proposals per prompt","AI copy generation","Asset library","Email support"], featured:false },
-      { name:"Professional", price:"$149", gens:"500", period:"per month", feats:["Everything in Free","Advanced AI Brand Profile","Image generation with Gemini","Content calendar","Analytics & insights","Priority support"], featured:true },
-      { name:"Enterprise", price:"$199", gens:"5,000", period:"per month", feats:["Everything in Professional","Up to 10 active brands","API access","Dedicated account manager","Personalized onboarding","Guaranteed SLA"], featured:false },
+      { name:"Free", price:"$0", gens:"20", period:"forever", feats:["Basic Brand Profile","Step 1 only (copy generation)","AI copy (5 proposals)","Library: last 10 pieces","Email support"], featured:false },
+      { name:"Professional", price:"$49", gens:"200", period:"per month", feats:["Everything in Free","Full 3-step flow","Visual references","Talent photo in image","Advanced AI Brand Profile","Unlimited library","Priority support"], featured:true },
+      { name:"Enterprise", price:"$175", gens:"1,000", period:"per month", feats:["Everything in Professional","Up to 5 active brands","AI content calendar","Performance analytics","Dedicated account manager","Personalized onboarding"], featured:false },
     ],
     faqTitle: "Frequently asked questions",
     faqs: [
@@ -63,7 +63,12 @@ const content = {
 
 export default function Pricing() {
   const router = useRouter();
-  const [lang, setLang] = useState("es");
+  const [lang, setLang] = useState("en");
+
+  useEffect(() => {
+    const saved = localStorage.getItem("lang");
+    if (saved) setLang(saved);
+  }, []);
   const [openFaq, setOpenFaq] = useState(null);
   const t = content[lang];
 
@@ -82,19 +87,12 @@ export default function Pricing() {
           <span style={{ fontSize:15, fontWeight:500, color:"#0A0A0A" }}>Ai<span style={{ color:"#7950F2" }}>Studio</span>Brand</span>
         </div>
         <div style={{ display:"flex", gap:4, marginLeft:"auto", alignItems:"center" }}>
-          {t.nav.map((item, i) => (
-            <button key={i} onClick={() => {
-              if (i === 0) router.push("/");
-              else if (i === 1) router.push("/#features");
-              else if (i === 2) router.push("/pricing");
-              else if (i === 3) router.push("/contacto");
-            }} style={{ padding:"6px 13px", borderRadius:8, fontSize:13, color: i === 2 ? "#7950F2" : "#555", cursor:"pointer", background: i === 2 ? "#F3F0FF" : "none", border:"none", fontFamily:"Inter, sans-serif", fontWeight: i === 2 ? 500 : 400 }}>
-              {item}
-            </button>
-          ))}
+          <button onClick={() => router.push("/")} style={{ padding:"6px 13px", borderRadius:8, fontSize:13, color:"#555", cursor:"pointer", background:"none", border:"none", fontFamily:"Inter, sans-serif" }}>{lang === "en" ? "Home" : "Inicio"}</button>
+          <button onClick={() => router.push("/pricing")} style={{ padding:"6px 13px", borderRadius:8, fontSize:13, color:"#7950F2", cursor:"pointer", background:"#F3F0FF", border:"none", fontFamily:"Inter, sans-serif", fontWeight:500 }}>{lang === "en" ? "Pricing" : "Precios"}</button>
+          <button onClick={() => router.push("/contacto")} style={{ padding:"6px 13px", borderRadius:8, fontSize:13, color:"#555", cursor:"pointer", background:"none", border:"none", fontFamily:"Inter, sans-serif" }}>{lang === "en" ? "Contact" : "Contacto"}</button>
           <div style={{ display:"flex", background:"#F5F5F5", borderRadius:8, padding:3, gap:2, marginLeft:8 }}>
-            <button onClick={() => setLang("es")} style={{ padding:"5px 10px", borderRadius:6, fontSize:12, fontWeight:500, cursor:"pointer", background: lang==="es" ? "#fff" : "transparent", border:"none", fontFamily:"Inter, sans-serif", color: lang==="es" ? "#0A0A0A" : "#888" }}>ES</button>
-            <button onClick={() => setLang("en")} style={{ padding:"5px 10px", borderRadius:6, fontSize:12, fontWeight:500, cursor:"pointer", background: lang==="en" ? "#fff" : "transparent", border:"none", fontFamily:"Inter, sans-serif", color: lang==="en" ? "#0A0A0A" : "#888" }}>EN</button>
+            <button onClick={() => { setLang("es"); localStorage.setItem("lang", "es"); }} style={{ padding:"5px 10px", borderRadius:6, fontSize:12, fontWeight:500, cursor:"pointer", background: lang==="es" ? "#fff" : "transparent", border:"none", fontFamily:"Inter, sans-serif", color: lang==="es" ? "#0A0A0A" : "#888" }}>ES</button>
+            <button onClick={() => { setLang("en"); localStorage.setItem("lang", "en"); }} style={{ padding:"5px 10px", borderRadius:6, fontSize:12, fontWeight:500, cursor:"pointer", background: lang==="en" ? "#fff" : "transparent", border:"none", fontFamily:"Inter, sans-serif", color: lang==="en" ? "#0A0A0A" : "#888" }}>EN</button>
           </div>
           <button onClick={() => router.push("/login")} style={{ padding:"8px 18px", background:"#7950F2", color:"#fff", border:"none", borderRadius:8, fontSize:13, fontWeight:500, cursor:"pointer", fontFamily:"Inter, sans-serif", marginLeft:4 }}>
             {lang === "es" ? "Empieza gratis" : "Start free"}
