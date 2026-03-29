@@ -33,6 +33,7 @@ export default function Generar() {
   const [skippedRef, setSkippedRef] = useState(false);
   const [skippedTalent, setSkippedTalent] = useState(false);
   const [brandProfile, setBrandProfile] = useState(null);
+  const [user, setUser] = useState(null);
   const [error, setError] = useState("");
   const refInput = useRef(null);
   const talentInput = useRef(null);
@@ -40,6 +41,7 @@ export default function Generar() {
   useEffect(() => {
     const bp = localStorage.getItem("brandProfile");
     if (bp) setBrandProfile(JSON.parse(bp));
+    supabase.auth.getUser().then(({ data: { user } }) => setUser(user));
   }, []);
 
   const generarCopy = async () => {
@@ -54,12 +56,16 @@ export default function Generar() {
     try {
       const res = await fetch("/api/generate", {
         method:"POST", headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({ prompt, tipo, brandProfile }),
+        body: JSON.stringify({ prompt, tipo, brandProfile, userId: user?.id || "" }),
       });
       const data = await res.json();
       clearInterval(iv); setCopyProgress(100);
       setTimeout(() => { setCopyProgress(0); setCopyMsg(""); }, 400);
-      setProposals(data.propuestas);
+      if (data.error === "limit_reached") {
+        setError("Alcanzaste tu limite de " + data.limit + " generaciones este mes. Actualiza tu plan para continuar.");
+      } else {
+        setProposals(data.propuestas);
+      }
     } catch(e) {
       clearInterval(iv); setCopyProgress(0); setError("Error generando copy.");
     }
