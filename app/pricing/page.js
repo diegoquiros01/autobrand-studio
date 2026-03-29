@@ -21,7 +21,7 @@ const content = {
     plans: [
       { name:"Free", price:"$0", gens:"20", period:"para siempre", feats:["Brand Profile básico","Solo paso 1 de generación","Copy con IA (5 propuestas)","Biblioteca: últimas 10 piezas","Soporte por email"], featured:false },
       { name:"Professional", price:"$49", gens:"200", period:"por mes", feats:["Todo lo del plan Free","Flujo completo 3 pasos","Referencias visuales","Foto de talento en imagen","Brand Profile avanzado con IA","Biblioteca ilimitada","Soporte prioritario"], featured:true },
-      { name:"Enterprise", price:"$175", gens:"1,000", period:"por mes", feats:["Todo lo del Professional","Hasta 5 marcas activas","Calendario de contenido con IA","Analytics de performance","Account manager dedicado","Onboarding personalizado"], featured:false },
+      { name:"Enterprise", price:"$175", gens:"1,000", period:"por mes", feats:["Todo lo del Free","Flujo completo 3 pasos","Referencias visuales","Foto de talento en imagen","Brand Profile avanzado con IA","Biblioteca ilimitada","Soporte prioritario","Hasta 5 marcas activas","Calendario de contenido con IA","Analytics de performance","Account manager dedicado","Onboarding personalizado"], featured:false },
     ],
     faqTitle: "Preguntas frecuentes",
     faqs: [
@@ -49,7 +49,7 @@ const content = {
     plans: [
       { name:"Free", price:"$0", gens:"20", period:"forever", feats:["Basic Brand Profile","Step 1 only (copy generation)","AI copy (5 proposals)","Library: last 10 pieces","Email support"], featured:false },
       { name:"Professional", price:"$49", gens:"200", period:"per month", feats:["Everything in Free","Full 3-step flow","Visual references","Talent photo in image","Advanced AI Brand Profile","Unlimited library","Priority support"], featured:true },
-      { name:"Enterprise", price:"$175", gens:"1,000", period:"per month", feats:["Everything in Professional","Up to 5 active brands","AI content calendar","Performance analytics","Dedicated account manager","Personalized onboarding"], featured:false },
+      { name:"Enterprise", price:"$175", gens:"1,000", period:"per month", feats:["Everything in Free","Full 3-step flow","Visual references","Talent photo in image","Advanced AI Brand Profile","Unlimited library","Priority support","Up to 5 active brands","AI content calendar","Performance analytics","Dedicated account manager","Personalized onboarding"], featured:false },
     ],
     faqTitle: "Frequently asked questions",
     faqs: [
