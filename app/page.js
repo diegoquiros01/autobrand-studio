@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 
 export default function Landing() {
   const router = useRouter();
-  const [lang, setLang] = useState("es");
+  const [lang, setLang] = useState("en");
 
   const S = {
     nav: { display:"flex", alignItems:"center", padding:"0 32px", height:62, borderBottom:"1px solid #F0F0F0", background:"#fff", position:"sticky", top:0, zIndex:100 },
@@ -37,14 +37,20 @@ export default function Landing() {
   return (
     <div style={{ minHeight:"100vh", background:"#fff", fontFamily:"Inter, sans-serif" }}>
       <nav style={S.nav}>
-        <div style={{ display:"flex", alignItems:"center", gap:9, cursor:"pointer" }} onClick={() => router.push("/generar")}>
+        <div style={{ display:"flex", alignItems:"center", gap:9, cursor:"pointer" }} onClick={() => router.push("/")}>
           <div style={S.logoIcon}>Ai</div>
           <span style={S.logoText}>Ai<span style={{ color:"#7950F2" }}>Studio</span>Brand</span>
         </div>
-        <div style={{ display:"flex", gap:6, marginLeft:"auto", alignItems:"center" }}>
-          <button style={S.navLink} onClick={() => document.getElementById("features").scrollIntoView({behavior:"smooth"})}>Funcionalidades</button>
-          <button style={S.navLink} onClick={() => document.getElementById("pricing").scrollIntoView({behavior:"smooth"})}>Precios</button>
-          <button style={S.navCta} onClick={() => router.push("/login")}>Empieza gratis</button>
+        <div style={{ display:"flex", gap:4, marginLeft:"auto", alignItems:"center" }}>
+          <button style={S.navLink} onClick={() => router.push("/")}>{lang === "en" ? "Home" : "Inicio"}</button>
+          <button style={S.navLink} onClick={() => router.push("/pricing")}>{lang === "en" ? "Pricing" : "Precios"}</button>
+          <button style={S.navLink} onClick={() => router.push("/contacto")}>{lang === "en" ? "Contact" : "Contacto"}</button>
+          <div style={{ display:"flex", background:"#F5F5F5", borderRadius:8, padding:3, gap:2, marginLeft:8 }}>
+            <button onClick={() => setLang("en")} style={{ padding:"5px 10px", borderRadius:6, fontSize:12, fontWeight:500, cursor:"pointer", background: lang==="en" ? "#fff" : "transparent", border:"none", fontFamily:"Inter, sans-serif", color: lang==="en" ? "#0A0A0A" : "#888" }}>EN</button>
+            <button onClick={() => setLang("es")} style={{ padding:"5px 10px", borderRadius:6, fontSize:12, fontWeight:500, cursor:"pointer", background: lang==="es" ? "#fff" : "transparent", border:"none", fontFamily:"Inter, sans-serif", color: lang==="es" ? "#0A0A0A" : "#888" }}>ES</button>
+          </div>
+          <button style={{ padding:"7px 16px", background:"#fff", color:"#0A0A0A", border:"1.5px solid #E0E0E0", borderRadius:8, fontSize:13, fontWeight:500, cursor:"pointer", marginLeft:4 }} onClick={() => router.push("/login")}>{lang === "en" ? "Sign in" : "Iniciar sesión"}</button>
+          <button style={S.navCta} onClick={() => router.push("/login")}>{lang === "en" ? "Start free" : "Empieza gratis"}</button>
         </div>
       </nav>
 
