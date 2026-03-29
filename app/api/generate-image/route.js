@@ -1,35 +1,27 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export async function POST(request) {
   const { prompt, brandProfile } = await request.json();
 
-  const brandContext = brandProfile ? `
-Marca: ${brandProfile.nombre}
-Tono: ${brandProfile.tono}
-Audiencia: ${brandProfile.audiencia}
-` : "";
+  const brandContext = brandProfile
+    ? "Brand: " + brandProfile.nombre + ". Tone: " + brandProfile.tono + ". Audience: " + brandProfile.audiencia + "."
+    : "";
 
-  const model = genAI.getGenerativeModel({ 
-    model: "gemini-2.0-flash-exp-image-generation",
-    generationConfig: { responseModalities: ["image", "text"] }
+  const imagePrompt = "Create a professional Instagram post image. " + brandContext + " Concept: " + prompt + ". Style: clean composition, vibrant colors, professional photography, square 1:1 format, social media ready.";
+
+  const response = await ai.models.generateContent({
+    model: "gemini-3.1-flash-image-preview",
+    contents: imagePrompt,
+    config: { responseModalities: ["TEXT", "IMAGE"] },
   });
 
-  const imagePrompt = `Create a professional Instagram post image.
-${brandContext}
-Concept: ${prompt}
-Style: clean composition, vibrant colors, professional photography style, 
-square format 1:1, social media ready, high quality.`;
-
-  const result = await model.generateContent(imagePrompt);
-  const response = await result.response;
-  
   for (const part of response.candidates[0].content.parts) {
     if (part.inlineData) {
-      return Response.json({ 
+      return Response.json({
         image: part.inlineData.data,
-        mimeType: part.inlineData.mimeType
+        mimeType: part.inlineData.mimeType,
       });
     }
   }
