@@ -1,0 +1,206 @@
+"use client";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+
+const content = {
+  es: {
+    nav: ["Inicio", "Funcionalidades", "Precios", "Contacto"],
+    badge: "Contacto",
+    title: "Hablemos",
+    sub: "Tienes preguntas sobre AiStudioBrand? Estamos aqui para ayudarte.",
+    namePlaceholder: "Tu nombre",
+    emailPlaceholder: "tu@email.com",
+    subjectPlaceholder: "Asunto",
+    messagePlaceholder: "Cuentanos como podemos ayudarte...",
+    send: "Enviar mensaje",
+    sending: "Enviando...",
+    successTitle: "Mensaje enviado",
+    successSub: "Te responderemos en menos de 24 horas.",
+    nameLabel: "Nombre",
+    emailLabel: "Email",
+    subjectLabel: "Asunto",
+    messageLabel: "Mensaje",
+    infoTitle: "Informacion de contacto",
+    infoItems: [
+      { icon:"@", label:"Email", value:"hola@aistudiobrand.com" },
+      { icon:"◎", label:"Soporte", value:"Lunes a Viernes, 9am - 6pm EST" },
+      { icon:"◉", label:"Respuesta", value:"Menos de 24 horas" },
+    ],
+    faqTitle: "Preguntas rapidas",
+    faqs: [
+      { q:"Como empiezo?", a:"Crea una cuenta gratis y tienes 20 generaciones de cortesia sin tarjeta de credito." },
+      { q:"Ofrecen demostracion?", a:"Si, puedes ver el generador en accion directamente en nuestra pagina principal." },
+      { q:"Tienen descuentos para emprendedoras?", a:"Contactanos y evaluamos tu caso. Tenemos programas especiales para creadoras en crecimiento." },
+    ],
+  },
+  en: {
+    nav: ["Home", "Features", "Pricing", "Contact"],
+    badge: "Contact",
+    title: "Let's talk",
+    sub: "Have questions about AiStudioBrand? We are here to help you.",
+    namePlaceholder: "Your name",
+    emailPlaceholder: "you@email.com",
+    subjectPlaceholder: "Subject",
+    messagePlaceholder: "Tell us how we can help you...",
+    send: "Send message",
+    sending: "Sending...",
+    successTitle: "Message sent",
+    successSub: "We will get back to you within 24 hours.",
+    nameLabel: "Name",
+    emailLabel: "Email",
+    subjectLabel: "Subject",
+    messageLabel: "Message",
+    infoTitle: "Contact information",
+    infoItems: [
+      { icon:"@", label:"Email", value:"hello@aistudiobrand.com" },
+      { icon:"◎", label:"Support", value:"Monday to Friday, 9am - 6pm EST" },
+      { icon:"◉", label:"Response", value:"Less than 24 hours" },
+    ],
+    faqTitle: "Quick questions",
+    faqs: [
+      { q:"How do I get started?", a:"Create a free account and get 20 complimentary generations with no credit card required." },
+      { q:"Do you offer a demo?", a:"Yes, you can see the generator in action directly on our home page." },
+      { q:"Do you have discounts for entrepreneurs?", a:"Contact us and we will evaluate your case. We have special programs for growing creators." },
+    ],
+  }
+};
+
+export default function Contacto() {
+  const router = useRouter();
+  const [lang, setLang] = useState("es");
+  const [form, setForm] = useState({ name:"", email:"", subject:"", message:"" });
+  const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
+  const [openFaq, setOpenFaq] = useState(null);
+  const t = content[lang];
+
+  const handleSubmit = async () => {
+    if (!form.name || !form.email || !form.message) return;
+    setSending(true);
+    await new Promise(r => setTimeout(r, 1500));
+    setSent(true);
+    setSending(false);
+  };
+
+  const inp = { width:"100%", border:"1.5px solid #E8E8E8", borderRadius:8, padding:"11px 13px", fontSize:14, fontFamily:"Inter, sans-serif", background:"#FAFAFA", color:"#0A0A0A", outline:"none" };
+  const nav = { display:"flex", alignItems:"center", padding:"0 32px", height:62, borderBottom:"1px solid #F0F0F0", background:"#fff", position:"sticky", top:0, zIndex:100 };
+
+  return (
+    <div style={{ minHeight:"100vh", background:"#fff", fontFamily:"Inter, sans-serif" }}>
+      <nav style={nav}>
+        <div style={{ display:"flex", alignItems:"center", gap:9, cursor:"pointer" }} onClick={() => router.push("/")}>
+          <div style={{ width:30, height:30, background:"#7950F2", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:12, fontWeight:500 }}>Ai</div>
+          <span style={{ fontSize:15, fontWeight:500, color:"#0A0A0A" }}>Ai<span style={{ color:"#7950F2" }}>Studio</span>Brand</span>
+        </div>
+        <div style={{ display:"flex", gap:4, marginLeft:"auto", alignItems:"center" }}>
+          {t.nav.map((item, i) => (
+            <button key={i} onClick={() => {
+              if (i === 0) router.push("/");
+              else if (i === 1) router.push("/#features");
+              else if (i === 2) router.push("/pricing");
+              else if (i === 3) router.push("/contacto");
+            }} style={{ padding:"6px 13px", borderRadius:8, fontSize:13, color: i === 3 ? "#7950F2" : "#555", cursor:"pointer", background: i === 3 ? "#F3F0FF" : "none", border:"none", fontFamily:"Inter, sans-serif", fontWeight: i === 3 ? 500 : 400 }}>
+              {item}
+            </button>
+          ))}
+          <div style={{ display:"flex", background:"#F5F5F5", borderRadius:8, padding:3, gap:2, marginLeft:8 }}>
+            <button onClick={() => setLang("es")} style={{ padding:"5px 10px", borderRadius:6, fontSize:12, fontWeight:500, cursor:"pointer", background: lang==="es" ? "#fff" : "transparent", border:"none", fontFamily:"Inter, sans-serif", color: lang==="es" ? "#0A0A0A" : "#888" }}>ES</button>
+            <button onClick={() => setLang("en")} style={{ padding:"5px 10px", borderRadius:6, fontSize:12, fontWeight:500, cursor:"pointer", background: lang==="en" ? "#fff" : "transparent", border:"none", fontFamily:"Inter, sans-serif", color: lang==="en" ? "#0A0A0A" : "#888" }}>EN</button>
+          </div>
+          <button onClick={() => router.push("/login")} style={{ padding:"8px 18px", background:"#7950F2", color:"#fff", border:"none", borderRadius:8, fontSize:13, fontWeight:500, cursor:"pointer", fontFamily:"Inter, sans-serif", marginLeft:4 }}>
+            {lang === "es" ? "Empieza gratis" : "Start free"}
+          </button>
+        </div>
+      </nav>
+
+      <div style={{ maxWidth:960, margin:"0 auto", padding:"64px 32px" }}>
+        <div style={{ textAlign:"center", marginBottom:52 }}>
+          <div style={{ display:"inline-block", background:"#F3F0FF", color:"#5B21B6", fontSize:11, fontWeight:500, padding:"4px 12px", borderRadius:20, marginBottom:12 }}>{t.badge}</div>
+          <h1 style={{ fontSize:38, fontWeight:500, color:"#0A0A0A", letterSpacing:"-0.03em", marginBottom:10 }}>{t.title}</h1>
+          <p style={{ fontSize:15, color:"#666", maxWidth:480, margin:"0 auto" }}>{t.sub}</p>
+        </div>
+
+        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:40, alignItems:"start" }}>
+          <div>
+            {sent ? (
+              <div style={{ background:"#F0FFF4", border:"1.5px solid #86EFAC", borderRadius:16, padding:"40px 32px", textAlign:"center" }}>
+                <div style={{ fontSize:40, marginBottom:16, color:"#16A34A" }}>✓</div>
+                <h2 style={{ fontSize:20, fontWeight:500, color:"#0A0A0A", marginBottom:8 }}>{t.successTitle}</h2>
+                <p style={{ fontSize:14, color:"#666" }}>{t.successSub}</p>
+                <button onClick={() => { setSent(false); setForm({ name:"", email:"", subject:"", message:"" }); }} style={{ marginTop:20, padding:"10px 20px", background:"#7950F2", color:"#fff", border:"none", borderRadius:8, fontSize:13, fontWeight:500, cursor:"pointer" }}>
+                  {lang === "es" ? "Enviar otro mensaje" : "Send another message"}
+                </button>
+              </div>
+            ) : (
+              <div style={{ background:"#fff", border:"1.5px solid #EAEAEA", borderRadius:16, padding:28, boxShadow:"0 2px 16px rgba(0,0,0,0.05)" }}>
+                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14, marginBottom:14 }}>
+                  <div>
+                    <label style={{ fontSize:13, fontWeight:500, color:"#333", display:"block", marginBottom:6 }}>{t.nameLabel}</label>
+                    <input style={inp} type="text" placeholder={t.namePlaceholder} value={form.name} onChange={e => setForm({...form, name:e.target.value})} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize:13, fontWeight:500, color:"#333", display:"block", marginBottom:6 }}>{t.emailLabel}</label>
+                    <input style={inp} type="email" placeholder={t.emailPlaceholder} value={form.email} onChange={e => setForm({...form, email:e.target.value})} />
+                  </div>
+                </div>
+                <div style={{ marginBottom:14 }}>
+                  <label style={{ fontSize:13, fontWeight:500, color:"#333", display:"block", marginBottom:6 }}>{t.subjectLabel}</label>
+                  <input style={inp} type="text" placeholder={t.subjectPlaceholder} value={form.subject} onChange={e => setForm({...form, subject:e.target.value})} />
+                </div>
+                <div style={{ marginBottom:20 }}>
+                  <label style={{ fontSize:13, fontWeight:500, color:"#333", display:"block", marginBottom:6 }}>{t.messageLabel}</label>
+                  <textarea style={{ ...inp, minHeight:140, resize:"none" }} placeholder={t.messagePlaceholder} value={form.message} onChange={e => setForm({...form, message:e.target.value})} />
+                </div>
+                <button
+                  onClick={handleSubmit}
+                  disabled={sending || !form.name || !form.email || !form.message}
+                  style={{ width:"100%", padding:13, background: sending || !form.name || !form.email || !form.message ? "#C5B8FB" : "linear-gradient(135deg,#7950F2,#4C6EF5)", color:"#fff", border:"none", borderRadius:10, fontSize:14.5, fontWeight:500, cursor: sending ? "not-allowed" : "pointer", fontFamily:"Inter, sans-serif" }}
+                >
+                  {sending ? t.sending : t.send}
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div>
+            <div style={{ background:"#FAFAFA", border:"0.5px solid #E8E8E8", borderRadius:16, padding:28, marginBottom:20 }}>
+              <h3 style={{ fontSize:16, fontWeight:500, color:"#0A0A0A", marginBottom:20 }}>{t.infoTitle}</h3>
+              {t.infoItems.map((item, i) => (
+                <div key={i} style={{ display:"flex", alignItems:"center", gap:14, marginBottom:18 }}>
+                  <div style={{ width:38, height:38, background:"#F3F0FF", borderRadius:9, display:"flex", alignItems:"center", justifyContent:"center", color:"#7950F2", fontSize:16, flexShrink:0 }}>{item.icon}</div>
+                  <div>
+                    <div style={{ fontSize:11, fontWeight:500, color:"#999", textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:2 }}>{item.label}</div>
+                    <div style={{ fontSize:13.5, color:"#0A0A0A", fontWeight:500 }}>{item.value}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ background:"#fff", border:"0.5px solid #E8E8E8", borderRadius:16, padding:28 }}>
+              <h3 style={{ fontSize:16, fontWeight:500, color:"#0A0A0A", marginBottom:16 }}>{t.faqTitle}</h3>
+              {t.faqs.map((faq, i) => (
+                <div key={i} style={{ borderBottom: i < t.faqs.length - 1 ? "0.5px solid #F0F0F0" : "none" }}>
+                  <button onClick={() => setOpenFaq(openFaq === i ? null : i)} style={{ width:"100%", padding:"13px 0", display:"flex", alignItems:"center", justifyContent:"space-between", background:"none", border:"none", cursor:"pointer", fontFamily:"Inter, sans-serif", textAlign:"left" }}>
+                    <span style={{ fontSize:13.5, fontWeight:500, color:"#0A0A0A" }}>{faq.q}</span>
+                    <span style={{ fontSize:16, color:"#999", transform: openFaq === i ? "rotate(45deg)" : "none", transition:"transform 0.15s", flexShrink:0 }}>+</span>
+                  </button>
+                  {openFaq === i && (
+                    <div style={{ paddingBottom:13, fontSize:13, color:"#666", lineHeight:1.7 }}>{faq.a}</div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ padding:32, borderTop:"0.5px solid #F0F0F0", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+        <div style={{ display:"flex", alignItems:"center", gap:9 }}>
+          <div style={{ width:26, height:26, background:"#7950F2", borderRadius:7, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:11, fontWeight:500 }}>Ai</div>
+          <span style={{ fontSize:13, fontWeight:500, color:"#0A0A0A" }}>Ai<span style={{ color:"#7950F2" }}>Studio</span>Brand</span>
+        </div>
+        <div style={{ fontSize:12, color:"#bbb" }}>2025 AiStudioBrand.</div>
+      </div>
+    </div>
+  );
+}

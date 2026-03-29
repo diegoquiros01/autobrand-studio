@@ -1,8 +1,10 @@
 "use client";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function Landing() {
   const router = useRouter();
+  const [lang, setLang] = useState("es");
 
   const S = {
     nav: { display:"flex", alignItems:"center", padding:"0 32px", height:62, borderBottom:"1px solid #F0F0F0", background:"#fff", position:"sticky", top:0, zIndex:100 },
