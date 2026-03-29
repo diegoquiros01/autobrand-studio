@@ -27,10 +27,10 @@ ${brandContext}
 
 Genera 5 propuestas de Instagram tipo "${tipo}" para: "${prompt}"
 
-Cada propuesta: hook (1 línea), copy (máximo 80 palabras), cta (1 línea).
+Cada propuesta: hook (1 linea), copy (maximo 80 palabras), cta (1 linea), hashtags (6-8 hashtags relevantes separados por espacios).
 
 Responde SOLO JSON puro sin backticks:
-{"propuestas":[{"id":1,"hook":"...","copy":"...","cta":"..."},{"id":2,"hook":"...","copy":"...","cta":"..."},{"id":3,"hook":"...","copy":"...","cta":"..."},{"id":4,"hook":"...","copy":"...","cta":"..."},{"id":5,"hook":"...","copy":"...","cta":"..."}]}`,
+{"propuestas":[{"id":1,"hook":"...","copy":"...","cta":"...","hashtags":"#tag1 #tag2 #tag3"},{"id":2,"hook":"...","copy":"...","cta":"...","hashtags":"#tag1 #tag2 #tag3"},{"id":3,"hook":"...","copy":"...","cta":"...","hashtags":"#tag1 #tag2 #tag3"},{"id":4,"hook":"...","copy":"...","cta":"...","hashtags":"#tag1 #tag2 #tag3"},{"id":5,"hook":"...","copy":"...","cta":"...","hashtags":"#tag1 #tag2 #tag3"}]}`,
       },
     ],
   });
