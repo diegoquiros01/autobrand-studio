@@ -207,7 +207,11 @@ export default function Landing() {
             <div style={{ fontSize:12, color:"rgba(255,255,255,0.3)", marginTop:2 }}>{t.footerTag}</div>
           </div>
         </div>
-        <div style={{ fontSize:12, color:"rgba(255,255,255,0.25)" }}>{t.footerRights}</div>
+        <div style={{ display:"flex", gap:16, alignItems:"center" }}>
+          <button onClick={() => router.push("/terminos")} style={{ fontSize:12, color:"rgba(255,255,255,0.25)", background:"none", border:"none", cursor:"pointer" }}>{lang === "en" ? "Terms" : "Términos"}</button>
+          <button onClick={() => router.push("/privacidad")} style={{ fontSize:12, color:"rgba(255,255,255,0.25)", background:"none", border:"none", cursor:"pointer" }}>{lang === "en" ? "Privacy" : "Privacidad"}</button>
+          <span style={{ fontSize:12, color:"rgba(255,255,255,0.25)" }}>{t.footerRights}</span>
+        </div>
       </div>
     </div>
   );
