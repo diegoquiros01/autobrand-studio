@@ -1,14 +1,17 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { supabase } from "../lib/supabase";
 
 export default function Landing() {
   const router = useRouter();
   const [lang, setLang] = useState("en");
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const saved = localStorage.getItem("lang");
     if (saved) setLang(saved);
+    supabase.auth.getUser().then(({ data: { user } }) => setUser(user));
   }, []);
 
   const setLanguage = (l) => {
