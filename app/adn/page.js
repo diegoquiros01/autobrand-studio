@@ -1,0 +1,262 @@
+"use client";
+import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "../../lib/supabase";
+import AppLayout from "../components/AppLayout";
+
+export default function ADN() {
+  const router = useRouter();
+  const [user, setUser] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [analyzing, setAnalyzing] = useState(false);
+  const [analyzeProgress, setAnalyzeProgress] = useState(0);
+  const [analyzeMsg, setAnalyzeMsg] = useState("");
+  const [screenshots, setScreenshots] = useState([]);
+  const [showAnalyze, setShowAnalyze] = useState(false);
+  const screenshotRef = useRef(null);
+  const [profile, setProfile] = useState({
+    nombre: "", descripcion: "", audiencia: "", tono: "",
+    idioma: "Español", categorias: [], propuestaValor: "",
+    instagramUrl: "", webUrl: "", canvaUrl: "",
+  });
+
+  const D = {
+    bg3:"rgba(255,255,255,0.04)", border:"rgba(255,255,255,0.08)",
+    text:"#fff", text2:"rgba(255,255,255,0.55)", text3:"rgba(255,255,255,0.3)",
+    purple:"#7950F2", purpleLight:"#A78BFA",
+  };
+
+  const tonos = ["Empoderador","Cercano","Profesional","Divertido","Inspiracional","Educativo"];
+  const idiomas = ["Español","Inglés","Spanglish"];
+  const cats = ["Coaching","Lifestyle","Moda","Belleza","Negocio","Motivación","Educación","Fitness","Recetas","Familia"];
+
+  useEffect(() => {
+    const init = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      setUser(user);
+      const { data } = await supabase.from("brand_profiles").select("*").eq("user_id", user.id).single();
+      if (data) {
+        setProfile({
+          nombre: data.nombre || "", descripcion: data.descripcion || "",
+          audiencia: data.audiencia || "", tono: data.tono || "",
+          idioma: data.idioma || "Español", categorias: data.categorias || [],
+          propuestaValor: data.propuesta_valor || "",
+          instagramUrl: data.instagram_url || "", webUrl: data.web_url || "", canvaUrl: data.canva_url || "",
+        });
+        localStorage.setItem("brandProfile", JSON.stringify({
+          nombre: data.nombre, descripcion: data.descripcion,
+          audiencia: data.audiencia, tono: data.tono,
+          idioma: data.idioma, categorias: data.categorias,
+          propuestaValor: data.propuesta_valor,
+        }));
+      }
+    };
+    init();
+  }, []);
+
+  const toBase64 = (file) => new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result.split(",")[1]); r.onerror = rej; r.readAsDataURL(file);
+  });
+
+  const analyzeInstagram = async () => {
+    if (screenshots.length === 0 && !profile.instagramUrl) return;
+    setAnalyzing(true); setAnalyzeProgress(0);
+    const msgs = ["Analizando tu contenido...", "Identificando tu tono...", "Detectando tu audiencia...", "Construyendo tu ADN..."];
+    let mi = 0; setAnalyzeMsg(msgs[0]);
+    const iv = setInterval(() => {
+      setAnalyzeProgress(p => Math.min(p + Math.random() * 15, 88));
+      mi = Math.min(mi + 1, msgs.length - 1); setAnalyzeMsg(msgs[mi]);
+    }, 2000);
+    try {
+      const images = await Promise.all(screenshots.map(async s => ({ data: await toBase64(s.file), mimeType: s.file.type })));
+      const res = await fetch("/api/analyze-brand", {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({ images, instagramUrl: profile.instagramUrl }),
+      });
+      const data = await res.json();
+      if (data.profile) {
+        setProfile(prev => ({ ...prev, ...data.profile, instagramUrl: prev.instagramUrl, webUrl: prev.webUrl, canvaUrl: prev.canvaUrl }));
+        setShowAnalyze(false);
+      }
+    } catch(e) { console.error(e); }
+    clearInterval(iv); setAnalyzeProgress(100); setAnalyzing(false); setAnalyzeMsg("");
+  };
+
+  const guardar = async () => {
+    if (!user) return;
+    setSaving(true);
+    localStorage.setItem("brandProfile", JSON.stringify(profile));
+    const { data: existing } = await supabase.from("brand_profiles").select("id").eq("user_id", user.id).single();
+    const payload = {
+      nombre: profile.nombre, descripcion: profile.descripcion,
+      audiencia: profile.audiencia, tono: profile.tono,
+      idioma: profile.idioma, categorias: profile.categorias,
+      propuesta_valor: profile.propuestaValor,
+      instagram_url: profile.instagramUrl, web_url: profile.webUrl, canva_url: profile.canvaUrl,
+      updated_at: new Date().toISOString(),
+    };
+    if (existing) await supabase.from("brand_profiles").update(payload).eq("user_id", user.id);
+    else await supabase.from("brand_profiles").insert({ ...payload, user_id: user.id });
+    setSaving(false); setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  };
+
+  const inp = { width:"100%", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, padding:"10px 12px", fontSize:13, color:D.text, outline:"none", fontFamily:"Inter, sans-serif" };
+
+  return (
+    <AppLayout>
+      <div style={{ maxWidth:760, margin:"0 auto", padding:"32px 24px" }}>
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:24 }}>
+          <div>
+            <h1 style={{ fontSize:22, fontWeight:500, color:D.text, marginBottom:4, letterSpacing:"-0.02em" }}>ADN de tu marca</h1>
+            <p style={{ fontSize:13, color:D.text2 }}>Esta información guía toda la generación de contenido — edítala cuando quieras</p>
+          </div>
+          <button onClick={guardar} disabled={saving}
+            style={{ padding:"9px 20px", background: saved ? "#40C057" : saving ? "rgba(121,80,242,0.4)" : D.purple, color:"#fff", border:"none", borderRadius:9, fontSize:13, fontWeight:500, cursor:"pointer" }}>
+            {saved ? "✓ Guardado" : saving ? "Guardando..." : "Guardar cambios"}
+          </button>
+        </div>
+
+        <div style={{ background:"rgba(121,80,242,0.08)", border:"1px solid rgba(121,80,242,0.2)", borderRadius:12, padding:20, marginBottom:16 }}>
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom: showAnalyze ? 16 : 0 }}>
+            <div>
+              <div style={{ fontSize:14, fontWeight:500, color:D.text, marginBottom:3 }}>✦ Analiza tu Instagram con IA</div>
+              <div style={{ fontSize:12, color:D.text2 }}>Sube screenshots y Claude construye tu ADN automáticamente</div>
+            </div>
+            <button onClick={() => setShowAnalyze(!showAnalyze)}
+              style={{ padding:"7px 14px", background: showAnalyze ? D.purple : "rgba(255,255,255,0.06)", color: showAnalyze ? "#fff" : D.text2, border:"1px solid " + (showAnalyze ? D.purple : "rgba(255,255,255,0.1)"), borderRadius:8, fontSize:12, fontWeight:500, cursor:"pointer" }}>
+              {showAnalyze ? "Ocultar" : "Usar IA →"}
+            </button>
+          </div>
+          {showAnalyze && (
+            <div>
+              <input ref={null} type="file" accept="image/*" multiple id="screenshots" style={{ display:"none" }} onChange={e => { const arr = Array.from(e.target.files).slice(0,6).map(f => ({ file:f, url:URL.createObjectURL(f) })); setScreenshots(prev => [...prev,...arr].slice(0,6)); }} />
+              {screenshots.length > 0 ? (
+                <div style={{ display:"grid", gridTemplateColumns:"repeat(6,1fr)", gap:6, marginBottom:12 }}>
+                  {screenshots.map((s,i) => (
+                    <div key={i} style={{ position:"relative" }}>
+                      <img src={s.url} alt="" style={{ width:"100%", aspectRatio:"1", objectFit:"cover", borderRadius:8, display:"block" }} />
+                      <button onClick={() => setScreenshots(prev => prev.filter((_,j) => j!==i))} style={{ position:"absolute", top:2, right:2, width:16, height:16, borderRadius:"50%", background:"#DC2626", border:"none", color:"#fff", fontSize:9, cursor:"pointer" }}>x</button>
+                    </div>
+                  ))}
+                  {screenshots.length < 6 && (
+                    <label htmlFor="screenshots" style={{ aspectRatio:"1", border:"2px dashed rgba(255,255,255,0.1)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", fontSize:20, color:D.text3 }}>+</label>
+                  )}
+                </div>
+              ) : (
+                <label htmlFor="screenshots" style={{ display:"block", border:"2px dashed rgba(121,80,242,0.3)", borderRadius:10, padding:"20px", textAlign:"center", cursor:"pointer", marginBottom:12 }}>
+                  <div style={{ fontSize:13, color:D.text2, fontWeight:500 }}>Sube screenshots de tus posts · Hasta 6</div>
+                </label>
+              )}
+              {analyzing && (
+                <div style={{ marginBottom:10 }}>
+                  <div style={{ display:"flex", justifyContent:"space-between", marginBottom:5 }}>
+                    <span style={{ fontSize:11, color:D.purpleLight }}>{analyzeMsg}</span>
+                    <span style={{ fontSize:11, color:D.purpleLight }}>{Math.round(Math.min(analyzeProgress,95))}%</span>
+                  </div>
+                  <div style={{ height:4, background:"rgba(255,255,255,0.06)", borderRadius:4, overflow:"hidden" }}>
+                    <div style={{ height:"100%", width: Math.min(analyzeProgress,95) + "%", background:"linear-gradient(90deg,#7950F2,#4C6EF5)", borderRadius:4, transition:"width 0.5s" }} />
+                  </div>
+                </div>
+              )}
+              <button onClick={analyzeInstagram} disabled={analyzing || (screenshots.length === 0 && !profile.instagramUrl)}
+                style={{ width:"100%", padding:10, background: analyzing ? "rgba(121,80,242,0.3)" : "linear-gradient(135deg,#7950F2,#4C6EF5)", color:"#fff", border:"none", borderRadius:8, fontSize:13, fontWeight:500, cursor: analyzing ? "not-allowed" : "pointer" }}>
+                {analyzing ? "Analizando con Claude..." : "Analizar y generar ADN"}
+              </button>
+            </div>
+          )}
+        </div>
+
+        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14, marginBottom:14 }}>
+          <div style={{ background:D.bg3, border:"1px solid " + D.border, borderRadius:12, padding:18 }}>
+            <div style={{ fontSize:11, fontWeight:500, color:D.text3, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:14 }}>Tu marca</div>
+            <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+              <div>
+                <label style={{ fontSize:12, color:D.text2, display:"block", marginBottom:5 }}>Nombre / cuenta</label>
+                <input style={inp} placeholder="@tumarca" value={profile.nombre} onChange={e => setProfile(p => ({ ...p, nombre: e.target.value }))} />
+              </div>
+              <div>
+                <label style={{ fontSize:12, color:D.text2, display:"block", marginBottom:5 }}>Qué haces</label>
+                <textarea style={{ ...inp, minHeight:70, resize:"none" }} placeholder="Soy coach de negocios para mujeres latinas..." value={profile.descripcion} onChange={e => setProfile(p => ({ ...p, descripcion: e.target.value }))} />
+              </div>
+              <div>
+                <label style={{ fontSize:12, color:D.text2, display:"block", marginBottom:5 }}>A quién le hablas</label>
+                <input style={inp} placeholder="Mujeres latinas 28-42 en EE.UU." value={profile.audiencia} onChange={e => setProfile(p => ({ ...p, audiencia: e.target.value }))} />
+              </div>
+              <div>
+                <label style={{ fontSize:12, color:D.text2, display:"block", marginBottom:5 }}>Propuesta de valor</label>
+                <input style={inp} placeholder="Tu ventaja única" value={profile.propuestaValor} onChange={e => setProfile(p => ({ ...p, propuestaValor: e.target.value }))} />
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+            <div style={{ background:D.bg3, border:"1px solid " + D.border, borderRadius:12, padding:18 }}>
+              <div style={{ fontSize:11, fontWeight:500, color:D.text3, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:14 }}>Tus canales</div>
+              <div style={{ fontSize:11, color:"rgba(121,80,242,0.7)", marginBottom:10 }}>Recomendado: agrega al menos uno</div>
+              <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+                <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                  <span style={{ fontSize:14 }}>📸</span>
+                  <input style={{ ...inp, flex:1 }} placeholder="instagram.com/tucuenta" value={profile.instagramUrl} onChange={e => setProfile(p => ({ ...p, instagramUrl: e.target.value }))} />
+                </div>
+                <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                  <span style={{ fontSize:14 }}>🌐</span>
+                  <input style={{ ...inp, flex:1 }} placeholder="tuweb.com" value={profile.webUrl} onChange={e => setProfile(p => ({ ...p, webUrl: e.target.value }))} />
+                </div>
+                <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                  <span style={{ fontSize:14 }}>🎨</span>
+                  <input style={{ ...inp, flex:1 }} placeholder="canva.com/tucuenta" value={profile.canvaUrl} onChange={e => setProfile(p => ({ ...p, canvaUrl: e.target.value }))} />
+                </div>
+              </div>
+            </div>
+
+            <div style={{ background:D.bg3, border:"1px solid " + D.border, borderRadius:12, padding:18 }}>
+              <div style={{ fontSize:11, fontWeight:500, color:D.text3, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:12 }}>Comunicación</div>
+              <div style={{ marginBottom:12 }}>
+                <div style={{ fontSize:12, color:D.text2, marginBottom:8 }}>Idioma</div>
+                <div style={{ display:"flex", gap:6 }}>
+                  {idiomas.map(i => (
+                    <button key={i} onClick={() => setProfile(p => ({ ...p, idioma: i }))}
+                      style={{ padding:"6px 12px", borderRadius:7, border: profile.idioma===i ? "1.5px solid " + D.purple : "1px solid rgba(255,255,255,0.1)", background: profile.idioma===i ? "rgba(121,80,242,0.15)" : "transparent", color: profile.idioma===i ? D.purpleLight : D.text2, fontSize:12, fontWeight:500, cursor:"pointer" }}>
+                      {i}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div style={{ marginBottom:12 }}>
+                <div style={{ fontSize:12, color:D.text2, marginBottom:8 }}>Tono de voz</div>
+                <div style={{ display:"flex", gap:5, flexWrap:"wrap" }}>
+                  {tonos.map(t => (
+                    <button key={t} onClick={() => setProfile(p => ({ ...p, tono: t }))}
+                      style={{ padding:"5px 10px", borderRadius:7, border: profile.tono===t ? "1.5px solid " + D.purple : "1px solid rgba(255,255,255,0.1)", background: profile.tono===t ? "rgba(121,80,242,0.15)" : "transparent", color: profile.tono===t ? D.purpleLight : D.text2, fontSize:11, fontWeight:500, cursor:"pointer" }}>
+                      {t}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <div style={{ fontSize:12, color:D.text2, marginBottom:8 }}>Categorías</div>
+                <div style={{ display:"flex", gap:5, flexWrap:"wrap" }}>
+                  {cats.map(c => (
+                    <button key={c} onClick={() => setProfile(p => ({ ...p, categorias: p.categorias.includes(c) ? p.categorias.filter(x => x!==c) : [...p.categorias, c] }))}
+                      style={{ padding:"5px 10px", borderRadius:7, border: profile.categorias.includes(c) ? "1.5px solid " + D.purple : "1px solid rgba(255,255,255,0.1)", background: profile.categorias.includes(c) ? "rgba(121,80,242,0.15)" : "transparent", color: profile.categorias.includes(c) ? D.purpleLight : D.text2, fontSize:11, fontWeight:500, cursor:"pointer" }}>
+                      {c}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button onClick={() => router.push("/crear")}
+          style={{ width:"100%", padding:13, background:"linear-gradient(135deg,#7950F2,#4C6EF5)", color:"#fff", border:"none", borderRadius:10, fontSize:14, fontWeight:500, cursor:"pointer" }}>
+          Listo — crear mi primera pieza →
+        </button>
+      </div>
+    </AppLayout>
+  );
+}
