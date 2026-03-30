@@ -12,12 +12,8 @@ export default function Landing() {
     const saved = localStorage.getItem("lang");
     if (saved) setLang(saved);
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user || null);
+      if (session?.user) router.push("/generar");
     });
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user || null);
-    });
-    return () => subscription.unsubscribe();
   }, []);
 
   const setLanguage = (l) => {
