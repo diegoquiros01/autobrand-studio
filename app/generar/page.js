@@ -62,7 +62,7 @@ export default function Generar() {
       clearInterval(iv); setCopyProgress(100);
       setTimeout(() => { setCopyProgress(0); setCopyMsg(""); }, 400);
       if (data.error === "limit_reached") {
-        setError("Alcanzaste tu limite de " + data.limit + " generaciones este mes. Actualiza tu plan para continuar.");
+        setError("LIMIT_REACHED:" + data.plan + ":" + data.limit);
       } else {
         setProposals(data.propuestas);
       }
@@ -201,7 +201,19 @@ export default function Generar() {
               )}
             </div>
 
-            {error && <div style={{ background:"rgba(220,38,38,0.1)", border:"1px solid rgba(220,38,38,0.3)", borderRadius:9, padding:12, color:"#FCA5A5", fontSize:13, marginBottom:14 }}>{error}</div>}
+            {error && (
+              error.startsWith("LIMIT_REACHED") ? (
+                <div style={{ background:"rgba(121,80,242,0.1)", border:"1px solid rgba(121,80,242,0.25)", borderRadius:12, padding:16, marginBottom:14 }}>
+                  <div style={{ fontSize:14, fontWeight:500, color:"#A78BFA", marginBottom:6 }}>Alcanzaste tu limite mensual</div>
+                  <div style={{ fontSize:13, color:"rgba(255,255,255,0.55)", marginBottom:12 }}>Has usado todas tus generaciones de este mes. Actualiza tu plan para continuar.</div>
+                  <button onClick={() => router.push("/pricing")} style={{ padding:"9px 18px", background:"linear-gradient(135deg,#7950F2,#4C6EF5)", color:"#fff", border:"none", borderRadius:8, fontSize:13, fontWeight:500, cursor:"pointer", fontFamily:"Inter, sans-serif" }}>
+                    Ver planes
+                  </button>
+                </div>
+              ) : (
+                <div style={{ background:"rgba(220,38,38,0.1)", border:"1px solid rgba(220,38,38,0.3)", borderRadius:9, padding:12, color:"#FCA5A5", fontSize:13, marginBottom:14 }}>{error}</div>
+              )
+            )}
 
             {proposals.length > 0 && (
               <div>
