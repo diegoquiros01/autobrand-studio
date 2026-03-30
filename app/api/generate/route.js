@@ -35,13 +35,18 @@ export async function POST(request) {
   }
 
   const brandContext = brandProfile ? `
-MARCA: ${brandProfile.nombre}
-DESCRIPCIÓN: ${brandProfile.descripcion}
-AUDIENCIA: ${brandProfile.audiencia}
-TONO: ${brandProfile.tono}
-IDIOMA: ${brandProfile.idioma}
-PROPUESTA DE VALOR: ${brandProfile.propuestaValor}
-${brandProfile.idioma === "Spanglish" ? "IMPORTANTE: Mezcla español e inglés naturalmente." : ""}
+ADN DE MARCA:
+- Marca: ${brandProfile.nombre || ""}
+- Descripción: ${brandProfile.descripcion || ""}
+- Audiencia objetivo: ${brandProfile.audiencia || ""}
+- Tono de voz: ${brandProfile.tono || ""}
+- Idioma: ${brandProfile.idioma || ""}
+- Propuesta de valor única: ${brandProfile.propuestaValor || ""}
+${brandProfile.categorias && brandProfile.categorias.length > 0 ? "- Categorías de contenido: " + brandProfile.categorias.join(", ") : ""}
+${brandProfile.idioma === "Spanglish" ? "IMPORTANTE: Esta marca habla en Spanglish — mezcla español e inglés de forma natural y auténtica, como lo haría una latina bicultural en EE.UU." : ""}
+${brandProfile.idioma === "Español" ? "IMPORTANTE: Todo el contenido debe ser en español." : ""}
+${brandProfile.idioma === "Inglés" ? "IMPORTANTE: All content must be in English." : ""}
+INSTRUCCIÓN CLAVE: El copy debe sonar EXACTAMENTE como esta marca — usa su tono, su idioma y habla directamente a su audiencia específica.
 ` : "";
 
   const message = await client.messages.create({

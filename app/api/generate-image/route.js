@@ -5,9 +5,16 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 export async function POST(request) {
   const { prompt, brandProfile, referencias, talentos, editedCopy } = await request.json();
 
-  const brandContext = brandProfile
-    ? "Brand: " + brandProfile.nombre + ". Tone: " + brandProfile.tono + ". Audience: " + brandProfile.audiencia + ". Language: " + brandProfile.idioma + "."
-    : "";
+  const brandContext = brandProfile ? [
+    "Brand: " + (brandProfile.nombre || ""),
+    "Description: " + (brandProfile.descripcion || ""),
+    "Audience: " + (brandProfile.audiencia || ""),
+    "Tone: " + (brandProfile.tono || ""),
+    "Language: " + (brandProfile.idioma || ""),
+    "Value proposition: " + (brandProfile.propuestaValor || ""),
+    brandProfile.categorias && brandProfile.categorias.length > 0 ? "Categories: " + brandProfile.categorias.join(", ") : "",
+    brandProfile.idioma === "Spanglish" ? "IMPORTANT: The brand communicates in Spanglish — mix Spanish and English naturally." : "",
+  ].filter(Boolean).join(" ") : "";
 
   const refContext = referencias && referencias.length > 0
     ? " Use the " + referencias.length + " reference image(s) provided as visual style inspiration."
@@ -21,7 +28,15 @@ export async function POST(request) {
     ? " The post copy is: " + editedCopy.substring(0, 200)
     : "";
 
-  const imagePrompt = "Create a professional Instagram post image. " + brandContext + " Concept: " + prompt + "." + copyContext + refContext + talentContext + " Style: clean composition, vibrant colors, professional photography, square 1:1 format, social media ready, high quality.";
+  const imagePrompt = [
+    "Create a professional Instagram post image for a social media creator.",
+    brandContext ? "BRAND DNA: " + brandContext : "",
+    "CONCEPT: " + prompt + ".",
+    copyContext ? "POST COPY CONTEXT: " + copyContext : "",
+    refContext,
+    talentContext,
+    "STYLE REQUIREMENTS: Clean composition, vibrant colors, professional photography quality, square 1:1 format, social media ready, high quality. The image must feel authentic to the brand DNA described above.",
+  ].filter(Boolean).join(" ");
 
   const contents = [{ text: imagePrompt }];
 
