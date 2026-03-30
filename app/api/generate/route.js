@@ -65,9 +65,7 @@ Responde SOLO JSON puro sin backticks:
   });
 
   const text = message.content[0].text;
-  const clean = text.replace(/```json
-?/g, "").replace(/```
-?/g, "").trim();
+  const clean = text.replace(/```json/g, "").replace(/```/g, "").trim();
   const data = JSON.parse(clean);
   return Response.json(data);
 }
