@@ -1,10 +1,10 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, useRef, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "../../lib/supabase";
 import AppLayout from "../components/AppLayout";
 
-export default function ADN() {
+function ADNContent() {
   const router = useRouter();
   const [user, setUser] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -15,6 +15,8 @@ export default function ADN() {
   const [screenshots, setScreenshots] = useState([]);
   const [sources, setSources] = useState([]);
   const [showAnalyze, setShowAnalyze] = useState(false);
+  const searchParams = useSearchParams();
+  const isOnboarding = searchParams.get("onboarding") === "true";
   const screenshotRef = useRef(null);
   const [profile, setProfile] = useState({
     nombre: "", descripcion: "", audiencia: "", tono: "",
@@ -110,14 +112,31 @@ export default function ADN() {
   return (
     <AppLayout>
       <div style={{ maxWidth:760, margin:"0 auto", padding:"32px 24px" }}>
+        {isOnboarding && (
+          <div style={{ background:"linear-gradient(135deg,rgba(121,80,242,0.15),rgba(230,73,128,0.1))", border:"1px solid rgba(121,80,242,0.3)", borderRadius:14, padding:20, marginBottom:24 }}>
+            <div style={{ fontSize:18, fontWeight:500, color:D.text, marginBottom:6 }}>Bienvenida a AiStudioBrand! 🎉</div>
+            <div style={{ fontSize:13, color:D.text2, lineHeight:1.65, marginBottom:12 }}>
+              Antes de crear tu primera pieza, cuéntanos sobre tu marca. Esta información es la base que la IA usa para generar contenido que suena exactamente como tú.
+            </div>
+            <div style={{ display:"flex", gap:16 }}>
+              {["Define tu marca", "Genera contenido", "Publica en segundos"].map((step, i) => (
+                <div key={i} style={{ display:"flex", alignItems:"center", gap:6 }}>
+                  <div style={{ width:20, height:20, borderRadius:"50%", background:D.purple, display:"flex", alignItems:"center", justifyContent:"center", fontSize:10, fontWeight:600, color:"#fff", flexShrink:0 }}>{i+1}</div>
+                  <span style={{ fontSize:12, color:D.text2 }}>{step}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:24 }}>
           <div>
-            <h1 style={{ fontSize:22, fontWeight:500, color:D.text, marginBottom:4, letterSpacing:"-0.02em" }}>ADN de tu marca</h1>
-            <p style={{ fontSize:13, color:D.text2 }}>Esta información guía toda la generación de contenido — edítala cuando quieras</p>
+            <h1 style={{ fontSize:22, fontWeight:500, color:D.text, marginBottom:4, letterSpacing:"-0.02em" }}>{isOnboarding ? "Define el ADN de tu marca" : "ADN de tu marca"}</h1>
+            <p style={{ fontSize:13, color:D.text2 }}>{isOnboarding ? "Completa tu perfil para que la IA genere contenido que suena exactamente como tú" : "Esta información guía toda la generación de contenido — edítala cuando quieras"}</p>
           </div>
           <button onClick={guardar} disabled={saving}
             style={{ padding:"9px 20px", background: saved ? "#40C057" : saving ? "rgba(121,80,242,0.4)" : D.purple, color:"#fff", border:"none", borderRadius:9, fontSize:13, fontWeight:500, cursor:"pointer" }}>
-            {saved ? "✓ Guardado" : saving ? "Guardando..." : "Guardar cambios"}
+            {saved ? "✓ Guardado" : saving ? "Guardando..." : isOnboarding ? "Guardar y crear mi primera pieza →" : "Guardar cambios"}
           </button>
         </div>
 
@@ -287,5 +306,13 @@ export default function ADN() {
         </button>
       </div>
     </AppLayout>
+  );
+}
+
+export default function ADN() {
+  return (
+    <Suspense fallback={null}>
+      <ADNContent />
+    </Suspense>
   );
 }

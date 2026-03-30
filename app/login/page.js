@@ -44,7 +44,9 @@ function LoginContent() {
       }
       const redirect = searchParams.get("redirect");
       if (redirect === "pricing") {
-        setTimeout(() => router.push("/pricing"), 1000);
+        setTimeout(() => router.push("/pricing"), 800);
+      } else {
+        setTimeout(() => router.push("/adn?onboarding=true"), 800);
       }
       setSuccess("Cuenta creada exitosamente.");
     }
