@@ -129,29 +129,15 @@ export default function Landing() {
               ))}
             </div>
           </div>
-          <div style={{ background:"linear-gradient(135deg,#F3F0FF,#FDF2F8)", borderRadius:20, padding:24 }}>
-            <div style={{ background:"#0A0A1A", borderRadius:18, padding:16, maxWidth:240, margin:"0 auto" }}>
-              <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:14 }}>
-                <div style={{ width:24, height:24, background:"#7950F2", borderRadius:6, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:10, fontWeight:500 }}>Ai</div>
-                <span style={{ fontSize:12, fontWeight:500, color:"#fff" }}>AiStudioBrand</span>
-                <span style={{ marginLeft:"auto", fontSize:10, color:"rgba(255,255,255,0.4)" }}>generating...</span>
+          <div style={{ borderRadius:20, overflow:"hidden", boxShadow:"0 20px 60px rgba(0,0,0,0.4)", position:"relative" }}>
+            <img src="/hero-example.jpg" alt="AI Generated Instagram post example" style={{ width:"100%", display:"block", borderRadius:20 }} />
+            <div style={{ position:"absolute", bottom:14, left:14, right:14, background:"rgba(10,10,25,0.85)", borderRadius:12, padding:"10px 14px", display:"flex", alignItems:"center", gap:10, backdropFilter:"blur(10px)", border:"1px solid rgba(255,255,255,0.1)" }}>
+              <div style={{ width:28, height:28, background:"#7950F2", borderRadius:7, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:11, fontWeight:500, flexShrink:0 }}>Ai</div>
+              <div>
+                <div style={{ fontSize:11, fontWeight:500, color:"#fff" }}>AiStudioBrand</div>
+                <div style={{ fontSize:10, color:"rgba(255,255,255,0.5)" }}>{lang === "en" ? "Generated in 25 seconds" : "Generado en 25 segundos"}</div>
               </div>
-              <div style={{ background:"linear-gradient(135deg,#7950F2,#E64980)", borderRadius:12, height:120, display:"flex", alignItems:"center", justifyContent:"center", marginBottom:10, position:"relative", overflow:"hidden" }}>
-                <div style={{ textAlign:"center" }}>
-                  <div style={{ fontSize:28, marginBottom:4 }}>◉</div>
-                  <div style={{ fontSize:10, color:"rgba(255,255,255,0.7)" }}>AI Generated</div>
-                </div>
-              </div>
-              <div style={{ background:"#1A1A2E", borderRadius:10, padding:"10px 12px", marginBottom:8 }}>
-                <div style={{ fontSize:9, fontWeight:500, color:"#9775FA", textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:4 }}>Hook</div>
-                <div style={{ fontSize:11, fontWeight:500, color:"#fff", marginBottom:4, lineHeight:1.4 }}>Mami, ya no más stress!</div>
-                <div style={{ fontSize:9, color:"rgba(255,255,255,0.45)", lineHeight:1.5, marginBottom:4 }}>Our coaching program es literally a lifesaver para todas las mujeres...</div>
-                <div style={{ fontSize:9, color:"#A78BFA", fontWeight:500 }}>DM con LISTA y te cuento todo</div>
-              </div>
-              <div style={{ background:"#1A1A2E", borderRadius:8, padding:"8px 10px", display:"flex", alignItems:"center", gap:8 }}>
-                <div style={{ width:16, height:16, borderRadius:"50%", background:"#40C057", display:"flex", alignItems:"center", justifyContent:"center", fontSize:8, color:"#fff", flexShrink:0 }}>✓</div>
-                <div style={{ fontSize:9, color:"rgba(255,255,255,0.55)" }}>{t.savedLib}</div>
-              </div>
+              <div style={{ marginLeft:"auto", background:"rgba(64,192,87,0.15)", border:"1px solid rgba(64,192,87,0.3)", borderRadius:6, padding:"3px 8px", fontSize:10, color:"#86EFAC", fontWeight:500 }}>✓ {lang === "en" ? "Saved" : "Guardado"}</div>
             </div>
           </div>
         </div>
