@@ -88,10 +88,12 @@ export default function Crear() {
       console.log("Generating image with:", { prompt: promptFinal, refs: refB.length, talents: talB.length, brandProfile: brandProfile?.nombre });
       const res = await fetch("/api/generate-image", {
         method:"POST", headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({ prompt: promptFinal, brandProfile, referencias: refB, talentos: talB, editedCopy: prompt }),
+        body: JSON.stringify({ prompt: promptFinal, brandProfile, referencias: refB, talentos: talB, editedCopy: prompt, userId: user?.id || "" }),
       });
       const data = await res.json();
-      if (data.image) {
+      if (data.error === "limit_reached") {
+        setError("LIMIT_REACHED");
+      } else if (data.image) {
         const newVersion = { image: data.image, mimeType: data.mimeType, feedback: feedbackText, timestamp: new Date().toLocaleTimeString() };
         setVersiones(prev => { const updated = [...prev, newVersion]; setVersionActiva(updated.length - 1); return updated; });
         setFeedback("");
