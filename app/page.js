@@ -12,7 +12,7 @@ export default function Landing() {
     const saved = localStorage.getItem("lang");
     if (saved) setLang(saved);
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) router.push("/generar");
+      if (session?.user) router.push("/crear");
     });
   }, []);
 

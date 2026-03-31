@@ -1,4 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
+
+export const maxDuration = 60;
 import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(

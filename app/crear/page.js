@@ -76,8 +76,25 @@ export default function Crear() {
     init();
   }, []);
 
-  const toBase64 = (file) => new Promise((res,rej) => {
-    const r = new FileReader(); r.onload = () => res(r.result.split(",")[1]); r.onerror = rej; r.readAsDataURL(file);
+  const toBase64 = (file) => new Promise((res, rej) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      const MAX = 800;
+      let w = img.width, h = img.height;
+      if (w > MAX || h > MAX) {
+        if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+        else { w = Math.round(w * MAX / h); h = MAX; }
+      }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+      URL.revokeObjectURL(url);
+      const data = canvas.toDataURL("image/jpeg", 0.7).split(",")[1];
+      res(data);
+    };
+    img.onerror = rej;
+    img.src = url;
   });
 
   const generarImagen = async (feedbackText = "") => {
@@ -89,8 +106,8 @@ export default function Crear() {
       mi = Math.min(mi + 1, msgs.length - 1); setGenMsg(msgs[mi]);
     }, 3000);
     try {
-      const refB = referencias.length > 0 ? await Promise.all(referencias.map(async r => ({ data: await toBase64(r.file), mimeType: r.file.type }))) : [];
-      const talB = talentos.length > 0 ? await Promise.all(talentos.map(async t => ({ data: await toBase64(t.file), mimeType: t.file.type }))) : [];
+      const refB = referencias.length > 0 ? await Promise.all(referencias.map(async r => ({ data: await toBase64(r.file), mimeType: "image/jpeg" }))) : [];
+      const talB = talentos.length > 0 ? await Promise.all(talentos.map(async t => ({ data: await toBase64(t.file), mimeType: "image/jpeg" }))) : [];
       const promptFinal = feedbackText ? prompt + ". Feedback del usuario: " + feedbackText : prompt;
       console.log("Generating image with:", { prompt: promptFinal, refs: refB.length, talents: talB.length, brandProfile: brandProfile?.nombre });
       const res = await fetch("/api/generate-image", {

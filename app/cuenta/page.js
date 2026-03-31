@@ -59,7 +59,7 @@ export default function Cuenta() {
           <span style={{ fontSize:16, fontWeight:500, color:D.text }}>Ai<span style={{ color:D.purpleLight }}>Studio</span>Brand</span>
         </div>
         <div style={{ display:"flex", gap:8, marginLeft:"auto", alignItems:"center" }}>
-          <button onClick={() => router.push("/generar")} style={{ padding:"7px 14px", borderRadius:8, fontSize:13, color:D.text2, cursor:"pointer", background:"none", border:"none" }}>Generador</button>
+          <button onClick={() => router.push("/crear")} style={{ padding:"7px 14px", borderRadius:8, fontSize:13, color:D.text2, cursor:"pointer", background:"none", border:"none" }}>Generador</button>
           <button onClick={() => router.push("/biblioteca")} style={{ padding:"7px 14px", borderRadius:8, fontSize:13, color:D.text2, cursor:"pointer", background:"none", border:"none" }}>Biblioteca</button>
           <button onClick={handleLogout} style={{ padding:"7px 14px", borderRadius:8, fontSize:12, color:"rgba(255,255,255,0.3)", cursor:"pointer", background:"none", border:"1px solid rgba(255,255,255,0.08)" }}>Salir</button>
         </div>
@@ -117,10 +117,10 @@ export default function Cuenta() {
         <div style={{ background:D.bg3, border:"1px solid " + D.border, borderRadius:14, padding:24, marginBottom:24 }}>
           <div style={{ fontSize:11, fontWeight:500, color:D.text3, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:16 }}>Acciones rápidas</div>
           <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
-            <button onClick={() => router.push("/generar")} style={{ padding:"11px 16px", background:"rgba(121,80,242,0.1)", border:"1px solid rgba(121,80,242,0.2)", borderRadius:9, fontSize:13, fontWeight:500, color:D.purpleLight, cursor:"pointer", textAlign:"left" }}>
+            <button onClick={() => router.push("/crear")} style={{ padding:"11px 16px", background:"rgba(121,80,242,0.1)", border:"1px solid rgba(121,80,242,0.2)", borderRadius:9, fontSize:13, fontWeight:500, color:D.purpleLight, cursor:"pointer", textAlign:"left" }}>
               ✦ Ir al generador
             </button>
-            <button onClick={() => router.push("/brand-profile")} style={{ padding:"11px 16px", background:D.bg3, border:"1px solid " + D.border, borderRadius:9, fontSize:13, color:D.text2, cursor:"pointer", textAlign:"left" }}>
+            <button onClick={() => router.push("/adn")} style={{ padding:"11px 16px", background:D.bg3, border:"1px solid " + D.border, borderRadius:9, fontSize:13, color:D.text2, cursor:"pointer", textAlign:"left" }}>
               ◉ Editar Brand Profile
             </button>
             <button onClick={() => router.push("/biblioteca")} style={{ padding:"11px 16px", background:D.bg3, border:"1px solid " + D.border, borderRadius:9, fontSize:13, color:D.text2, cursor:"pointer", textAlign:"left" }}>
