@@ -161,32 +161,25 @@ export default function Crear() {
     try {
       const imgData = versiones[versionActiva];
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { console.log("No user logged in"); return; }
-      
-      const blob = await fetch("data:" + imgData.mimeType + ";base64," + imgData.image).then(r => r.blob());
-      const fileName = user.id + "/resultados/" + Date.now() + ".png";
-      
-      const { error: uploadError } = await supabase.storage.from("assets").upload(fileName, blob, { contentType: "image/png" });
-      if (uploadError) {
-        console.error("Upload error:", uploadError);
-        // Try without contentType
-        const { error: uploadError2 } = await supabase.storage.from("assets").upload(fileName + "2.png", blob);
-        if (uploadError2) { console.error("Upload error 2:", uploadError2); return; }
-      }
-      
-      const { error: insertError } = await supabase.from("generaciones").insert({
-        user_id: user.id,
-        prompt: prompt,
-        tipo: tipo,
-        propuestas: [copy],
-        imagen_url: fileName,
+      if (!user) { console.log("No user"); return; }
+
+      const res = await fetch("/api/guardar-pieza", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: user.id,
+          prompt, tipo,
+          copy,
+          imageBase64: imgData.image,
+          mimeType: imgData.mimeType,
+        }),
       });
-      
-      if (insertError) {
-        console.error("Insert error:", insertError);
-      } else {
-        console.log("Saved successfully!");
+      const data = await res.json();
+      if (data.success) {
+        console.log("Saved!");
         setSavedFinal(true);
+      } else {
+        console.error("Save failed:", data.error);
       }
     } catch(e) {
       console.error("guardarFinal error:", e);
