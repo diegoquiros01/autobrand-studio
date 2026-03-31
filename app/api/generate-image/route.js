@@ -11,7 +11,13 @@ const LIMITS = { free: 20, professional: 200, enterprise: 1000 };
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export async function POST(request) {
-  const { prompt, brandProfile, referencias, talentos, editedCopy, userId } = await request.json();
+  const { prompt, brandProfile, referencias, talentos, editedCopy, userId, idiomapieza } = await request.json();
+  console.log("=== GENERATE IMAGE REQUEST ===");
+  console.log("Prompt:", prompt?.substring(0, 100));
+  console.log("Brand:", brandProfile?.nombre);
+  console.log("Referencias:", referencias?.length || 0);
+  console.log("Talentos:", talentos?.length || 0);
+  console.log("==============================");
 
   if (userId) {
     const mesActual = new Date().toISOString().slice(0, 7);
@@ -60,6 +66,7 @@ export async function POST(request) {
     refContext,
     talentContext,
     "STYLE REQUIREMENTS: Clean composition, vibrant colors, professional photography quality, square 1:1 format, social media ready, high quality. The image must feel authentic to the brand DNA described above.",
+    idiomapieza ? "TEXT IN IMAGE (if any): Use " + idiomapieza + " for any text overlay in the image." : "",
   ].filter(Boolean).join(" ");
 
   const contents = [{ text: imagePrompt }];

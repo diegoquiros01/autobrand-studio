@@ -25,6 +25,7 @@ export default function Crear() {
   const [brandProfile, setBrandProfile] = useState(null);
 
   const [prompt, setPrompt] = useState("");
+  const [idiomapieza, setIdiomaPieza] = useState("ADN");
   const [tipo, setTipo] = useState("Comercial");
 
   const [referencias, setReferencias] = useState([]);
@@ -94,7 +95,7 @@ export default function Crear() {
       console.log("Generating image with:", { prompt: promptFinal, refs: refB.length, talents: talB.length, brandProfile: brandProfile?.nombre });
       const res = await fetch("/api/generate-image", {
         method:"POST", headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({ prompt: promptFinal, brandProfile, referencias: refB, talentos: talB, editedCopy: prompt, userId: user?.id || "" }),
+        body: JSON.stringify({ prompt: promptFinal, brandProfile, referencias: refB, talentos: talB, editedCopy: prompt, userId: user?.id || "", idiomapieza: idiomapieza === "ADN" ? (brandProfile?.idioma || "") : idiomapieza }),
       });
       const data = await res.json();
       if (data.error === "limit_reached") {
@@ -113,7 +114,7 @@ export default function Crear() {
     try {
       const res = await fetch("/api/generate", {
         method:"POST", headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({ prompt, tipo, brandProfile, userId: user?.id || "" }),
+        body: JSON.stringify({ prompt, tipo, brandProfile, userId: user?.id || "", idiomapieza: idiomapieza === "ADN" ? (brandProfile?.idioma || "") : idiomapieza }),
       });
       const data = await res.json();
       if (data.error === "limit_reached") {
@@ -127,22 +128,28 @@ export default function Crear() {
 
   const guardarFinal = async () => {
     const copy = copies.find(c => c.id === copySeleccionado);
-    if (!copy || versiones.length === 0) return;
+    if (!copy || versiones.length === 0) { console.log("Missing copy or versiones"); return; }
     try {
       const imgData = versiones[versionActiva];
       const blob = await fetch("data:" + imgData.mimeType + ";base64," + imgData.image).then(r => r.blob());
       const { data: { user } } = await supabase.auth.getUser();
+      console.log("Saving for user:", user?.id);
       if (user) {
         const fileName = user.id + "/resultados/" + Date.now() + ".png";
-        await supabase.storage.from("assets").upload(fileName, blob);
-        await supabase.from("generaciones").insert({ user_id: user.id, prompt, tipo, propuestas: [copy], imagen_url: fileName });
+        const { error: uploadError } = await supabase.storage.from("assets").upload(fileName, blob, { contentType: imgData.mimeType });
+        if (uploadError) { console.error("Upload error:", uploadError); }
+        const { error: insertError } = await supabase.from("generaciones").insert({
+          user_id: user.id, prompt, tipo,
+          propuestas: [copy], imagen_url: fileName,
+        });
+        if (insertError) { console.error("Insert error:", insertError); }
+        else { console.log("Saved successfully!"); setSavedFinal(true); }
       }
-      setSavedFinal(true);
-    } catch(e) { console.error(e); }
+    } catch(e) { console.error("guardarFinal error:", e); }
   };
 
   const resetAll = () => {
-    setStep(1); setMaxStep(1); setPrompt(""); setTipo("Comercial"); setReferencias([]); setTalentos([]);
+    setStep(1); setMaxStep(1); setPrompt(""); setTipo("Comercial"); setIdiomaPieza("ADN"); setReferencias([]); setTalentos([]);
     setVersiones([]); setCopies([]); setCopySeleccionado(null); setImgAprobada(false);
     setSavedFinal(false); setFeedback(""); setError("");
   };
@@ -223,6 +230,23 @@ export default function Crear() {
                 ))}
               </div>
             </div>
+              <div style={{ marginTop:14, marginBottom:14 }}>
+                <div style={{ fontSize:12, color:D.text3, marginBottom:8 }}>Idioma de esta pieza</div>
+                <div style={{ display:"flex", gap:6 }}>
+                  {[
+                    { key:"ADN", label:"Según mi ADN", desc: brandProfile?.idioma || "Auto" },
+                    { key:"Español", label:"Español" },
+                    { key:"Inglés", label:"English" },
+                    { key:"Spanglish", label:"Spanglish" },
+                  ].map(op => (
+                    <button key={op.key} onClick={() => setIdiomaPieza(op.key)}
+                      style={{ padding:"7px 12px", borderRadius:8, fontSize:11.5, border: idiomapieza===op.key ? "1.5px solid " + D.purple : "1px solid rgba(255,255,255,0.1)", background: idiomapieza===op.key ? "rgba(121,80,242,0.12)" : "transparent", color: idiomapieza===op.key ? D.purpleLight : D.text2, fontWeight: idiomapieza===op.key ? 500 : 400, cursor:"pointer", textAlign:"center" }}>
+                      <div>{op.label}</div>
+                      {op.desc && <div style={{ fontSize:9, opacity:0.6, marginTop:1 }}>{op.desc}</div>}
+                    </button>
+                  ))}
+                </div>
+              </div>
             <button onClick={() => prompt.trim() && goToStep(2)}
               style={{ ...NB, background: !prompt.trim() ? "rgba(121,80,242,0.3)" : "linear-gradient(135deg,#7950F2,#4C6EF5)", cursor: !prompt.trim() ? "not-allowed" : "pointer" }}>
               Continuar → Agregar referencias visuales
@@ -458,18 +482,59 @@ export default function Crear() {
         )}
 
         {step === 6 && (
-          <div style={{ textAlign:"center", padding:"40px 20px" }}>
-            <div style={{ width:64, height:64, background:"rgba(64,192,87,0.15)", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 16px", fontSize:28 }}>✓</div>
-            <h2 style={{ fontSize:22, fontWeight:500, color:D.text, marginBottom:8 }}>Arte final guardado</h2>
-            <p style={{ fontSize:14, color:D.text2, marginBottom:24 }}>Tu pieza está en la biblioteca y puedes editarla cuando quieras.</p>
-            {versiones.length > 0 && (
-              <img src={"data:" + versiones[versionActiva].mimeType + ";base64," + versiones[versionActiva].image} alt="" style={{ maxWidth:260, borderRadius:14, display:"block", margin:"0 auto 24px", border:"1px solid rgba(255,255,255,0.1)" }} />
-            )}
-            <div style={{ display:"flex", gap:10, justifyContent:"center" }}>
-              <button onClick={resetAll} style={{ padding:"10px 20px", background:"rgba(255,255,255,0.06)", color:D.text2, border:"1px solid rgba(255,255,255,0.1)", borderRadius:9, fontSize:13, fontWeight:500, cursor:"pointer" }}>
-                Nueva pieza
+          <div>
+            <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:20 }}>
+              <div style={{ width:32, height:32, background:"rgba(64,192,87,0.15)", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:16 }}>✓</div>
+              <div>
+                <div style={{ fontSize:16, fontWeight:500, color:D.text }}>Arte final guardado</div>
+                <div style={{ fontSize:12, color:D.text2 }}>Tu pieza está en la biblioteca</div>
+              </div>
+            </div>
+
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:20, marginBottom:20 }}>
+              <div>
+                {versiones.length > 0 && (
+                  <img src={"data:" + versiones[versionActiva].mimeType + ";base64," + versiones[versionActiva].image} alt="" style={{ width:"100%", borderRadius:12, display:"block", border:"1px solid rgba(255,255,255,0.1)" }} />
+                )}
+                <button onClick={() => {
+                  if (versiones.length > 0) {
+                    const a = document.createElement("a");
+                    a.href = "data:" + versiones[versionActiva].mimeType + ";base64," + versiones[versionActiva].image;
+                    a.download = "aistudiobrand-" + Date.now() + ".png";
+                    a.click();
+                  }
+                }} style={{ width:"100%", padding:10, background:"rgba(255,255,255,0.06)", color:D.text2, border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, fontSize:12, fontWeight:500, cursor:"pointer", marginTop:8 }}>
+                  ⬇ Descargar imagen
+                </button>
+              </div>
+
+              <div>
+                {copies.find(c => c.id === copySeleccionado) && (() => {
+                  const copy = copies.find(c => c.id === copySeleccionado);
+                  return (
+                    <div style={{ background:D.bg3, border:"1px solid " + D.border, borderRadius:12, padding:16, height:"100%" }}>
+                      <div style={{ fontSize:10, fontWeight:500, color:D.purpleLight, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:10 }}>Copy final</div>
+                      <div style={{ fontSize:14, fontWeight:500, color:D.text, marginBottom:8, lineHeight:1.4 }}>{copy.hook}</div>
+                      <div style={{ fontSize:12, color:D.text2, lineHeight:1.7, marginBottom:8 }}>{copy.copy}</div>
+                      <div style={{ fontSize:12, color:D.purpleLight, fontWeight:500, marginBottom:8 }}>{copy.cta}</div>
+                      {copy.hashtags && <div style={{ fontSize:11, color:"rgba(167,139,250,0.5)", marginBottom:14 }}>{copy.hashtags}</div>}
+                      <button onClick={() => {
+                        const text = copy.hook + "\n\n" + copy.copy + "\n\n" + copy.cta + (copy.hashtags ? "\n\n" + copy.hashtags : "");
+                        navigator.clipboard.writeText(text);
+                      }} style={{ width:"100%", padding:9, background:"rgba(255,255,255,0.06)", color:D.text2, border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, fontSize:12, cursor:"pointer" }}>
+                        ⎘ Copiar texto
+                      </button>
+                    </div>
+                  );
+                })()}
+              </div>
+            </div>
+
+            <div style={{ display:"flex", gap:10 }}>
+              <button onClick={resetAll} style={{ flex:1, padding:11, background:"rgba(255,255,255,0.06)", color:D.text2, border:"1px solid rgba(255,255,255,0.1)", borderRadius:9, fontSize:13, fontWeight:500, cursor:"pointer" }}>
+                + Nueva pieza
               </button>
-              <button onClick={() => router.push("/biblioteca")} style={{ padding:"10px 20px", background:D.purple, color:"#fff", border:"none", borderRadius:9, fontSize:13, fontWeight:500, cursor:"pointer" }}>
+              <button onClick={() => router.push("/biblioteca")} style={{ flex:1, padding:11, background:D.purple, color:"#fff", border:"none", borderRadius:9, fontSize:13, fontWeight:500, cursor:"pointer" }}>
                 Ver biblioteca →
               </button>
             </div>

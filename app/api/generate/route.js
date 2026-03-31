@@ -10,7 +10,7 @@ const supabase = createClient(
 const LIMITS = { free: 20, professional: 200, enterprise: 1000 };
 
 export async function POST(request) {
-  const { prompt, tipo, brandProfile, userId } = await request.json();
+  const { prompt, tipo, brandProfile, userId, idiomapieza } = await request.json();
 
   if (userId) {
     const mesActual = new Date().toISOString().slice(0, 7);
@@ -44,10 +44,16 @@ ADN DE MARCA:
 - Propuesta de valor única: ${brandProfile.propuestaValor || ""}
 ${brandProfile.categorias && brandProfile.categorias.length > 0 ? "- Categorías de contenido: " + brandProfile.categorias.join(", ") : ""}
 ${brandProfile.idioma === "Spanglish" ? "IMPORTANTE: Esta marca habla en Spanglish — mezcla español e inglés de forma natural y auténtica, como lo haría una latina bicultural en EE.UU." : ""}
-${brandProfile.idioma === "Español" ? "IMPORTANTE: Todo el contenido debe ser en español." : ""}
-${brandProfile.idioma === "Inglés" ? "IMPORTANTE: All content must be in English." : ""}
-INSTRUCCIÓN CLAVE: El copy debe sonar EXACTAMENTE como esta marca — usa su tono, su idioma y habla directamente a su audiencia específica.
+${brandProfile.idioma === "Español" ? "IMPORTANTE: El ADN de esta marca es en español." : ""}
+${brandProfile.idioma === "Inglés" ? "IMPORTANT: This brand communicates in English." : ""}
+INSTRUCCIÓN CLAVE: El copy debe sonar EXACTAMENTE como esta marca — usa su tono y habla directamente a su audiencia específica.
 ` : "";
+
+  const idiomaInstruccion = idiomapieza && idiomapieza !== brandProfile?.idioma ? (
+    idiomapieza === "Español" ? "IMPORTANTE PARA ESTA PIEZA: Genera el copy en español, independientemente del idioma del ADN." :
+    idiomapieza === "Inglés" ? "IMPORTANT FOR THIS PIECE: Generate the copy in English, regardless of the brand ADN language." :
+    idiomapieza === "Spanglish" ? "IMPORTANTE PARA ESTA PIEZA: Genera el copy en Spanglish — mezcla español e inglés naturalmente." : ""
+  ) : "";
 
   const message = await client.messages.create({
     model: "claude-sonnet-4-20250514",
@@ -60,6 +66,8 @@ INSTRUCCIÓN CLAVE: El copy debe sonar EXACTAMENTE como esta marca — usa su to
 ${brandContext}
 
 Genera 5 propuestas de Instagram tipo "${tipo}" para: "${prompt}"
+
+${idiomaInstruccion}
 
 Cada propuesta: hook (1 linea), copy (maximo 80 palabras), cta (1 linea), hashtags (6-8 hashtags relevantes separados por espacios).
 
