@@ -121,8 +121,8 @@ export default function Landing() {
             </h1>
             <p style={{ fontSize:16, color:"rgba(255,255,255,0.5)", lineHeight:1.7, marginBottom:28 }}>{t.sub}</p>
             <div style={{ display:"flex", gap:10, marginBottom:14 }}>
-              <button style={S.btnPrimary} onClick={() => router.push("/login")}>{t.btn1}</button>
-              <button style={S.btnSecondary} onClick={() => router.push("/generar")}>{t.btn2}</button>
+              <button style={S.btnPrimary} onClick={() => router.push("/login?tab=register")}>{t.btn1}</button>
+              <button style={S.btnSecondary} onClick={() => router.push("/crear")}>{t.btn2}</button>
             </div>
             <div style={{ fontSize:12, color:"rgba(255,255,255,0.3)" }}>{t.note}</div>
             <div style={{ display:"flex", gap:24, marginTop:28 }}>
@@ -198,7 +198,7 @@ export default function Landing() {
       <div style={{ padding:"72px 32px", background:"#7950F2", textAlign:"center" }}>
         <h2 style={{ fontSize:32, fontWeight:500, color:"#fff", letterSpacing:"-0.02em", marginBottom:12 }}>{t.ctaTitle}</h2>
         <p style={{ fontSize:15, color:"rgba(255,255,255,0.75)", marginBottom:28 }}>{t.ctaSub}</p>
-        <button style={{ padding:"14px 32px", background:"#0D0D1F", color:"#7950F2", border:"none", borderRadius:10, fontSize:15, fontWeight:500, cursor:"pointer", fontFamily:"Inter, sans-serif" }} onClick={() => router.push("/login")}>
+        <button style={{ padding:"14px 32px", background:"#0D0D1F", color:"#7950F2", border:"none", borderRadius:10, fontSize:15, fontWeight:500, cursor:"pointer", fontFamily:"Inter, sans-serif" }} onClick={() => router.push("/login?tab=register")}>
           {t.ctaBtn}
         </button>
         <div style={{ fontSize:12, color:"rgba(255,255,255,0.55)", marginTop:12 }}>{t.ctaNote}</div>
