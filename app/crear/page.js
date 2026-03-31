@@ -15,6 +15,12 @@ const D = {
 export default function Crear() {
   const router = useRouter();
   const [step, setStep] = useState(1);
+  const [maxStep, setMaxStep] = useState(1);
+
+  const goToStep = (n) => {
+    setStep(n);
+    if (n > maxStep) setMaxStep(n);
+  };
   const [user, setUser] = useState(null);
   const [brandProfile, setBrandProfile] = useState(null);
 
@@ -136,7 +142,7 @@ export default function Crear() {
   };
 
   const resetAll = () => {
-    setStep(1); setPrompt(""); setTipo("Comercial"); setReferencias([]); setTalentos([]);
+    setStep(1); setMaxStep(1); setPrompt(""); setTipo("Comercial"); setReferencias([]); setTalentos([]);
     setVersiones([]); setCopies([]); setCopySeleccionado(null); setImgAprobada(false);
     setSavedFinal(false); setFeedback(""); setError("");
   };
@@ -148,8 +154,8 @@ export default function Crear() {
       {steps.map((s, i) => (
         <div key={s.n} style={{ display:"flex", alignItems:"center" }}>
           <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:3 }}>
-            <div onClick={() => step > s.n && setStep(s.n)}
-              style={{ width:26, height:26, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:10, fontWeight:600, background: step > s.n ? D.purple : step === s.n ? D.purple : "rgba(255,255,255,0.08)", color: step >= s.n ? "#fff" : D.text3, boxShadow: step === s.n ? "0 0 0 3px rgba(121,80,242,0.2)" : "none", cursor: step > s.n ? "pointer" : "default" }}>
+            <div onClick={() => s.n <= maxStep && setStep(s.n)}
+              style={{ width:26, height:26, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:10, fontWeight:600, background: step > s.n ? D.purple : step === s.n ? D.purple : "rgba(255,255,255,0.08)", color: step >= s.n ? "#fff" : D.text3, boxShadow: step === s.n ? "0 0 0 3px rgba(121,80,242,0.2)" : "none", cursor: s.n <= maxStep ? "pointer" : "default", opacity: s.n <= maxStep ? 1 : 0.5 }}>
               {step > s.n ? "✓" : s.n}
             </div>
             <span style={{ fontSize:10, color: step >= s.n ? D.purpleLight : D.text3, whiteSpace:"nowrap" }}>{s.l}</span>
@@ -161,9 +167,16 @@ export default function Crear() {
   );
 
   const BackBtn = ({ toStep }) => (
-    <button onClick={() => setStep(toStep)} style={{ display:"flex", alignItems:"center", gap:4, padding:"6px 0", background:"none", border:"none", color:D.text3, fontSize:12, cursor:"pointer", marginBottom:16 }}>
-      ← Volver al paso anterior
-    </button>
+    <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:16 }}>
+      <button onClick={() => setStep(toStep)} style={{ display:"flex", alignItems:"center", gap:4, padding:"6px 0", background:"none", border:"none", color:D.text3, fontSize:12, cursor:"pointer" }}>
+        ← Paso anterior
+      </button>
+      {maxStep > step && (
+        <button onClick={() => setStep(Math.min(step + 1, maxStep))} style={{ display:"flex", alignItems:"center", gap:4, padding:"6px 0", background:"none", border:"none", color:D.purpleLight, fontSize:12, cursor:"pointer" }}>
+          Siguiente paso →
+        </button>
+      )}
+    </div>
   );
 
   const NB = { width:"100%", padding:12, background:"linear-gradient(135deg,#7950F2,#4C6EF5)", color:"#fff", border:"none", borderRadius:9, fontSize:13, fontWeight:500, cursor:"pointer", marginBottom:8, fontFamily:"Inter, sans-serif" };
@@ -210,7 +223,7 @@ export default function Crear() {
                 ))}
               </div>
             </div>
-            <button onClick={() => prompt.trim() && setStep(2)}
+            <button onClick={() => prompt.trim() && goToStep(2)}
               style={{ ...NB, background: !prompt.trim() ? "rgba(121,80,242,0.3)" : "linear-gradient(135deg,#7950F2,#4C6EF5)", cursor: !prompt.trim() ? "not-allowed" : "pointer" }}>
               Continuar → Agregar referencias visuales
             </button>
@@ -253,8 +266,8 @@ export default function Crear() {
                 </UploadZone>
               )}
             </div>
-            <button onClick={() => setStep(3)} style={NB}>Continuar → Agregar foto de talento</button>
-            <button onClick={() => { setReferencias([]); setStep(3); }} style={SB}>Saltar — continuar sin referencias</button>
+            <button onClick={() => goToStep(3)} style={NB}>Continuar → Agregar foto de talento</button>
+            <button onClick={() => { setReferencias([]); goToStep(3); }} style={SB}>Saltar — continuar sin referencias</button>
           </div>
         )}
 
@@ -294,10 +307,10 @@ export default function Crear() {
                 </UploadZone>
               )}
             </div>
-            <button onClick={() => { setStep(4); generarImagen(); }} style={{ ...NB, background:"linear-gradient(135deg,#E64980,#7950F2)" }}>
+            <button onClick={() => { goToStep(4); generarImagen(); }} style={{ ...NB, background:"linear-gradient(135deg,#E64980,#7950F2)" }}>
               Generar imagen con IA →
             </button>
-            <button onClick={() => { setTalentos([]); setStep(4); generarImagen(); }} style={SB}>
+            <button onClick={() => { setTalentos([]); goToStep(4); generarImagen(); }} style={SB}>
               Generar sin talento
             </button>
           </div>
@@ -355,7 +368,7 @@ export default function Crear() {
                     {generatingImg ? "Generando..." : "↺ Regenerar con feedback"}
                   </button>
                   {versiones.length > 0 && !generatingImg && (
-                    <button onClick={() => { setImgAprobada(true); generarCopies(); setStep(5); }}
+                    <button onClick={() => { setImgAprobada(true); generarCopies(); goToStep(5); }}
                       style={{ width:"100%", padding:9, background:"rgba(64,192,87,0.12)", border:"1px solid rgba(64,192,87,0.3)", color:"#86EFAC", borderRadius:8, fontSize:12, fontWeight:500, cursor:"pointer", fontFamily:"Inter, sans-serif" }}>
                       ✓ Aprobar imagen → Generar copy
                     </button>
@@ -434,7 +447,7 @@ export default function Crear() {
                   </div>
                 ))}
                 {copySeleccionado && (
-                  <button onClick={() => { guardarFinal(); setStep(6); }}
+                  <button onClick={() => { guardarFinal(); goToStep(6); }}
                     style={{ width:"100%", padding:13, background:"linear-gradient(135deg,#40C057,#2F9E44)", color:"#fff", border:"none", borderRadius:10, fontSize:14, fontWeight:500, cursor:"pointer", marginTop:6, fontFamily:"Inter, sans-serif" }}>
                     Guardar arte final →
                   </button>
