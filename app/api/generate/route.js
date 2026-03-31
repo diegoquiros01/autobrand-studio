@@ -49,11 +49,12 @@ ${brandProfile.idioma === "Inglés" ? "IMPORTANT: This brand communicates in Eng
 INSTRUCCIÓN CLAVE: El copy debe sonar EXACTAMENTE como esta marca — usa su tono y habla directamente a su audiencia específica.
 ` : "";
 
-  const idiomaInstruccion = idiomapieza && idiomapieza !== brandProfile?.idioma ? (
-    idiomapieza === "Español" ? "IMPORTANTE PARA ESTA PIEZA: Genera el copy en español, independientemente del idioma del ADN." :
-    idiomapieza === "Inglés" ? "IMPORTANT FOR THIS PIECE: Generate the copy in English, regardless of the brand ADN language." :
-    idiomapieza === "Spanglish" ? "IMPORTANTE PARA ESTA PIEZA: Genera el copy en Spanglish — mezcla español e inglés naturalmente." : ""
-  ) : "";
+  const idiomaFinal = idiomapieza && idiomapieza !== "ADN" ? idiomapieza : (brandProfile?.idioma || "Español");
+  const idiomaInstruccion = 
+    idiomaFinal === "Español" ? "INSTRUCCIÓN OBLIGATORIA: Todo el copy DEBE estar en español. Sin excepciones." :
+    idiomaFinal === "Inglés" ? "MANDATORY INSTRUCTION: All copy MUST be in English. No exceptions." :
+    idiomaFinal === "Spanglish" ? "INSTRUCCIÓN OBLIGATORIA: El copy DEBE estar en Spanglish — mezcla natural de español e inglés como hablan las latinas biculturales en EE.UU." : 
+    "INSTRUCCIÓN OBLIGATORIA: Todo el copy DEBE estar en español.";
 
   const message = await client.messages.create({
     model: "claude-sonnet-4-20250514",

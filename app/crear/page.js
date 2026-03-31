@@ -92,7 +92,7 @@ export default function Crear() {
     const url = URL.createObjectURL(file);
     img.onload = () => {
       const canvas = document.createElement("canvas");
-      const MAX = 800;
+      const MAX = 512;
       let w = img.width, h = img.height;
       if (w > MAX || h > MAX) {
         if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
@@ -101,7 +101,7 @@ export default function Crear() {
       canvas.width = w; canvas.height = h;
       canvas.getContext("2d").drawImage(img, 0, 0, w, h);
       URL.revokeObjectURL(url);
-      const data = canvas.toDataURL("image/jpeg", 0.7).split(",")[1];
+      const data = canvas.toDataURL("image/jpeg", 0.6).split(",")[1];
       res(data);
     };
     img.onerror = rej;
@@ -156,24 +156,41 @@ export default function Crear() {
 
   const guardarFinal = async () => {
     const copy = copies.find(c => c.id === copySeleccionado);
-    if (!copy || versiones.length === 0) { console.log("Missing copy or versiones"); return; }
+    if (!copy) { console.log("No copy selected"); return; }
+    if (versiones.length === 0) { console.log("No versiones"); return; }
     try {
       const imgData = versiones[versionActiva];
-      const blob = await fetch("data:" + imgData.mimeType + ";base64," + imgData.image).then(r => r.blob());
       const { data: { user } } = await supabase.auth.getUser();
-      console.log("Saving for user:", user?.id);
-      if (user) {
-        const fileName = user.id + "/resultados/" + Date.now() + ".png";
-        const { error: uploadError } = await supabase.storage.from("assets").upload(fileName, blob, { contentType: imgData.mimeType });
-        if (uploadError) { console.error("Upload error:", uploadError); }
-        const { error: insertError } = await supabase.from("generaciones").insert({
-          user_id: user.id, prompt, tipo,
-          propuestas: [copy], imagen_url: fileName,
-        });
-        if (insertError) { console.error("Insert error:", insertError); }
-        else { console.log("Saved successfully!"); setSavedFinal(true); }
+      if (!user) { console.log("No user logged in"); return; }
+      
+      const blob = await fetch("data:" + imgData.mimeType + ";base64," + imgData.image).then(r => r.blob());
+      const fileName = user.id + "/resultados/" + Date.now() + ".png";
+      
+      const { error: uploadError } = await supabase.storage.from("assets").upload(fileName, blob, { contentType: "image/png" });
+      if (uploadError) {
+        console.error("Upload error:", uploadError);
+        // Try without contentType
+        const { error: uploadError2 } = await supabase.storage.from("assets").upload(fileName + "2.png", blob);
+        if (uploadError2) { console.error("Upload error 2:", uploadError2); return; }
       }
-    } catch(e) { console.error("guardarFinal error:", e); }
+      
+      const { error: insertError } = await supabase.from("generaciones").insert({
+        user_id: user.id,
+        prompt: prompt,
+        tipo: tipo,
+        propuestas: [copy],
+        imagen_url: fileName,
+      });
+      
+      if (insertError) {
+        console.error("Insert error:", insertError);
+      } else {
+        console.log("Saved successfully!");
+        setSavedFinal(true);
+      }
+    } catch(e) {
+      console.error("guardarFinal error:", e);
+    }
   };
 
   const resetAll = () => {
