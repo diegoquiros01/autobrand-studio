@@ -51,29 +51,40 @@ export default function Crear() {
   const [savedFinal, setSavedFinal] = useState(false);
   const [error, setError] = useState("");
 
+  const loadBrandProfile = async (user) => {
+    if (!user) return;
+    const { data } = await supabase.from("brand_profiles").select("*").eq("user_id", user.id).single();
+    if (data) {
+      const bp = {
+        nombre: data.nombre, descripcion: data.descripcion,
+        audiencia: data.audiencia, tono: data.tono,
+        idioma: data.idioma, categorias: data.categorias,
+        propuestaValor: data.propuesta_valor,
+        instagramUrl: data.instagram_url, webUrl: data.web_url,
+      };
+      setBrandProfile(bp);
+      localStorage.setItem("brandProfile", JSON.stringify(bp));
+    } else {
+      const bp = localStorage.getItem("brandProfile");
+      if (bp) setBrandProfile(JSON.parse(bp));
+    }
+  };
+
   useEffect(() => {
     const init = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
-      if (user) {
-        const { data } = await supabase.from("brand_profiles").select("*").eq("user_id", user.id).single();
-        if (data) {
-          const bp = {
-            nombre: data.nombre, descripcion: data.descripcion,
-            audiencia: data.audiencia, tono: data.tono,
-            idioma: data.idioma, categorias: data.categorias,
-            propuestaValor: data.propuesta_valor,
-            instagramUrl: data.instagram_url, webUrl: data.web_url,
-          };
-          setBrandProfile(bp);
-          localStorage.setItem("brandProfile", JSON.stringify(bp));
-        } else {
-          const bp = localStorage.getItem("brandProfile");
-          if (bp) setBrandProfile(JSON.parse(bp));
-        }
-      }
+      await loadBrandProfile(user);
     };
     init();
+
+    // Reload ADN when user comes back to this tab
+    const handleFocus = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      await loadBrandProfile(user);
+    };
+    window.addEventListener("focus", handleFocus);
+    return () => window.removeEventListener("focus", handleFocus);
   }, []);
 
   const toBase64 = (file) => new Promise((res, rej) => {
