@@ -68,10 +68,16 @@ export default function Landing() {
 
       {/* ═══ HERO — FULL VIEWPORT ═══ */}
       <section style={s.heroSection}>
-        <div style={s.heroGradient} />
-        <div style={s.heroGradient2} />
+        {/* Animated gradient background */}
+        <div style={{ position:"absolute", inset:0, background:"radial-gradient(ellipse 80% 50% at 50% -20%, rgba(121,80,242,0.25) 0%, transparent 50%), radial-gradient(ellipse 60% 40% at 80% 60%, rgba(230,73,128,0.08) 0%, transparent 50%), radial-gradient(ellipse 50% 30% at 10% 80%, rgba(167,139,250,0.06) 0%, transparent 50%)", zIndex:0 }} />
+        {/* Slow moving orbs */}
+        <div className="orb-1" style={{ position:"absolute", top:"15%", left:"20%", width:300, height:300, borderRadius:"50%", background:"rgba(121,80,242,0.08)", filter:"blur(80px)", pointerEvents:"none", zIndex:0 }} />
+        <div className="orb-2" style={{ position:"absolute", bottom:"10%", right:"15%", width:250, height:250, borderRadius:"50%", background:"rgba(230,73,128,0.06)", filter:"blur(70px)", pointerEvents:"none", zIndex:0 }} />
+        <div className="orb-3" style={{ position:"absolute", top:"60%", left:"60%", width:200, height:200, borderRadius:"50%", background:"rgba(167,139,250,0.05)", filter:"blur(60px)", pointerEvents:"none", zIndex:0 }} />
         {/* Grid overlay */}
-        <div style={{ position:"absolute", inset:0, backgroundImage:"linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px)", backgroundSize:"60px 60px", maskImage:"radial-gradient(circle at center, black, transparent 80%)", WebkitMaskImage:"radial-gradient(circle at center, black, transparent 80%)", pointerEvents:"none", zIndex:0 }} />
+        <div style={{ position:"absolute", inset:0, backgroundImage:"linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px)", backgroundSize:"40px 40px", maskImage:"radial-gradient(ellipse 70% 50% at 50% 40%, black, transparent)", WebkitMaskImage:"radial-gradient(ellipse 70% 50% at 50% 40%, black, transparent)", pointerEvents:"none", zIndex:0 }} />
+        {/* Horizon line glow */}
+        <div style={{ position:"absolute", top:"50%", left:0, right:0, height:1, background:"linear-gradient(90deg, transparent 5%, rgba(121,80,242,0.15) 30%, rgba(167,139,250,0.2) 50%, rgba(121,80,242,0.15) 70%, transparent 95%)", zIndex:0 }} />
         <div style={s.contentWrapper}>
           <div className="animate-hero" style={{ ...s.heroBadge, backdropFilter:"blur(10px)", WebkitBackdropFilter:"blur(10px)" }}>
             <span style={{ fontSize:16 }}>🧠</span>
@@ -246,6 +252,27 @@ const GlobalAnimations = () => (
       50% { transform: translateY(-10px); }
       100% { transform: translateY(0px); }
     }
+    @keyframes orbFloat1 {
+      0% { transform: translate(0, 0); }
+      33% { transform: translate(30px, -20px); }
+      66% { transform: translate(-20px, 15px); }
+      100% { transform: translate(0, 0); }
+    }
+    @keyframes orbFloat2 {
+      0% { transform: translate(0, 0); }
+      33% { transform: translate(-25px, 20px); }
+      66% { transform: translate(15px, -25px); }
+      100% { transform: translate(0, 0); }
+    }
+    @keyframes orbFloat3 {
+      0% { transform: translate(0, 0); }
+      33% { transform: translate(20px, 15px); }
+      66% { transform: translate(-15px, -20px); }
+      100% { transform: translate(0, 0); }
+    }
+    .orb-1 { animation: orbFloat1 8s ease-in-out infinite; }
+    .orb-2 { animation: orbFloat2 10s ease-in-out infinite; }
+    .orb-3 { animation: orbFloat3 12s ease-in-out infinite; }
     @keyframes shimmer {
       0% { transform: translateX(-100%); }
       100% { transform: translateX(100%); }
