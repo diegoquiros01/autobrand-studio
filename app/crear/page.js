@@ -1,10 +1,15 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, useRef, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "../../lib/supabase";
 import AppLayout from "../components/AppLayout";
 
 const TIPOS = ["Comercial","Branding","Educativo","Storytelling","Promocional","Posicionamiento"];
+const FORMATOS = [
+  { key:"square", label:"Post cuadrado", desc:"1:1 · Feed" },
+  { key:"story", label:"Story vertical", desc:"9:16 · Stories/Reels" },
+  { key:"carousel", label:"Carrusel", desc:"1:1 · Slides" },
+];
 
 const D = {
   bg3:"rgba(255,255,255,0.04)", border:"rgba(255,255,255,0.08)",
@@ -12,8 +17,9 @@ const D = {
   purple:"#7950F2", purpleLight:"#A78BFA",
 };
 
-export default function Crear() {
+function CrearContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [step, setStep] = useState(1);
   const [maxStep, setMaxStep] = useState(1);
 
@@ -27,6 +33,9 @@ export default function Crear() {
   const [prompt, setPrompt] = useState("");
   const [idiomapieza, setIdiomaPieza] = useState("ADN");
   const [tipo, setTipo] = useState("Comercial");
+  const [formato, setFormato] = useState("square");
+  const [skipRefs, setSkipRefs] = useState(false);
+  const [skipTalent, setSkipTalent] = useState(false);
 
   const [referencias, setReferencias] = useState([]);
   const refInput = useRef(null);
@@ -61,6 +70,8 @@ export default function Crear() {
         idioma: data.idioma, categorias: data.categorias,
         propuestaValor: data.propuesta_valor,
         instagramUrl: data.instagram_url, webUrl: data.web_url,
+        personalidad: data.personalidad, coloresMarca: data.colores_marca,
+        estiloVisual: data.estilo_visual, ejemplosCopy: data.ejemplos_copy,
       };
       setBrandProfile(bp);
       localStorage.setItem("brandProfile", JSON.stringify(bp));
@@ -75,6 +86,11 @@ export default function Crear() {
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
       await loadBrandProfile(user);
+      // Pre-fill from query params (e.g. "Crear pieza similar" from biblioteca)
+      const qPrompt = searchParams.get("prompt");
+      const qTipo = searchParams.get("tipo");
+      if (qPrompt) setPrompt(qPrompt);
+      if (qTipo) setTipo(qTipo);
     };
     init();
 
@@ -110,7 +126,7 @@ export default function Crear() {
 
   const generarImagen = async (feedbackText = "") => {
     setGeneratingImg(true); setError(""); setGenProgress(0);
-    const msgs = ["Analizando tu marca...","Procesando referencias...","Componiendo la imagen...","Aplicando estilo de marca...","Finalizando..."];
+    const msgs = ["Art Director analizando tu marca...","Creando brief visual con IA...","Describiendo referencias y estilo...","Generando imagen con Gemini...","Componiendo la imagen...","Aplicando estilo de marca...","Validando calidad de imagen...","Ajustes finales del Art Director...","Casi listo..."];
     let mi = 0; setGenMsg(msgs[0]);
     const iv = setInterval(() => {
       setGenProgress(p => Math.min(p + Math.random() * 8, 90));
@@ -123,7 +139,7 @@ export default function Crear() {
       console.log("Generating image with:", { prompt: promptFinal, refs: refB.length, talents: talB.length, brandProfile: brandProfile?.nombre });
       const res = await fetch("/api/generate-image", {
         method:"POST", headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({ prompt: promptFinal, brandProfile, referencias: refB, talentos: talB, editedCopy: prompt, userId: user?.id || "", idiomapieza: idiomapieza === "ADN" ? (brandProfile?.idioma || "") : idiomapieza }),
+        body: JSON.stringify({ prompt: promptFinal, brandProfile, referencias: refB, talentos: talB, editedCopy: prompt, userId: user?.id || "", idiomapieza: idiomapieza === "ADN" ? (brandProfile?.idioma || "") : idiomapieza, formato }),
       });
       const data = await res.json();
       if (data.error === "limit_reached") {
@@ -154,14 +170,16 @@ export default function Crear() {
     setGeneratingCopy(false);
   };
 
+  const [savingFinal, setSavingFinal] = useState(false);
+
   const guardarFinal = async () => {
     const copy = copies.find(c => c.id === copySeleccionado);
-    if (!copy) { console.log("No copy selected"); return; }
-    if (versiones.length === 0) { console.log("No versiones"); return; }
+    if (!copy || versiones.length === 0) return;
+    setSavingFinal(true); setError("");
     try {
       const imgData = versiones[versionActiva];
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { console.log("No user"); return; }
+      if (!user) { setError("Debes iniciar sesión para guardar."); setSavingFinal(false); return; }
 
       const res = await fetch("/api/guardar-pieza", {
         method: "POST",
@@ -176,18 +194,19 @@ export default function Crear() {
       });
       const data = await res.json();
       if (data.success) {
-        console.log("Saved!");
         setSavedFinal(true);
       } else {
-        console.error("Save failed:", data.error);
+        setError("Error guardando pieza: " + (data.error || "Intenta de nuevo"));
       }
     } catch(e) {
-      console.error("guardarFinal error:", e);
+      setError("Error guardando pieza: " + e.message);
     }
+    setSavingFinal(false);
   };
 
   const resetAll = () => {
-    setStep(1); setMaxStep(1); setPrompt(""); setTipo("Comercial"); setIdiomaPieza("ADN"); setReferencias([]); setTalentos([]);
+    setStep(1); setMaxStep(1); setPrompt(""); setTipo("Comercial"); setFormato("square"); setIdiomaPieza("ADN");
+    setReferencias([]); setTalentos([]); setSkipRefs(false); setSkipTalent(false);
     setVersiones([]); setCopies([]); setCopySeleccionado(null); setImgAprobada(false);
     setSavedFinal(false); setFeedback(""); setError("");
   };
@@ -267,6 +286,16 @@ export default function Crear() {
                   </button>
                 ))}
               </div>
+              <div style={{ fontSize:12, color:D.text3, marginTop:12, marginBottom:8 }}>Formato</div>
+              <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:6 }}>
+                {FORMATOS.map(f => (
+                  <button key={f.key} onClick={() => setFormato(f.key)}
+                    style={{ padding:"8px 6px", borderRadius:8, fontSize:11.5, border: formato===f.key ? "1.5px solid " + D.purple : "1px solid rgba(255,255,255,0.1)", background: formato===f.key ? "rgba(121,80,242,0.12)" : "transparent", color: formato===f.key ? D.purpleLight : D.text2, fontWeight: formato===f.key ? 500 : 400, cursor:"pointer", textAlign:"center" }}>
+                    <div>{f.label}</div>
+                    <div style={{ fontSize:9, opacity:0.6, marginTop:2 }}>{f.desc}</div>
+                  </button>
+                ))}
+              </div>
             </div>
               <div style={{ marginTop:14, marginBottom:14 }}>
                 <div style={{ fontSize:12, color:D.text3, marginBottom:8 }}>Idioma de esta pieza</div>
@@ -329,7 +358,7 @@ export default function Crear() {
               )}
             </div>
             <button onClick={() => goToStep(3)} style={NB}>Continuar → Agregar foto de talento</button>
-            <button onClick={() => { setReferencias([]); goToStep(3); }} style={SB}>Saltar — continuar sin referencias</button>
+            <button onClick={() => { setReferencias([]); setSkipRefs(true); goToStep(3); }} style={SB}>Saltar — continuar sin referencias</button>
           </div>
         )}
 
@@ -372,7 +401,7 @@ export default function Crear() {
             <button onClick={() => { goToStep(4); generarImagen(); }} style={{ ...NB, background:"linear-gradient(135deg,#E64980,#7950F2)" }}>
               Generar imagen con IA →
             </button>
-            <button onClick={() => { setTalentos([]); goToStep(4); generarImagen(); }} style={SB}>
+            <button onClick={() => { setTalentos([]); setSkipTalent(true); goToStep(4); generarImagen(); }} style={SB}>
               Generar sin talento
             </button>
           </div>
@@ -381,6 +410,12 @@ export default function Crear() {
         {step === 4 && (
           <div>
             <BackBtn toStep={3} />
+            <div style={{ display:"flex", gap:6, marginBottom:12, flexWrap:"wrap" }}>
+              <span style={{ fontSize:10, padding:"3px 10px", borderRadius:12, background:"rgba(121,80,242,0.1)", border:"1px solid rgba(121,80,242,0.2)", color:D.purpleLight }}>{tipo}</span>
+              <span style={{ fontSize:10, padding:"3px 10px", borderRadius:12, background:"rgba(121,80,242,0.1)", border:"1px solid rgba(121,80,242,0.2)", color:D.purpleLight }}>{FORMATOS.find(f => f.key === formato)?.label || "Post cuadrado"}</span>
+              {skipRefs && <span style={{ fontSize:10, padding:"3px 10px", borderRadius:12, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", color:D.text3 }}>Sin referencias</span>}
+              {skipTalent && <span style={{ fontSize:10, padding:"3px 10px", borderRadius:12, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", color:D.text3 }}>Sin talento</span>}
+            </div>
             <div style={{ display:"grid", gridTemplateColumns:"1fr 260px", gap:16 }}>
               <div>
                 <div style={{ background:"linear-gradient(135deg,rgba(121,80,242,0.1),rgba(230,73,128,0.08))", borderRadius:12, minHeight:300, display:"flex", alignItems:"center", justifyContent:"center", marginBottom:10, position:"relative", overflow:"hidden", border:"1px solid rgba(255,255,255,0.06)" }}>
@@ -390,7 +425,7 @@ export default function Crear() {
                       <div style={{ height:4, background:"rgba(255,255,255,0.06)", borderRadius:4, overflow:"hidden", width:220, margin:"0 auto" }}>
                         <div style={{ height:"100%", width: Math.min(genProgress,95) + "%", background:"linear-gradient(90deg,#7950F2,#4C6EF5)", borderRadius:4, transition:"width 0.5s" }} />
                       </div>
-                      <div style={{ fontSize:11, color:D.text3, marginTop:10 }}>Gemini está procesando · 20-30 segundos</div>
+                      <div style={{ fontSize:11, color:D.text3, marginTop:10 }}>Art Director + Gemini procesando · 30-45 segundos</div>
                       <div style={{ fontSize:10, color:"rgba(121,80,242,0.5)", marginTop:6 }}>{Math.round(Math.min(genProgress,95))}%</div>
                     </div>
                   ) : versiones.length > 0 ? (
@@ -509,11 +544,12 @@ export default function Crear() {
                   </div>
                 ))}
                 {copySeleccionado && (
-                  <button onClick={() => { guardarFinal(); goToStep(6); }}
-                    style={{ width:"100%", padding:13, background:"linear-gradient(135deg,#40C057,#2F9E44)", color:"#fff", border:"none", borderRadius:10, fontSize:14, fontWeight:500, cursor:"pointer", marginTop:6, fontFamily:"Inter, sans-serif" }}>
-                    Guardar arte final →
+                  <button onClick={() => { guardarFinal(); goToStep(6); }} disabled={savingFinal}
+                    style={{ width:"100%", padding:13, background: savingFinal ? "rgba(64,192,87,0.3)" : "linear-gradient(135deg,#40C057,#2F9E44)", color:"#fff", border:"none", borderRadius:10, fontSize:14, fontWeight:500, cursor: savingFinal ? "not-allowed" : "pointer", marginTop:6, fontFamily:"Inter, sans-serif" }}>
+                    {savingFinal ? "Guardando..." : "Guardar arte final →"}
                   </button>
                 )}
+                {error && <div style={{ background:"rgba(220,38,38,0.1)", border:"1px solid rgba(220,38,38,0.2)", borderRadius:8, padding:10, fontSize:11, color:"#FCA5A5", marginTop:8 }}>{error}</div>}
               </div>
             )}
           </div>
@@ -521,11 +557,16 @@ export default function Crear() {
 
         {step === 6 && (
           <div>
+            {savedFinal && (
+              <div style={{ background:"rgba(64,192,87,0.1)", border:"1px solid rgba(64,192,87,0.3)", borderRadius:10, padding:"12px 16px", marginBottom:16, display:"flex", alignItems:"center", gap:10 }}>
+                <div style={{ width:24, height:24, background:"#40C057", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:12, color:"#fff", flexShrink:0 }}>✓</div>
+                <span style={{ fontSize:13, color:"#86EFAC", fontWeight:500 }}>Guardado en tu biblioteca</span>
+              </div>
+            )}
             <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:20 }}>
-              <div style={{ width:32, height:32, background:"rgba(64,192,87,0.15)", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:16 }}>✓</div>
               <div>
-                <div style={{ fontSize:16, fontWeight:500, color:D.text }}>Arte final guardado</div>
-                <div style={{ fontSize:12, color:D.text2 }}>Tu pieza está en la biblioteca</div>
+                <div style={{ fontSize:16, fontWeight:500, color:D.text }}>Arte final</div>
+                <div style={{ fontSize:12, color:D.text2 }}>{tipo} · {FORMATOS.find(f => f.key === formato)?.label || "Post cuadrado"}</div>
               </div>
             </div>
 
@@ -580,5 +621,13 @@ export default function Crear() {
         )}
       </div>
     </AppLayout>
+  );
+}
+
+export default function Crear() {
+  return (
+    <Suspense fallback={null}>
+      <CrearContent />
+    </Suspense>
   );
 }

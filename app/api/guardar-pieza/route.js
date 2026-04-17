@@ -14,12 +14,13 @@ export async function POST(request) {
     }
 
     const byteCharacters = Buffer.from(imageBase64, "base64");
-    const fileName = userId + "/resultados/" + Date.now() + ".png";
-    
+    const ext = (mimeType || "image/png").split("/")[1] || "png";
+    const fileName = userId + "/resultados/" + Date.now() + "." + ext;
+
     const { error: uploadError } = await supabase.storage
       .from("assets")
-      .upload(fileName, byteCharacters, { 
-        contentType: "image/png",
+      .upload(fileName, byteCharacters, {
+        contentType: mimeType || "image/png",
         upsert: true
       });
     

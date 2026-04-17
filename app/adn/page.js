@@ -15,6 +15,7 @@ function ADNContent() {
   const [screenshots, setScreenshots] = useState([]);
   const [sources, setSources] = useState([]);
   const [showAnalyze, setShowAnalyze] = useState(false);
+  const [analyzeError, setAnalyzeError] = useState("");
   const searchParams = useSearchParams();
   const isOnboarding = searchParams.get("onboarding") === "true";
   const screenshotRef = useRef(null);
@@ -22,6 +23,8 @@ function ADNContent() {
     nombre: "", descripcion: "", audiencia: "", tono: "",
     idioma: "Español", categorias: [], propuestaValor: "",
     instagramUrl: "", webUrl: "", canvaUrl: "",
+    personalidad: "", coloresMarca: [], estiloVisual: "",
+    ejemplosCopy: ["", "", ""], competidores: ["", "", ""],
   });
 
   const D = {
@@ -47,12 +50,18 @@ function ADNContent() {
           idioma: data.idioma || "Español", categorias: data.categorias || [],
           propuestaValor: data.propuesta_valor || "",
           instagramUrl: data.instagram_url || "", webUrl: data.web_url || "", canvaUrl: data.canva_url || "",
+          personalidad: data.personalidad || "", coloresMarca: data.colores_marca || [],
+          estiloVisual: data.estilo_visual || "",
+          ejemplosCopy: data.ejemplos_copy && data.ejemplos_copy.length > 0 ? data.ejemplos_copy : ["", "", ""],
+          competidores: data.competidores && data.competidores.length > 0 ? data.competidores : ["", "", ""],
         });
         localStorage.setItem("brandProfile", JSON.stringify({
           nombre: data.nombre, descripcion: data.descripcion,
           audiencia: data.audiencia, tono: data.tono,
           idioma: data.idioma, categorias: data.categorias,
           propuestaValor: data.propuesta_valor,
+          personalidad: data.personalidad, coloresMarca: data.colores_marca,
+          estiloVisual: data.estilo_visual, ejemplosCopy: data.ejemplos_copy,
         }));
       }
     };
@@ -66,7 +75,7 @@ function ADNContent() {
 
   const analyzeInstagram = async () => {
     if (screenshots.length === 0 && !profile.instagramUrl) return;
-    setAnalyzing(true); setAnalyzeProgress(0);
+    setAnalyzing(true); setAnalyzeProgress(0); setAnalyzeError("");
     const msgs = ["Analizando tu contenido...", "Identificando tu tono...", "Detectando tu audiencia...", "Construyendo tu ADN..."];
     let mi = 0; setAnalyzeMsg(msgs[0]);
     const iv = setInterval(() => {
@@ -83,8 +92,10 @@ function ADNContent() {
       if (data.profile) {
         setProfile(prev => ({ ...prev, ...data.profile, instagramUrl: prev.instagramUrl, webUrl: prev.webUrl, canvaUrl: prev.canvaUrl }));
         setShowAnalyze(false);
+      } else if (data.error) {
+        setAnalyzeError("Error: " + data.error);
       }
-    } catch(e) { console.error(e); }
+    } catch(e) { setAnalyzeError("Error analizando tu marca. Intenta de nuevo."); console.error(e); }
     clearInterval(iv); setAnalyzeProgress(100); setAnalyzing(false); setAnalyzeMsg("");
   };
 
@@ -99,6 +110,11 @@ function ADNContent() {
       idioma: profile.idioma, categorias: profile.categorias,
       propuesta_valor: profile.propuestaValor,
       instagram_url: profile.instagramUrl, web_url: profile.webUrl, canva_url: profile.canvaUrl,
+      personalidad: profile.personalidad,
+      colores_marca: profile.coloresMarca.filter(c => c),
+      estilo_visual: profile.estiloVisual,
+      ejemplos_copy: profile.ejemplosCopy.filter(e => e),
+      competidores: profile.competidores.filter(c => c),
       updated_at: new Date().toISOString(),
     };
     if (existing) await supabase.from("brand_profiles").update(payload).eq("user_id", user.id);
@@ -210,6 +226,9 @@ function ADNContent() {
                   </div>
                 </div>
               )}
+              {analyzeError && (
+                <div style={{ background:"rgba(220,38,38,0.1)", border:"1px solid rgba(220,38,38,0.2)", borderRadius:8, padding:10, fontSize:11, color:"#FCA5A5", marginBottom:10 }}>{analyzeError}</div>
+              )}
               <button onClick={analyzeInstagram} disabled={analyzing || sources.length === 0 || (sources.includes("screenshots") && screenshots.length === 0 && sources.length === 1)}
                 style={{ width:"100%", padding:10, background: analyzing || sources.length === 0 ? "rgba(121,80,242,0.3)" : "linear-gradient(135deg,#7950F2,#4C6EF5)", color:"#fff", border:"none", borderRadius:8, fontSize:13, fontWeight:500, cursor: analyzing || sources.length === 0 ? "not-allowed" : "pointer" }}>
                 {analyzing ? "Analizando con Claude..." : "Analizar y generar ADN (" + sources.length + " fuentes)"}
@@ -295,6 +314,64 @@ function ADNContent() {
                     </button>
                   ))}
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14, marginBottom:14 }}>
+          <div style={{ background:D.bg3, border:"1px solid " + D.border, borderRadius:12, padding:18 }}>
+            <div style={{ fontSize:11, fontWeight:500, color:D.text3, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:14 }}>Personalidad de marca</div>
+            <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+              <div>
+                <label style={{ fontSize:12, color:D.text2, display:"block", marginBottom:5 }}>Personalidad y voz</label>
+                <textarea style={{ ...inp, minHeight:80, resize:"none" }} placeholder="Cómo habla tu marca, qué evita, frases típicas... Ej: Hablo directo, uso humor, evito ser formal, digo 'reina' y 'amiga'..." value={profile.personalidad} onChange={e => setProfile(p => ({ ...p, personalidad: e.target.value }))} />
+              </div>
+              <div>
+                <label style={{ fontSize:12, color:D.text2, display:"block", marginBottom:5 }}>Estilo visual</label>
+                <textarea style={{ ...inp, minHeight:60, resize:"none" }} placeholder="Ej: Minimalista con toques de color, lifestyle, editorial, colorido y vibrante..." value={profile.estiloVisual} onChange={e => setProfile(p => ({ ...p, estiloVisual: e.target.value }))} />
+              </div>
+              <div>
+                <label style={{ fontSize:12, color:D.text2, display:"block", marginBottom:5 }}>Colores de marca</label>
+                <div style={{ display:"flex", gap:8, flexWrap:"wrap", alignItems:"center" }}>
+                  {profile.coloresMarca.map((c, i) => (
+                    <div key={i} style={{ display:"flex", alignItems:"center", gap:4 }}>
+                      <input type="color" value={c} onChange={e => { const arr = [...profile.coloresMarca]; arr[i] = e.target.value; setProfile(p => ({ ...p, coloresMarca: arr })); }}
+                        style={{ width:28, height:28, border:"none", borderRadius:6, cursor:"pointer", background:"transparent" }} />
+                      <span style={{ fontSize:10, color:D.text3, fontFamily:"monospace" }}>{c}</span>
+                      <button onClick={() => setProfile(p => ({ ...p, coloresMarca: p.coloresMarca.filter((_, j) => j !== i) }))}
+                        style={{ width:16, height:16, borderRadius:"50%", background:"rgba(220,38,38,0.2)", border:"none", color:"#FCA5A5", fontSize:9, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center" }}>x</button>
+                    </div>
+                  ))}
+                  {profile.coloresMarca.length < 6 && (
+                    <button onClick={() => setProfile(p => ({ ...p, coloresMarca: [...p.coloresMarca, "#7950F2"] }))}
+                      style={{ padding:"4px 10px", borderRadius:6, border:"1px dashed rgba(255,255,255,0.15)", background:"transparent", color:D.text3, fontSize:11, cursor:"pointer" }}>+ Color</button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+            <div style={{ background:D.bg3, border:"1px solid " + D.border, borderRadius:12, padding:18 }}>
+              <div style={{ fontSize:11, fontWeight:500, color:D.text3, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:14 }}>Ejemplos de copy ideal</div>
+              <div style={{ fontSize:11, color:"rgba(121,80,242,0.7)", marginBottom:10 }}>Pega 3 textos que consideras perfectos para tu marca</div>
+              <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+                {profile.ejemplosCopy.map((ej, i) => (
+                  <textarea key={i} style={{ ...inp, minHeight:50, resize:"none" }} placeholder={"Ejemplo " + (i + 1) + "..."} value={ej}
+                    onChange={e => { const arr = [...profile.ejemplosCopy]; arr[i] = e.target.value; setProfile(p => ({ ...p, ejemplosCopy: arr })); }} />
+                ))}
+              </div>
+            </div>
+
+            <div style={{ background:D.bg3, border:"1px solid " + D.border, borderRadius:12, padding:18 }}>
+              <div style={{ fontSize:11, fontWeight:500, color:D.text3, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:14 }}>Marcas de referencia</div>
+              <div style={{ fontSize:11, color:"rgba(121,80,242,0.7)", marginBottom:10 }}>Marcas que admiras o que son tu inspiración</div>
+              <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+                {profile.competidores.map((comp, i) => (
+                  <input key={i} style={inp} placeholder={"@cuenta o URL " + (i + 1)} value={comp}
+                    onChange={e => { const arr = [...profile.competidores]; arr[i] = e.target.value; setProfile(p => ({ ...p, competidores: arr })); }} />
+                ))}
               </div>
             </div>
           </div>

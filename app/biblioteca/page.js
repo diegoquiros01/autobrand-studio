@@ -10,6 +10,8 @@ export default function Biblioteca() {
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(null);
   const [filter, setFilter] = useState("todas");
+  const [page, setPage] = useState(1);
+  const PER_PAGE = 20;
 
   const D = {
     bg3:"rgba(255,255,255,0.04)", border:"rgba(255,255,255,0.08)",
@@ -48,7 +50,9 @@ export default function Biblioteca() {
 
   const formatDate = (d) => new Date(d).toLocaleDateString("es-ES", { day:"numeric", month:"short", year:"numeric" });
 
-  const filtered = filter === "todas" ? generaciones : generaciones.filter(g => g.tipo === filter);
+  const allFiltered = filter === "todas" ? generaciones : generaciones.filter(g => g.tipo === filter);
+  const totalPages = Math.ceil(allFiltered.length / PER_PAGE);
+  const filtered = allFiltered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
 
   return (
     <AppLayout>
@@ -66,7 +70,7 @@ export default function Biblioteca() {
 
         <div style={{ display:"flex", gap:6, marginBottom:20, flexWrap:"wrap" }}>
           {TIPOS.map(t => (
-            <button key={t} onClick={() => setFilter(t)}
+            <button key={t} onClick={() => { setFilter(t); setPage(1); }}
               style={{ padding:"5px 12px", borderRadius:20, fontSize:11.5, border: filter===t ? "1.5px solid " + D.purple : "1px solid rgba(255,255,255,0.1)", background: filter===t ? "rgba(121,80,242,0.12)" : "transparent", color: filter===t ? D.purpleLight : D.text3, fontWeight: filter===t ? 500 : 400, cursor:"pointer" }}>
               {t === "todas" ? "Todas (" + generaciones.length + ")" : t}
             </button>
@@ -90,7 +94,7 @@ export default function Biblioteca() {
         ) : (
           <div style={{ display:"grid", gridTemplateColumns: selected ? "1fr 380px" : "1fr", gap:20, alignItems:"start" }}>
             <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(175px,1fr))", gap:12 }}>
-              {filtered.map(g => (
+              {filtered.map((g, idx) => (
                 <div key={g.id} onClick={() => setSelected(selected?.id === g.id ? null : g)}
                   style={{ background: selected?.id===g.id ? "rgba(121,80,242,0.08)" : D.bg3, border: selected?.id===g.id ? "1.5px solid " + D.purple : "1px solid " + D.border, borderRadius:12, overflow:"hidden", cursor:"pointer", transition:"all 0.15s" }}
                   onMouseEnter={e => { if (selected?.id !== g.id) e.currentTarget.style.borderColor="rgba(121,80,242,0.3)"; }}
@@ -107,6 +111,19 @@ export default function Biblioteca() {
                   </div>
                 </div>
               ))}
+              {totalPages > 1 && (
+                <div style={{ gridColumn:"1 / -1", display:"flex", alignItems:"center", justifyContent:"center", gap:8, paddingTop:12 }}>
+                  <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
+                    style={{ padding:"6px 14px", borderRadius:7, fontSize:11, background: page===1 ? "rgba(255,255,255,0.02)" : "rgba(255,255,255,0.06)", color: page===1 ? D.text3 : D.text2, border:"1px solid " + D.border, cursor: page===1 ? "default" : "pointer" }}>
+                    ← Anterior
+                  </button>
+                  <span style={{ fontSize:11, color:D.text3 }}>{page} / {totalPages}</span>
+                  <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}
+                    style={{ padding:"6px 14px", borderRadius:7, fontSize:11, background: page===totalPages ? "rgba(255,255,255,0.02)" : "rgba(255,255,255,0.06)", color: page===totalPages ? D.text3 : D.text2, border:"1px solid " + D.border, cursor: page===totalPages ? "default" : "pointer" }}>
+                    Siguiente →
+                  </button>
+                </div>
+              )}
             </div>
 
             {selected && (
@@ -157,7 +174,7 @@ export default function Biblioteca() {
                     style={{ width:"100%", padding:10, background:"rgba(255,255,255,0.06)", color:D.text2, border:"1px solid " + D.border, borderRadius:8, fontSize:12, fontWeight:500, cursor:"pointer" }}>
                     ⎘ Copiar texto
                   </button>
-                  <button onClick={() => router.push("/crear")}
+                  <button onClick={() => router.push("/crear?prompt=" + encodeURIComponent(selected.prompt || "") + "&tipo=" + encodeURIComponent(selected.tipo || "Comercial"))}
                     style={{ width:"100%", padding:10, background:D.purple, color:"#fff", border:"none", borderRadius:8, fontSize:12, fontWeight:500, cursor:"pointer" }}>
                     ✦ Crear pieza similar
                   </button>

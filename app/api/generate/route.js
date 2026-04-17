@@ -10,76 +10,85 @@ const supabase = createClient(
 const LIMITS = { free: 20, professional: 200, enterprise: 1000 };
 
 export async function POST(request) {
-  const { prompt, tipo, brandProfile, userId, idiomapieza } = await request.json();
+  try {
+    const { prompt, tipo, brandProfile, userId, idiomapieza } = await request.json();
 
-  if (userId) {
-    const mesActual = new Date().toISOString().slice(0, 7);
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("plan, generaciones_mes, mes_actual")
-      .eq("id", userId)
-      .single();
+    if (userId) {
+      const mesActual = new Date().toISOString().slice(0, 7);
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("plan, generaciones_mes, mes_actual")
+        .eq("id", userId)
+        .single();
 
-    if (profile) {
-      const genCount = profile.mes_actual === mesActual ? (profile.generaciones_mes || 0) : 0;
-      const limit = LIMITS[profile.plan || "free"];
-      if (genCount >= limit) {
-        return Response.json({ error: "limit_reached", plan: profile.plan, limit }, { status: 403 });
+      if (profile) {
+        const genCount = profile.mes_actual === mesActual ? (profile.generaciones_mes || 0) : 0;
+        const limit = LIMITS[profile.plan || "free"];
+        if (genCount >= limit) {
+          return Response.json({ error: "limit_reached", plan: profile.plan, limit }, { status: 403 });
+        }
+        const newCount = profile.mes_actual === mesActual ? genCount + 1 : 1;
+        await supabase.from("profiles").update({
+          generaciones_mes: newCount,
+          mes_actual: mesActual,
+        }).eq("id", userId);
       }
-      const newCount = profile.mes_actual === mesActual ? genCount + 1 : 1;
-      await supabase.from("profiles").update({
-        generaciones_mes: newCount,
-        mes_actual: mesActual,
-      }).eq("id", userId);
     }
-  }
 
-  const brandContext = brandProfile ? `
+    const bp = brandProfile || {};
+    const brandContext = brandProfile ? `
 ADN DE MARCA:
-- Marca: ${brandProfile.nombre || ""}
-- Descripción: ${brandProfile.descripcion || ""}
-- Audiencia objetivo: ${brandProfile.audiencia || ""}
-- Tono de voz: ${brandProfile.tono || ""}
-- Idioma: ${brandProfile.idioma || ""}
-- Propuesta de valor única: ${brandProfile.propuestaValor || ""}
-${brandProfile.categorias && brandProfile.categorias.length > 0 ? "- Categorías de contenido: " + brandProfile.categorias.join(", ") : ""}
-${brandProfile.idioma === "Spanglish" ? "IMPORTANTE: Esta marca habla en Spanglish — mezcla español e inglés de forma natural y auténtica, como lo haría una latina bicultural en EE.UU." : ""}
-${brandProfile.idioma === "Español" ? "IMPORTANTE: El ADN de esta marca es en español." : ""}
-${brandProfile.idioma === "Inglés" ? "IMPORTANT: This brand communicates in English." : ""}
-INSTRUCCIÓN CLAVE: El copy debe sonar EXACTAMENTE como esta marca — usa su tono y habla directamente a su audiencia específica.
+- Marca: ${bp.nombre || ""}
+- Descripción: ${bp.descripcion || ""}
+- Audiencia objetivo: ${bp.audiencia || ""}
+- Tono de voz: ${bp.tono || ""}
+- Idioma: ${bp.idioma || ""}
+- Propuesta de valor única: ${bp.propuestaValor || ""}
+${bp.categorias && bp.categorias.length > 0 ? "- Categorías de contenido: " + bp.categorias.join(", ") : ""}
+${bp.personalidad ? "- Personalidad y voz: " + bp.personalidad : ""}
+${bp.estiloVisual ? "- Estilo visual: " + bp.estiloVisual : ""}
+${bp.ejemplosCopy && bp.ejemplosCopy.length > 0 ? "- Ejemplos de copy de referencia:\n" + bp.ejemplosCopy.filter(e => e).map((e, i) => '  ' + (i + 1) + '. "' + e + '"').join("\n") : ""}
+${bp.idioma === "Spanglish" ? "IMPORTANTE: Esta marca habla en Spanglish — mezcla español e inglés de forma natural y auténtica, como lo haría una latina bicultural en EE.UU." : ""}
+${bp.idioma === "Español" ? "IMPORTANTE: El ADN de esta marca es en español." : ""}
+${bp.idioma === "Inglés" ? "IMPORTANT: This brand communicates in English." : ""}
+INSTRUCCIÓN CLAVE: El copy debe sonar EXACTAMENTE como esta marca — usa su tono, personalidad y habla directamente a su audiencia específica. Si hay ejemplos de copy, imita ese estilo.
 ` : "";
 
-  const idiomaFinal = idiomapieza && idiomapieza !== "ADN" ? idiomapieza : (brandProfile?.idioma || "Español");
-  const idiomaInstruccion = 
-    idiomaFinal === "Español" ? "INSTRUCCIÓN OBLIGATORIA: Todo el copy DEBE estar en español. Sin excepciones." :
-    idiomaFinal === "Inglés" ? "MANDATORY INSTRUCTION: All copy MUST be in English. No exceptions." :
-    idiomaFinal === "Spanglish" ? "INSTRUCCIÓN OBLIGATORIA: El copy DEBE estar en Spanglish — mezcla natural de español e inglés como hablan las latinas biculturales en EE.UU." : 
-    "INSTRUCCIÓN OBLIGATORIA: Todo el copy DEBE estar en español.";
+    const idiomaFinal = idiomapieza && idiomapieza !== "ADN" ? idiomapieza : (bp.idioma || "Español");
+    const idiomaInstruccion =
+      idiomaFinal === "Español" ? "INSTRUCCIÓN OBLIGATORIA: Todo el copy DEBE estar en español. Sin excepciones." :
+      idiomaFinal === "Inglés" ? "MANDATORY INSTRUCTION: All copy MUST be in English. No exceptions." :
+      idiomaFinal === "Spanglish" ? "INSTRUCCIÓN OBLIGATORIA: El copy DEBE estar en Spanglish — mezcla natural de español e inglés como hablan las latinas biculturales en EE.UU." :
+      "INSTRUCCIÓN OBLIGATORIA: Todo el copy DEBE estar en español.";
 
-  const message = await client.messages.create({
-    model: "claude-sonnet-4-20250514",
-    max_tokens: 2048,
-    messages: [
-      {
-        role: "user",
-        content: `Eres experto en marketing para redes sociales.
+    const message = await client.messages.create({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 2048,
+      messages: [
+        {
+          role: "user",
+          content: `Eres experto en marketing para redes sociales.
 
 ${brandContext}
 
-Genera 5 propuestas de Instagram tipo "${tipo}" para: "${prompt}"
+Genera 3 propuestas de Instagram tipo "${tipo}" para: "${prompt}"
 
 ${idiomaInstruccion}
 
 Cada propuesta: hook (1 linea), copy (maximo 80 palabras), cta (1 linea), hashtags (6-8 hashtags relevantes separados por espacios).
 
 Responde SOLO JSON puro sin backticks:
-{"propuestas":[{"id":1,"hook":"...","copy":"...","cta":"...","hashtags":"#tag1 #tag2 #tag3"},{"id":2,"hook":"...","copy":"...","cta":"...","hashtags":"#tag1 #tag2 #tag3"},{"id":3,"hook":"...","copy":"...","cta":"...","hashtags":"#tag1 #tag2 #tag3"},{"id":4,"hook":"...","copy":"...","cta":"...","hashtags":"#tag1 #tag2 #tag3"},{"id":5,"hook":"...","copy":"...","cta":"...","hashtags":"#tag1 #tag2 #tag3"}]}`,
-      },
-    ],
-  });
+{"propuestas":[{"id":1,"hook":"...","copy":"...","cta":"...","hashtags":"#tag1 #tag2 #tag3"},{"id":2,"hook":"...","copy":"...","cta":"...","hashtags":"#tag1 #tag2 #tag3"},{"id":3,"hook":"...","copy":"...","cta":"...","hashtags":"#tag1 #tag2 #tag3"}]}`,
+        },
+      ],
+    });
 
-  const text = message.content[0].text;
-  const clean = text.replace(/```json/g, "").replace(/```/g, "").trim();
-  const data = JSON.parse(clean);
-  return Response.json(data);
+    const text = message.content[0].text;
+    const clean = text.replace(/```json/g, "").replace(/```/g, "").trim();
+    const data = JSON.parse(clean);
+    return Response.json(data);
+  } catch (e) {
+    console.error("generate error:", e);
+    return Response.json({ error: "Error generando copies: " + e.message }, { status: 500 });
+  }
 }
