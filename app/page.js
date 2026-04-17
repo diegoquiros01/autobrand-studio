@@ -103,14 +103,7 @@ export default function Landing() {
             <button className="magnetic-btn" onClick={() => router.push("/login?tab=register")} style={s.mainCta}>
               {en ? "Try 20 Free Generations" : "Prueba 20 Generaciones Gratis"}
             </button>
-            <div style={s.socialProof}>
-              <div style={s.avatarGroup}>
-                {["#7950F2","#E64980","#F59E0B","#40C057"].map((c, i) => (
-                  <div key={i} style={{ ...s.avatarPlaceholder, background:c, zIndex:4-i, boxShadow:"0 0 10px rgba(121,80,242,0.3)" }} />
-                ))}
-              </div>
-              <span style={s.socialText}>{en ? "No credit card required · Setup in 2 min" : "Sin tarjeta de crédito · Setup en 2 min"}</span>
-            </div>
+            <p style={{ fontSize:13, color:"rgba(255,255,255,0.3)", marginTop:16 }}>{en ? "No credit card required · Setup in 2 min" : "Sin tarjeta de crédito · Setup en 2 min"}</p>
           </div>
         </div>
       </section>
