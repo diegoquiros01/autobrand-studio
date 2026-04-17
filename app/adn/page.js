@@ -22,7 +22,7 @@ function ADNContent() {
   const [profile, setProfile] = useState({
     nombre: "", descripcion: "", audiencia: "", tono: "",
     idioma: "Español", categorias: [], propuestaValor: "",
-    instagramUrl: "", webUrl: "", canvaUrl: "",
+    instagramUrl: "", tiktokUrl: "", webUrl: "", canvaUrl: "",
     personalidad: "", coloresMarca: [], estiloVisual: "",
     ejemplosCopy: ["", "", ""], competidores: ["", "", ""],
   });
@@ -49,7 +49,7 @@ function ADNContent() {
           audiencia: data.audiencia || "", tono: data.tono || "",
           idioma: data.idioma || "Español", categorias: data.categorias || [],
           propuestaValor: data.propuesta_valor || "",
-          instagramUrl: data.instagram_url || "", webUrl: data.web_url || "", canvaUrl: data.canva_url || "",
+          instagramUrl: data.instagram_url || "", tiktokUrl: data.tiktok_url || "", webUrl: data.web_url || "", canvaUrl: data.canva_url || "",
           personalidad: data.personalidad || "", coloresMarca: data.colores_marca || [],
           estiloVisual: data.estilo_visual || "",
           ejemplosCopy: data.ejemplos_copy && data.ejemplos_copy.length > 0 ? data.ejemplos_copy : ["", "", ""],
@@ -74,9 +74,9 @@ function ADNContent() {
   });
 
   const analyzeInstagram = async () => {
-    if (screenshots.length === 0 && !profile.instagramUrl) return;
+    if (sources.length === 0) return;
     setAnalyzing(true); setAnalyzeProgress(0); setAnalyzeError("");
-    const msgs = ["Analizando tu contenido...", "Identificando tu tono...", "Detectando tu audiencia...", "Construyendo tu ADN..."];
+    const msgs = ["Recopilando tus fuentes...", "Leyendo tu página web...", "Analizando tu contenido visual...", "Identificando tu tono y personalidad...", "Detectando tu audiencia...", "Construyendo tu ADN de marca..."];
     let mi = 0; setAnalyzeMsg(msgs[0]);
     const iv = setInterval(() => {
       setAnalyzeProgress(p => Math.min(p + Math.random() * 15, 88));
@@ -86,11 +86,11 @@ function ADNContent() {
       const images = await Promise.all(screenshots.map(async s => ({ data: await toBase64(s.file), mimeType: s.file.type })));
       const res = await fetch("/api/analyze-brand", {
         method:"POST", headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({ images, instagramUrl: profile.instagramUrl, webUrl: profile.webUrl, canvaUrl: profile.canvaUrl, sources }),
+        body: JSON.stringify({ images, instagramUrl: profile.instagramUrl, tiktokUrl: profile.tiktokUrl, webUrl: profile.webUrl, sources }),
       });
       const data = await res.json();
       if (data.profile) {
-        setProfile(prev => ({ ...prev, ...data.profile, instagramUrl: prev.instagramUrl, webUrl: prev.webUrl, canvaUrl: prev.canvaUrl }));
+        setProfile(prev => ({ ...prev, ...data.profile, instagramUrl: prev.instagramUrl, tiktokUrl: prev.tiktokUrl, webUrl: prev.webUrl, canvaUrl: prev.canvaUrl }));
         setShowAnalyze(false);
       } else if (data.error) {
         setAnalyzeError("Error: " + data.error);
@@ -109,7 +109,7 @@ function ADNContent() {
       audiencia: profile.audiencia, tono: profile.tono,
       idioma: profile.idioma, categorias: profile.categorias,
       propuesta_valor: profile.propuestaValor,
-      instagram_url: profile.instagramUrl, web_url: profile.webUrl, canva_url: profile.canvaUrl,
+      instagram_url: profile.instagramUrl, tiktok_url: profile.tiktokUrl, web_url: profile.webUrl, canva_url: profile.canvaUrl,
       personalidad: profile.personalidad,
       colores_marca: profile.coloresMarca.filter(c => c),
       estilo_visual: profile.estiloVisual,
@@ -172,10 +172,11 @@ function ADNContent() {
               <div style={{ fontSize:12, color:D.text2, marginBottom:10 }}>Selecciona qué fuentes quieres incluir en el análisis:</div>
               <div style={{ display:"flex", flexDirection:"column", gap:8, marginBottom:16 }}>
                 {[
-                  { key:"instagram", label:"Instagram", icon:"📸", available: !!profile.instagramUrl, url: profile.instagramUrl },
-                  { key:"web", label:"Página web", icon:"🌐", available: !!profile.webUrl, url: profile.webUrl },
-                  { key:"canva", label:"Canva", icon:"🎨", available: !!profile.canvaUrl, url: profile.canvaUrl },
-                  { key:"screenshots", label:"Screenshots de posts", icon:"🖼", available: true, url: null },
+                  { key:"screenshots", label:"Screenshots de posts", icon:"🖼", available: true, url: null, hint:"La fuente más poderosa — Claude analiza tus imágenes directamente" },
+                  { key:"web", label:"Página web", icon:"🌐", available: !!profile.webUrl, url: profile.webUrl, hint:"Claude lee tu web y extrae tu mensaje y propuesta de valor" },
+                  { key:"instagram", label:"Instagram", icon:"📸", available: !!profile.instagramUrl, url: profile.instagramUrl, hint:"Sube screenshots de tu feed para mejores resultados" },
+                  { key:"tiktok", label:"TikTok", icon:"🎵", available: !!profile.tiktokUrl, url: profile.tiktokUrl, hint:"Sube screenshots de tus videos para mejores resultados" },
+                  { key:"canva", label:"Canva", icon:"🎨", available: !!profile.canvaUrl, url: profile.canvaUrl, hint:null },
                 ].map(source => (
                   <div key={source.key} style={{ display:"flex", alignItems:"center", gap:10, padding:"10px 12px", borderRadius:9, background: !source.available ? "rgba(255,255,255,0.02)" : sources.includes(source.key) ? "rgba(121,80,242,0.12)" : "rgba(255,255,255,0.04)", border:"1px solid " + (!source.available ? "rgba(255,255,255,0.05)" : sources.includes(source.key) ? "rgba(121,80,242,0.3)" : "rgba(255,255,255,0.08)"), opacity: !source.available ? 0.4 : 1, cursor: source.available ? "pointer" : "not-allowed" }}
                     onClick={() => { if (!source.available) return; setSources(prev => prev.includes(source.key) ? prev.filter(s => s !== source.key) : [...prev, source.key]); }}>
@@ -183,10 +184,11 @@ function ADNContent() {
                       {sources.includes(source.key) ? "✓" : ""}
                     </div>
                     <span style={{ fontSize:14 }}>{source.icon}</span>
-                    <div>
+                    <div style={{ flex:1 }}>
                       <div style={{ fontSize:12, fontWeight:500, color:D.text }}>{source.label}</div>
                       {source.url && <div style={{ fontSize:10, color:D.text3 }}>{source.url}</div>}
-                      {!source.available && source.key !== "screenshots" && <div style={{ fontSize:10, color:"rgba(255,100,100,0.5)" }}>No proporcionado — agrega la URL arriba</div>}
+                      {source.hint && source.available && <div style={{ fontSize:10, color:"rgba(121,80,242,0.6)", marginTop:1 }}>{source.hint}</div>}
+                      {!source.available && source.key !== "screenshots" && <div style={{ fontSize:10, color:"rgba(255,100,100,0.5)" }}>{"Agrega la URL en \"Tus canales\" primero"}</div>}
                     </div>
                   </div>
                 ))}
@@ -268,6 +270,10 @@ function ADNContent() {
                 <div style={{ display:"flex", alignItems:"center", gap:8 }}>
                   <span style={{ fontSize:14 }}>📸</span>
                   <input style={{ ...inp, flex:1 }} placeholder="instagram.com/tucuenta" value={profile.instagramUrl} onChange={e => setProfile(p => ({ ...p, instagramUrl: e.target.value }))} />
+                </div>
+                <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                  <span style={{ fontSize:14 }}>🎵</span>
+                  <input style={{ ...inp, flex:1 }} placeholder="tiktok.com/@tucuenta" value={profile.tiktokUrl} onChange={e => setProfile(p => ({ ...p, tiktokUrl: e.target.value }))} />
                 </div>
                 <div style={{ display:"flex", alignItems:"center", gap:8 }}>
                   <span style={{ fontSize:14 }}>🌐</span>
