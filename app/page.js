@@ -82,7 +82,7 @@ export default function Landing() {
           <div className="animate-hero" style={{ ...s.heroBadge, backdropFilter:"blur(10px)", WebkitBackdropFilter:"blur(10px)" }}>
             <span style={{ fontSize:16 }}>🧠</span>
             <span style={s.badgeNew}>NEW</span>
-            <span>{en ? "Claude Art Director v2" : "Claude Art Director v2"}</span>
+            <span>AI Brand Studio</span>
           </div>
 
           <h1 className="animate-hero" style={{ ...s.heroHeadline, animationDelay:"0.1s" }}>
