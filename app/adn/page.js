@@ -145,28 +145,55 @@ function ADNContent() {
           </div>
         )}
 
-        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:24 }}>
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:20 }}>
           <div>
-            <h1 style={{ fontSize:22, fontWeight:500, color:D.text, marginBottom:4, letterSpacing:"-0.02em" }}>{isOnboarding ? "Define el ADN de tu marca" : "ADN de tu marca"}</h1>
+            <h1 style={{ fontSize:24, fontWeight:700, color:D.text, marginBottom:4, letterSpacing:"-0.03em" }}>{isOnboarding ? "Define el ADN de tu marca" : "ADN de tu marca"}</h1>
             <p style={{ fontSize:13, color:D.text2 }}>{isOnboarding ? "Completa tu perfil para que la IA genere contenido que suena exactamente como tú" : "Esta información guía toda la generación de contenido — edítala cuando quieras"}</p>
           </div>
           <button className="btn-primary" onClick={guardar} disabled={saving}
-            style={{ padding:"9px 20px", background: saved ? "#40C057" : saving ? "rgba(121,80,242,0.4)" : D.purple, color:"#fff", border:"none", borderRadius:9, fontSize:13, fontWeight:500, cursor:"pointer", boxShadow:"0 4px 14px rgba(121,80,242,0.4)" }}>
-            {saved ? "✓ Guardado" : saving ? "Guardando..." : isOnboarding ? "Guardar y crear mi primera pieza →" : "Guardar cambios"}
+            style={{ padding:"10px 22px", background: saved ? "#40C057" : saving ? "rgba(121,80,242,0.4)" : D.purple, color:"#fff", border:"none", borderRadius:10, fontSize:13, fontWeight:600, cursor:"pointer", boxShadow:"0 4px 14px rgba(121,80,242,0.4)" }}>
+            {saved ? "✓ Guardado" : saving ? "Guardando..." : isOnboarding ? "Guardar y crear →" : "Guardar cambios"}
           </button>
         </div>
 
-        <div style={{ background:"rgba(121,80,242,0.08)", border:"1px solid rgba(121,80,242,0.2)", borderRadius:12, padding:20, marginBottom:16 }}>
-          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom: showAnalyze ? 16 : 0 }}>
-            <div>
-              <div style={{ fontSize:14, fontWeight:500, color:D.text, marginBottom:3 }}>✦ Analiza tu marca con IA</div>
-              <div style={{ fontSize:12, color:D.text2 }}>Claude analiza tus canales y construye tu ADN automáticamente</div>
+        {(() => {
+          const fields = [profile.nombre, profile.descripcion, profile.audiencia, profile.tono, profile.propuestaValor, profile.personalidad, profile.estiloVisual];
+          const filled = fields.filter(f => f && f.trim()).length;
+          const hasColors = profile.coloresMarca && profile.coloresMarca.length > 0;
+          const hasCopy = profile.ejemplosCopy && profile.ejemplosCopy.some(e => e && e.trim());
+          const total = fields.length + 2;
+          const score = filled + (hasColors ? 1 : 0) + (hasCopy ? 1 : 0);
+          const pct = Math.round((score / total) * 100);
+          return (
+            <div style={{ background:D.bg3, border:"1px solid " + D.border, borderRadius:12, padding:"16px 20px", marginBottom:16 }}>
+              <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:8 }}>
+                <div style={{ fontSize:12, fontWeight:600, color: pct === 100 ? "#40C057" : D.purpleLight }}>
+                  {pct === 100 ? "Tu ADN está completo" : "Tu ADN está al " + pct + "%"}
+                </div>
+                <div style={{ fontSize:11, color:D.text3 }}>{score}/{total} campos</div>
+              </div>
+              <div style={{ height:4, background:"rgba(255,255,255,0.06)", borderRadius:4, overflow:"hidden" }}>
+                <div style={{ height:"100%", width: pct + "%", background: pct === 100 ? "#40C057" : "linear-gradient(90deg,#7950F2,#A78BFA)", borderRadius:4, transition:"width 0.5s cubic-bezier(0.4,0,0.2,1)" }} />
+              </div>
+              {pct < 100 && (
+                <div style={{ fontSize:11, color:D.text3, marginTop:6 }}>
+                  {!profile.personalidad ? "Agrega tu personalidad de marca para mayor precisión" : !hasColors ? "Agrega tus colores de marca" : !hasCopy ? "Agrega ejemplos de copy ideal" : "Completa los campos restantes"}
+                </div>
+              )}
             </div>
-            <button onClick={() => setShowAnalyze(!showAnalyze)}
-              style={{ padding:"7px 14px", background: showAnalyze ? D.purple : "rgba(255,255,255,0.06)", color: showAnalyze ? "#fff" : D.text2, border:"1px solid " + (showAnalyze ? D.purple : "rgba(255,255,255,0.1)"), borderRadius:8, fontSize:12, fontWeight:500, cursor:"pointer" }}>
-              {showAnalyze ? "Ocultar" : "Usar IA →"}
-            </button>
+          );
+        })()}
+
+        <div style={{ background:"linear-gradient(135deg,#7950F2 0%,#4C1D95 100%)", borderRadius:16, padding:"28px 24px", marginBottom:20, display:"flex", alignItems:"center", justifyContent:"space-between", boxShadow:"0 12px 32px rgba(121,80,242,0.25)" }}>
+          <div>
+            <div style={{ fontSize:16, fontWeight:700, color:"#fff", marginBottom:4 }}>Analiza tu marca con IA</div>
+            <div style={{ fontSize:13, color:"rgba(255,255,255,0.7)" }}>Claude lee tus redes y web para construir tu ADN automáticamente</div>
           </div>
+            <button onClick={() => setShowAnalyze(!showAnalyze)}
+              style={{ padding:"9px 18px", background: showAnalyze ? "rgba(255,255,255,0.15)" : "#fff", color: showAnalyze ? "#fff" : "#7950F2", border:"none", borderRadius:10, fontSize:13, fontWeight:700, cursor:"pointer", transition:"all 0.2s", boxShadow: showAnalyze ? "none" : "0 2px 10px rgba(0,0,0,0.2)" }}>
+              {showAnalyze ? "Ocultar" : "Analizar con IA"}
+            </button>
+        </div>
           {showAnalyze && (
             <div>
               <div style={{ fontSize:12, color:D.text2, marginBottom:10 }}>Selecciona qué fuentes quieres incluir en el análisis:</div>
@@ -237,7 +264,6 @@ function ADNContent() {
               </button>
             </div>
           )}
-        </div>
 
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14, marginBottom:14 }}>
           <div style={{ background:D.bg3, border:"1px solid " + D.border, borderRadius:12, padding:18, transition:"all 0.2s ease" }}>
