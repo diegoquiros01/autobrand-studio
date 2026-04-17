@@ -109,7 +109,19 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Demo section removed — will be replaced with video when ready */}
+      {/* ═══ VIDEO DEMO ═══ */}
+      <RevealSection style={{ paddingTop:0 }}>
+        <div style={{ maxWidth:900, margin:"0 auto", borderRadius:20, border:"1px solid rgba(255,255,255,0.08)", overflow:"hidden", boxShadow:"0 40px 120px rgba(0,0,0,0.6), 0 0 60px rgba(121,80,242,0.06)" }}>
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            style={{ width:"100%", display:"block" }}
+            src="/assets/hero-video.mp4"
+          />
+        </div>
+      </RevealSection>
 
       {/* ═══ SOCIAL PROOF STRIP ═══ */}
       <RevealSection style={{ padding:"40px 20px" }}>
