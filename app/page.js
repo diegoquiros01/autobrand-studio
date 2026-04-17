@@ -109,53 +109,7 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ═══ DEMO — VIDEO/RENDER WINDOW ═══ */}
-      <RevealSection style={{ paddingTop:0 }}>
-        <div style={s.demoWindow}>
-          <div style={s.windowHeader}>
-            <div style={s.windowDots}>
-              <span style={{ ...s.dot, background:"#FF5F56" }} />
-              <span style={{ ...s.dot, background:"#FFBD2E" }} />
-              <span style={{ ...s.dot, background:"#27C93F" }} />
-            </div>
-            <div style={s.windowUrl}>AiStudioBrand — {en ? "Live Demo" : "Demo en Vivo"}</div>
-          </div>
-          <div style={{ padding:4 }}>
-            {/* VIDEO: Descomenta y reemplaza src con tu video demo */}
-            {/* <video autoPlay loop muted playsInline style={{ width:"100%", borderRadius:16, display:"block" }} src="/assets/hero-demo.mp4" /> */}
-            <div style={{ aspectRatio:"16/10", background:"linear-gradient(135deg, #1e1e3f 0%, #16162d 50%, #1a1a35 100%)", borderRadius:16, position:"relative", overflow:"hidden" }}>
-              <div style={{ position:"absolute", inset:0, background:"linear-gradient(90deg, transparent 30%, rgba(121,80,242,0.06) 50%, transparent 70%)", backgroundSize:"400px 100%", animation:"shimmer 3s infinite linear" }} />
-              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:24, padding:"32px 40px", width:"100%", position:"relative", zIndex:1 }}>
-                <div style={{ textAlign:"left" }}>
-                  <div style={s.miniLabel}>{en ? "POST IDEA" : "IDEA DEL POST"}</div>
-                  <div style={s.fakeInput}>{en ? "\"Announce my new coaching spots for Latinas in tech...\"" : "\"Quiero anunciar mis nuevos spots de coaching para latinas en tech...\""}</div>
-                  <div style={s.demoProgress}><div className="progress-fill" style={s.progressFill} /></div>
-                  <div style={{ marginTop:12 }}>
-                    {(en ? ["Claude analyzing brand", "Creating visual brief", "Gemini rendering image", "Validating quality"] : ["Claude analizando marca", "Creando brief visual", "Gemini renderizando", "Validando calidad"]).map((st, i) => (
-                      <div key={i} style={{ display:"flex", alignItems:"center", gap:8, marginBottom:5 }}>
-                        <div style={{ width:14, height:14, borderRadius:"50%", background: i<3 ? "#40C057" : "rgba(121,80,242,0.4)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:"#fff" }}>{i<3 ? "✓" : "⟳"}</div>
-                        <span style={{ fontSize:11, color: i<3 ? "rgba(255,255,255,0.4)" : "#A78BFA", fontWeight: i===3 ? 600 : 400 }}>{st}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
-                  <div className="image-reveal" style={{ flex:1, background:"linear-gradient(135deg,#7950F2,#E64980,#F59E0B)", borderRadius:12, display:"flex", alignItems:"center", justifyContent:"center", position:"relative", minHeight:160 }}>
-                    <div style={{ textAlign:"center" }}><div style={{ fontSize:36, opacity:0.4 }}>✦</div><div style={{ fontSize:11, fontWeight:600, color:"rgba(255,255,255,0.7)" }}>AI Generated</div></div>
-                    <div style={{ position:"absolute", bottom:8, left:8, background:"rgba(0,0,0,0.6)", backdropFilter:"blur(8px)", borderRadius:6, padding:"4px 10px", fontSize:9, color:"rgba(255,255,255,0.8)", fontWeight:600, display:"flex", alignItems:"center", gap:4 }}><span style={{ fontSize:7 }}>✓</span> {en ? "Validated" : "Validado"}</div>
-                  </div>
-                  <div style={{ background:"rgba(0,0,0,0.3)", borderRadius:10, padding:"12px 14px", textAlign:"left" }}>
-                    <div style={{ fontSize:8, fontWeight:700, color:"#A78BFA", textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:4 }}>HOOK</div>
-                    <div style={{ fontSize:12, fontWeight:600, color:"#fff", marginBottom:3 }}>Mami, ya no más stress!</div>
-                    <div style={{ fontSize:10, color:"rgba(255,255,255,0.35)", lineHeight:1.4 }}>Our coaching program es literally a lifesaver...</div>
-                    <div style={{ fontSize:10, color:"#A78BFA", fontWeight:600, marginTop:4 }}>DM con LISTA →</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </RevealSection>
+      {/* Demo section removed — will be replaced with video when ready */}
 
       {/* ═══ SOCIAL PROOF STRIP ═══ */}
       <RevealSection style={{ padding:"40px 20px" }}>
