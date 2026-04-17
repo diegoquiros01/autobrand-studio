@@ -52,7 +52,7 @@ export default function Cuenta() {
   const genPct = Math.min((genUsed / planInfo.limit) * 100, 100);
 
   return (
-    <div style={{ minHeight:"100vh", background:D.bg, fontFamily:"Inter, sans-serif" }}>
+    <div style={{ minHeight:"100vh", background:D.bg }}>
       <nav style={{ display:"flex", alignItems:"center", padding:"0 28px", height:60, borderBottom:"1px solid " + D.border, background:D.bg2 }}>
         <div style={{ display:"flex", alignItems:"center", gap:10, cursor:"pointer" }} onClick={() => router.push("/")}>
           <div style={{ width:32, height:32, background:D.purple, borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:500, fontSize:13 }}>Ai</div>
@@ -129,7 +129,7 @@ export default function Cuenta() {
           </div>
         </div>
 
-        <button onClick={handleLogout} style={{ width:"100%", padding:12, background:"rgba(220,38,38,0.08)", border:"1px solid rgba(220,38,38,0.2)", borderRadius:10, fontSize:13, color:"#FCA5A5", cursor:"pointer", fontFamily:"Inter, sans-serif" }}>
+        <button onClick={handleLogout} style={{ width:"100%", padding:12, background:"rgba(220,38,38,0.08)", border:"1px solid rgba(220,38,38,0.2)", borderRadius:10, fontSize:13, color:"#FCA5A5", cursor:"pointer" }}>
           Cerrar sesión
         </button>
       </div>

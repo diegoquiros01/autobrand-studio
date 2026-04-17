@@ -8,19 +8,19 @@ export default function Landing() {
     nav: { display:"flex", alignItems:"center", padding:"0 32px", height:62, borderBottom:"1px solid #F0F0F0", background:"#fff", position:"sticky", top:0, zIndex:100 },
     logoIcon: { width:30, height:30, background:"#7950F2", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:12, fontWeight:500 },
     logoText: { fontSize:15, fontWeight:500, color:"#0A0A0A" },
-    navLink: { padding:"6px 13px", borderRadius:8, fontSize:13, color:"#555", cursor:"pointer", background:"none", border:"none", fontFamily:"Inter, sans-serif" },
-    navCta: { padding:"8px 18px", background:"#7950F2", color:"#fff", border:"none", borderRadius:8, fontSize:13, fontWeight:500, cursor:"pointer", fontFamily:"Inter, sans-serif" },
+    navLink: { padding:"6px 13px", borderRadius:8, fontSize:13, color:"#555", cursor:"pointer", background:"none", border:"none" },
+    navCta: { padding:"8px 18px", background:"#7950F2", color:"#fff", border:"none", borderRadius:8, fontSize:13, fontWeight:500, cursor:"pointer" },
     heroBadge: { display:"inline-flex", alignItems:"center", gap:6, background:"#F3F0FF", color:"#5B21B6", fontSize:12, fontWeight:500, padding:"5px 13px", borderRadius:20, marginBottom:22 },
-    btnPrimary: { padding:"13px 28px", background:"#7950F2", color:"#fff", border:"none", borderRadius:10, fontSize:15, fontWeight:500, cursor:"pointer", fontFamily:"Inter, sans-serif" },
-    btnSecondary: { padding:"12px 24px", background:"#fff", color:"#0A0A0A", border:"1.5px solid #E0E0E0", borderRadius:10, fontSize:15, fontWeight:500, cursor:"pointer", fontFamily:"Inter, sans-serif" },
+    btnPrimary: { padding:"13px 28px", background:"#7950F2", color:"#fff", border:"none", borderRadius:10, fontSize:15, fontWeight:500, cursor:"pointer" },
+    btnSecondary: { padding:"12px 24px", background:"#fff", color:"#0A0A0A", border:"1.5px solid #E0E0E0", borderRadius:10, fontSize:15, fontWeight:500, cursor:"pointer" },
     sectionBadge: { display:"inline-block", background:"#F3F0FF", color:"#5B21B6", fontSize:11, fontWeight:500, padding:"4px 12px", borderRadius:20, marginBottom:12 },
     featCard: { background:"#fff", border:"0.5px solid #E8E8E8", borderRadius:14, padding:22 },
     howStep: { padding:"28px 24px", borderRight:"0.5px solid #F0F0F0" },
     priceCard: { background:"#fff", border:"0.5px solid #E8E8E8", borderRadius:16, padding:24, position:"relative" },
     priceCardFeat: { background:"#fff", border:"2px solid #7950F2", borderRadius:16, padding:24, position:"relative" },
     priceFeat: { fontSize:12.5, color:"#555", padding:"4px 0", display:"flex", alignItems:"flex-start", gap:7 },
-    priceBtn: { width:"100%", padding:11, borderRadius:9, fontSize:13.5, fontWeight:500, cursor:"pointer", fontFamily:"Inter, sans-serif", marginTop:16, border:"1.5px solid #E0E0E0", background:"#fff", color:"#333" },
-    priceBtnP: { width:"100%", padding:11, borderRadius:9, fontSize:13.5, fontWeight:500, cursor:"pointer", fontFamily:"Inter, sans-serif", marginTop:16, border:"none", background:"#7950F2", color:"#fff" },
+    priceBtn: { width:"100%", padding:11, borderRadius:9, fontSize:13.5, fontWeight:500, cursor:"pointer", marginTop:16, border:"1.5px solid #E0E0E0", background:"#fff", color:"#333" },
+    priceBtnP: { width:"100%", padding:11, borderRadius:9, fontSize:13.5, fontWeight:500, cursor:"pointer", marginTop:16, border:"none", background:"#7950F2", color:"#fff" },
   };
 
   const features = [
@@ -33,7 +33,7 @@ export default function Landing() {
   ];
 
   return (
-    <div style={{ minHeight:"100vh", background:"#fff", fontFamily:"Inter, sans-serif" }}>
+    <div style={{ minHeight:"100vh", background:"#fff" }}>
       <nav style={S.nav}>
         <div style={{ display:"flex", alignItems:"center", gap:9, cursor:"pointer" }} onClick={() => router.push("/")}>
           <div style={S.logoIcon}>Ai</div>
@@ -173,7 +173,7 @@ export default function Landing() {
       <div style={{ padding:"72px 32px", background:"#7950F2", textAlign:"center" }}>
         <h2 style={{ fontSize:32, fontWeight:500, color:"#fff", letterSpacing:"-0.02em", marginBottom:12 }}>Lista para empezar?</h2>
         <p style={{ fontSize:15, color:"rgba(255,255,255,0.75)", marginBottom:28 }}>Unete a las primeras creadoras que estan usando AiStudioBrand para escalar su contenido.</p>
-        <button style={{ padding:"14px 32px", background:"#fff", color:"#7950F2", border:"none", borderRadius:10, fontSize:15, fontWeight:500, cursor:"pointer", fontFamily:"Inter, sans-serif" }} onClick={() => router.push("/login")}>
+        <button style={{ padding:"14px 32px", background:"#fff", color:"#7950F2", border:"none", borderRadius:10, fontSize:15, fontWeight:500, cursor:"pointer" }} onClick={() => router.push("/login")}>
           Crear cuenta gratis
         </button>
         <div style={{ fontSize:12, color:"rgba(255,255,255,0.55)", marginTop:12 }}>20 generaciones gratis · Sin tarjeta de credito</div>

@@ -41,7 +41,7 @@ export default function Resultado() {
   const logoIcon = { width:32, height:32, background:"linear-gradient(135deg,#7950F2,#4C6EF5)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:500, fontSize:13 };
 
   return (
-    <div style={{ minHeight:"100vh", background:"#fff", fontFamily:"Inter, sans-serif" }}>
+    <div style={{ minHeight:"100vh", background:"#fff" }}>
       <nav style={navStyle}>
         <div style={{ display:"flex", alignItems:"center", gap:10, cursor:"pointer" }} onClick={() => router.push("/")}>
           <div style={logoIcon}>Ai</div>
@@ -90,7 +90,7 @@ export default function Resultado() {
                 <button
                   onClick={generarImagen}
                   disabled={loadingImg}
-                  style={{ width:"100%", marginTop:10, padding:14, background:loadingImg ? "#C5B8FB" : "linear-gradient(135deg,#E64980,#7950F2)", color:"#fff", border:"none", borderRadius:10, fontSize:14, fontWeight:500, cursor:loadingImg ? "not-allowed" : "pointer", fontFamily:"Inter, sans-serif" }}
+                  style={{ width:"100%", marginTop:10, padding:14, background:loadingImg ? "#C5B8FB" : "linear-gradient(135deg,#E64980,#7950F2)", color:"#fff", border:"none", borderRadius:10, fontSize:14, fontWeight:500, cursor:loadingImg ? "not-allowed" : "pointer" }}
                 >
                   {loadingImg ? "Generando con Gemini..." : "Generar imagen con IA"}
                 </button>

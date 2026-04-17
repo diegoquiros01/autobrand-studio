@@ -34,7 +34,7 @@ export default function AppLayout({ children }) {
   };
 
   return (
-    <div style={{ minHeight:"100vh", background:"#0D0D1F", fontFamily:"Inter, sans-serif", display:"flex", flexDirection:"column" }}>
+    <div style={{ minHeight:"100vh", background:"#0D0D1F", display:"flex", flexDirection:"column" }}>
       {/* Background glow */}
       <div style={{ position:"fixed", top:"-10%", right:"-5%", width:600, height:600, background:"radial-gradient(circle, rgba(121,80,242,0.06) 0%, rgba(13,13,31,0) 70%)", filter:"blur(80px)", zIndex:0, pointerEvents:"none" }} />
       <div style={{ position:"fixed", bottom:"-20%", left:"-10%", width:400, height:400, background:"radial-gradient(circle, rgba(167,139,250,0.04) 0%, rgba(13,13,31,0) 70%)", filter:"blur(60px)", zIndex:0, pointerEvents:"none" }} />

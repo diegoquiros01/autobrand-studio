@@ -243,8 +243,8 @@ function CrearContent() {
     </div>
   );
 
-  const NB = { width:"100%", padding:12, background:"linear-gradient(135deg,#7950F2,#4C6EF5)", color:"#fff", border:"none", borderRadius:9, fontSize:13, fontWeight:500, cursor:"pointer", marginBottom:8, fontFamily:"Inter, sans-serif", boxShadow:"0 4px 14px rgba(121,80,242,0.4)" };
-  const SB = { width:"100%", padding:11, background:"rgba(255,255,255,0.04)", color:D.text2, border:"1px solid rgba(255,255,255,0.1)", borderRadius:9, fontSize:13, cursor:"pointer", fontFamily:"Inter, sans-serif" };
+  const NB = { width:"100%", padding:12, background:"linear-gradient(135deg,#7950F2,#4C6EF5)", color:"#fff", border:"none", borderRadius:9, fontSize:13, fontWeight:500, cursor:"pointer", marginBottom:8, boxShadow:"0 4px 14px rgba(121,80,242,0.4)" };
+  const SB = { width:"100%", padding:11, background:"rgba(255,255,255,0.04)", color:D.text2, border:"1px solid rgba(255,255,255,0.1)", borderRadius:9, fontSize:13, cursor:"pointer" };
 
   // Typing placeholder effect
   const placeholders = [
@@ -353,7 +353,7 @@ function CrearContent() {
               <label style={{ fontSize:13, color:D.text2, display:"block", marginBottom:8, fontWeight:500 }}>¿Qué quieres comunicar hoy?</label>
               <textarea className="input-focus" rows={4} value={prompt} onChange={e => setPrompt(e.target.value)}
                 placeholder={placeholders[phIdx]}
-                style={{ width:"100%", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:9, padding:"11px 13px", fontSize:13, color:D.text, outline:"none", resize:"none", fontFamily:"Inter, sans-serif" }} />
+                style={{ width:"100%", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:9, padding:"11px 13px", fontSize:13, color:D.text, outline:"none", resize:"none" }} />
               <div style={{ fontSize:12, color:D.text3, marginTop:12, marginBottom:8 }}>¿Qué tipo de pieza es?</div>
               <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:6 }}>
                 {TIPOS.map(t => (
@@ -536,14 +536,14 @@ function CrearContent() {
                   <div style={{ fontSize:11, color:D.text3, marginBottom:8, lineHeight:1.5 }}>Describe qué ajustar y regenera una nueva versión</div>
                   <textarea className="input-focus" value={feedback} onChange={e => setFeedback(e.target.value)} rows={4}
                     placeholder="Ej: Hazla más colorida. Agrega texto con el precio. Cambia el fondo por algo más cálido..."
-                    style={{ width:"100%", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, padding:"8px 10px", fontSize:12, color:D.text, outline:"none", resize:"none", fontFamily:"Inter, sans-serif", marginBottom:8 }} />
+                    style={{ width:"100%", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, padding:"8px 10px", fontSize:12, color:D.text, outline:"none", resize:"none", marginBottom:8 }} />
                   <button onClick={() => { if (!generatingImg && feedback.trim()) generarImagen(feedback); }} disabled={generatingImg || !feedback.trim()}
-                    style={{ width:"100%", padding:9, background: generatingImg || !feedback.trim() ? "rgba(121,80,242,0.3)" : "linear-gradient(135deg,#7950F2,#4C6EF5)", color:"#fff", border:"none", borderRadius:8, fontSize:12, fontWeight:500, cursor: generatingImg || !feedback.trim() ? "not-allowed" : "pointer", marginBottom:8, fontFamily:"Inter, sans-serif" }}>
+                    style={{ width:"100%", padding:9, background: generatingImg || !feedback.trim() ? "rgba(121,80,242,0.3)" : "linear-gradient(135deg,#7950F2,#4C6EF5)", color:"#fff", border:"none", borderRadius:8, fontSize:12, fontWeight:500, cursor: generatingImg || !feedback.trim() ? "not-allowed" : "pointer", marginBottom:8 }}>
                     {generatingImg ? "Generando..." : "↺ Regenerar con feedback"}
                   </button>
                   {versiones.length > 0 && !generatingImg && (
                     <button onClick={() => { setImgAprobada(true); generarCopies(); goToStep(5); }}
-                      style={{ width:"100%", padding:9, background:"rgba(64,192,87,0.12)", border:"1px solid rgba(64,192,87,0.3)", color:"#86EFAC", borderRadius:8, fontSize:12, fontWeight:500, cursor:"pointer", fontFamily:"Inter, sans-serif" }}>
+                      style={{ width:"100%", padding:9, background:"rgba(64,192,87,0.12)", border:"1px solid rgba(64,192,87,0.3)", color:"#86EFAC", borderRadius:8, fontSize:12, fontWeight:500, cursor:"pointer" }}>
                       ✓ Aprobar imagen → Generar copy
                     </button>
                   )}
@@ -595,7 +595,7 @@ function CrearContent() {
                     {editingCopy === c.id ? (
                       <div>
                         <textarea value={editedText} onChange={e => setEditedText(e.target.value)} rows={7}
-                          style={{ width:"100%", background:"rgba(121,80,242,0.06)", border:"1px solid " + D.purple, borderRadius:8, padding:"10px 12px", fontSize:12, color:D.text, outline:"none", resize:"none", fontFamily:"Inter, sans-serif", marginBottom:8 }} />
+                          style={{ width:"100%", background:"rgba(121,80,242,0.06)", border:"1px solid " + D.purple, borderRadius:8, padding:"10px 12px", fontSize:12, color:D.text, outline:"none", resize:"none", marginBottom:8 }} />
                         <button onClick={() => { const updated = copies.map(x => x.id===c.id ? { ...x, hook: editedText.split("\n")[0], copy: editedText } : x); setCopies(updated); setEditingCopy(null); }}
                           style={{ padding:"6px 14px", background:D.purple, color:"#fff", border:"none", borderRadius:7, fontSize:12, cursor:"pointer" }}>Guardar edición</button>
                       </div>
@@ -622,7 +622,7 @@ function CrearContent() {
                 ))}
                 {copySeleccionado && (
                   <button onClick={() => { guardarFinal(); goToStep(6); }} disabled={savingFinal}
-                    style={{ width:"100%", padding:13, background: savingFinal ? "rgba(64,192,87,0.3)" : "linear-gradient(135deg,#40C057,#2F9E44)", color:"#fff", border:"none", borderRadius:10, fontSize:14, fontWeight:500, cursor: savingFinal ? "not-allowed" : "pointer", marginTop:6, fontFamily:"Inter, sans-serif" }}>
+                    style={{ width:"100%", padding:13, background: savingFinal ? "rgba(64,192,87,0.3)" : "linear-gradient(135deg,#40C057,#2F9E44)", color:"#fff", border:"none", borderRadius:10, fontSize:14, fontWeight:500, cursor: savingFinal ? "not-allowed" : "pointer", marginTop:6 }}>
                     {savingFinal ? "Guardando..." : "Guardar arte final →"}
                   </button>
                 )}

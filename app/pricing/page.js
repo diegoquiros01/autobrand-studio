@@ -98,25 +98,25 @@ export default function Pricing() {
   const priceCard = { background:"#16162d", border:"1px solid rgba(255,255,255,0.1)", borderRadius:24, padding:24, position:"relative" };
   const priceCardFeat = { backgroundImage:"linear-gradient(#16162d, #16162d), linear-gradient(135deg, #7950F2 0%, #A78BFA 100%)", backgroundOrigin:"border-box", backgroundClip:"padding-box, border-box", boxShadow:"0 20px 40px rgba(0,0,0,0.4), 0 0 20px rgba(121,80,242,0.1)", transform:"scale(1.05)", zIndex:2, border:"1px solid transparent", borderRadius:24, padding:24, position:"relative" };
   const priceFeat = { fontSize:13, color:"rgba(255,255,255,0.7)", padding:"5px 0", display:"flex", alignItems:"flex-start", gap:8 };
-  const priceBtn = { width:"100%", padding:11, borderRadius:9, fontSize:13.5, fontWeight:500, cursor:"pointer", fontFamily:"Inter, sans-serif", marginTop:16, border:"1.5px solid #E0E0E0", background:"#111122", color:"rgba(255,255,255,0.8)", boxShadow:"0 4px 14px rgba(121,80,242,0.4)" };
-  const priceBtnP = { width:"100%", padding:11, borderRadius:9, fontSize:13.5, fontWeight:500, cursor:"pointer", fontFamily:"Inter, sans-serif", marginTop:16, border:"none", background:"#7950F2", color:"#fff", boxShadow:"0 4px 14px rgba(121,80,242,0.4)" };
+  const priceBtn = { width:"100%", padding:11, borderRadius:9, fontSize:13.5, fontWeight:500, cursor:"pointer", marginTop:16, border:"1.5px solid #E0E0E0", background:"#111122", color:"rgba(255,255,255,0.8)", boxShadow:"0 4px 14px rgba(121,80,242,0.4)" };
+  const priceBtnP = { width:"100%", padding:11, borderRadius:9, fontSize:13.5, fontWeight:500, cursor:"pointer", marginTop:16, border:"none", background:"#7950F2", color:"#fff", boxShadow:"0 4px 14px rgba(121,80,242,0.4)" };
 
   return (
-    <div style={{ minHeight:"100vh", background:"#0D0D1F", fontFamily:"Inter, sans-serif" }}>
+    <div style={{ minHeight:"100vh", background:"#0D0D1F" }}>
       <nav style={nav}>
         <div style={{ display:"flex", alignItems:"center", gap:9, cursor:"pointer" }} onClick={() => router.push("/")}>
           <div style={{ width:30, height:30, background:"#7950F2", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:12, fontWeight:500 }}>Ai</div>
           <span style={{ fontSize:15, fontWeight:500, color:"#fff" }}>Ai<span style={{ color:"#7950F2" }}>Studio</span>Brand</span>
         </div>
         <div style={{ display:"flex", gap:4, marginLeft:"auto", alignItems:"center" }}>
-          <button onClick={() => router.push("/")} style={{ padding:"6px 13px", borderRadius:8, fontSize:13, color:"rgba(255,255,255,0.7)", cursor:"pointer", background:"none", border:"none", fontFamily:"Inter, sans-serif" }}>{lang === "en" ? "Home" : "Inicio"}</button>
-          <button onClick={() => router.push("/pricing")} style={{ padding:"6px 13px", borderRadius:8, fontSize:13, color:"#7950F2", cursor:"pointer", background:"#F3F0FF", border:"none", fontFamily:"Inter, sans-serif", fontWeight:500 }}>{lang === "en" ? "Pricing" : "Precios"}</button>
-          <button onClick={() => router.push("/contacto")} style={{ padding:"6px 13px", borderRadius:8, fontSize:13, color:"rgba(255,255,255,0.7)", cursor:"pointer", background:"none", border:"none", fontFamily:"Inter, sans-serif" }}>{lang === "en" ? "Contact" : "Contacto"}</button>
+          <button onClick={() => router.push("/")} style={{ padding:"6px 13px", borderRadius:8, fontSize:13, color:"rgba(255,255,255,0.7)", cursor:"pointer", background:"none", border:"none" }}>{lang === "en" ? "Home" : "Inicio"}</button>
+          <button onClick={() => router.push("/pricing")} style={{ padding:"6px 13px", borderRadius:8, fontSize:13, color:"#7950F2", cursor:"pointer", background:"#F3F0FF", border:"none", fontWeight:500 }}>{lang === "en" ? "Pricing" : "Precios"}</button>
+          <button onClick={() => router.push("/contacto")} style={{ padding:"6px 13px", borderRadius:8, fontSize:13, color:"rgba(255,255,255,0.7)", cursor:"pointer", background:"none", border:"none" }}>{lang === "en" ? "Contact" : "Contacto"}</button>
           <div style={{ display:"flex", background:"rgba(255,255,255,0.06)", borderRadius:8, padding:3, gap:2, marginLeft:8 }}>
-            <button onClick={() => { setLang("es"); localStorage.setItem("lang", "es"); }} style={{ padding:"5px 10px", borderRadius:6, fontSize:12, fontWeight:500, cursor:"pointer", background: lang==="es" ? "#fff" : "transparent", border:"none", fontFamily:"Inter, sans-serif", color: lang==="es" ? "#0A0A0A" : "#888" }}>ES</button>
-            <button onClick={() => { setLang("en"); localStorage.setItem("lang", "en"); }} style={{ padding:"5px 10px", borderRadius:6, fontSize:12, fontWeight:500, cursor:"pointer", background: lang==="en" ? "#fff" : "transparent", border:"none", fontFamily:"Inter, sans-serif", color: lang==="en" ? "#0A0A0A" : "#888" }}>EN</button>
+            <button onClick={() => { setLang("es"); localStorage.setItem("lang", "es"); }} style={{ padding:"5px 10px", borderRadius:6, fontSize:12, fontWeight:500, cursor:"pointer", background: lang==="es" ? "#fff" : "transparent", border:"none", color: lang==="es" ? "#0A0A0A" : "#888" }}>ES</button>
+            <button onClick={() => { setLang("en"); localStorage.setItem("lang", "en"); }} style={{ padding:"5px 10px", borderRadius:6, fontSize:12, fontWeight:500, cursor:"pointer", background: lang==="en" ? "#fff" : "transparent", border:"none", color: lang==="en" ? "#0A0A0A" : "#888" }}>EN</button>
           </div>
-          <button onClick={() => router.push("/login")} style={{ padding:"8px 18px", background:"#7950F2", color:"#fff", border:"none", borderRadius:8, fontSize:13, fontWeight:500, cursor:"pointer", fontFamily:"Inter, sans-serif", marginLeft:4 }}>
+          <button onClick={() => router.push("/login")} style={{ padding:"8px 18px", background:"#7950F2", color:"#fff", border:"none", borderRadius:8, fontSize:13, fontWeight:500, cursor:"pointer", marginLeft:4 }}>
             {lang === "es" ? "Empieza gratis" : "Start free"}
           </button>
         </div>
@@ -153,7 +153,7 @@ export default function Pricing() {
           <h2 style={{ fontSize:26, fontWeight:500, color:"#fff", letterSpacing:"-0.02em", marginBottom:28, textAlign:"center" }}>{t.faqTitle}</h2>
           {t.faqs.map((faq, i) => (
             <div key={i} style={{ background:"#16162d", border:"1px solid rgba(255,255,255,0.1)", borderRadius:12, marginBottom:8, overflow:"hidden" }}>
-              <button onClick={() => setOpenFaq(openFaq === i ? null : i)} style={{ width:"100%", padding:"16px 20px", display:"flex", alignItems:"center", justifyContent:"space-between", background:"none", border:"none", cursor:"pointer", fontFamily:"Inter, sans-serif", textAlign:"left" }}>
+              <button onClick={() => setOpenFaq(openFaq === i ? null : i)} style={{ width:"100%", padding:"16px 20px", display:"flex", alignItems:"center", justifyContent:"space-between", background:"none", border:"none", cursor:"pointer", textAlign:"left" }}>
                 <span style={{ fontSize:14, fontWeight:500, color:"#fff" }}>{faq.q}</span>
                 <span style={{ fontSize:18, color:"rgba(255,255,255,0.4)", transform: openFaq === i ? "rotate(45deg)" : "none", transition:"transform 0.15s" }}>+</span>
               </button>
@@ -172,7 +172,7 @@ export default function Pricing() {
         <p style={{ fontSize:15, color:"rgba(255,255,255,0.75)", marginBottom:28 }}>
           {lang === "es" ? "Únete a las primeras creadoras que están usando AiStudioBrand." : "Join the first creators using AiStudioBrand."}
         </p>
-        <button onClick={() => router.push("/login")} style={{ padding:"14px 32px", background:"#111122", color:"#7950F2", border:"none", borderRadius:10, fontSize:15, fontWeight:500, cursor:"pointer", fontFamily:"Inter, sans-serif" }}>
+        <button onClick={() => router.push("/login")} style={{ padding:"14px 32px", background:"#111122", color:"#7950F2", border:"none", borderRadius:10, fontSize:15, fontWeight:500, cursor:"pointer" }}>
           {lang === "es" ? "Crear cuenta gratis" : "Create free account"}
         </button>
       </div>

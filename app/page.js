@@ -311,19 +311,19 @@ const GlobalAnimations = () => (
 
 // --- STYLES ---
 const s = {
-  container: { backgroundColor:"#0A0A1A", color:"#fff", fontFamily:"Inter, sans-serif", overflowX:"hidden" },
+  container: { backgroundColor:"#0A0A1A", color:"#fff", overflowX:"hidden" },
   section: { padding:"100px 20px", maxWidth:1100, margin:"0 auto", textAlign:"center" },
 
   // Nav
   nav: { display:"flex", alignItems:"center", justifyContent:"space-between", padding:"0 32px", height:64, position:"sticky", top:0, zIndex:100, background:"rgba(10,10,26,0.8)", backdropFilter:"blur(20px)", WebkitBackdropFilter:"blur(20px)", borderBottom:"1px solid rgba(255,255,255,0.05)" },
   logoIcon: { width:30, height:30, background:"linear-gradient(135deg,#7950F2,#A78BFA)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:800, color:"#fff" },
   logoText: { fontSize:15, fontWeight:700, letterSpacing:"-0.03em" },
-  navLink: { padding:"8px 16px", background:"none", border:"none", color:"rgba(255,255,255,0.7)", fontSize:14, fontWeight:500, letterSpacing:"0.02em", cursor:"pointer", fontFamily:"Inter", borderRadius:8, transition:"all 0.2s" },
+  navLink: { padding:"8px 16px", background:"none", border:"none", color:"rgba(255,255,255,0.7)", fontSize:14, fontWeight:500, letterSpacing:"0.02em", cursor:"pointer", borderRadius:8, transition:"all 0.2s" },
   langToggle: { display:"flex", background:"rgba(255,255,255,0.06)", borderRadius:7, padding:2, gap:1, marginLeft:8 },
-  langBtn: { padding:"4px 9px", borderRadius:5, fontSize:11, fontWeight:600, cursor:"pointer", background:"transparent", border:"none", color:"rgba(255,255,255,0.35)", fontFamily:"Inter" },
+  langBtn: { padding:"4px 9px", borderRadius:5, fontSize:11, fontWeight:600, cursor:"pointer", background:"transparent", border:"none", color:"rgba(255,255,255,0.35)" },
   langActive: { background:"#fff", color:"#0A0A0A" },
-  navSignin: { padding:"7px 16px", background:"none", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, color:"rgba(255,255,255,0.6)", fontSize:13, fontWeight:500, cursor:"pointer", marginLeft:4, fontFamily:"Inter" },
-  navCta: { padding:"8px 18px", background:"#7950F2", border:"none", borderRadius:8, color:"#fff", fontSize:13, fontWeight:600, cursor:"pointer", fontFamily:"Inter", boxShadow:"0 2px 12px rgba(121,80,242,0.4)" },
+  navSignin: { padding:"7px 16px", background:"none", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, color:"rgba(255,255,255,0.6)", fontSize:13, fontWeight:500, cursor:"pointer", marginLeft:4 },
+  navCta: { padding:"8px 18px", background:"#7950F2", border:"none", borderRadius:8, color:"#fff", fontSize:13, fontWeight:600, cursor:"pointer", boxShadow:"0 2px 12px rgba(121,80,242,0.4)" },
 
   // Hero
   heroSection: { minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", position:"relative", textAlign:"center", padding:"0 24px" },
@@ -336,7 +336,7 @@ const s = {
   textAccent: { background:"linear-gradient(90deg,#7950F2,#A78BFA)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" },
   heroSub: { fontSize:"clamp(16px, 3vw, 20px)", color:"rgba(255,255,255,0.5)", marginBottom:40, lineHeight:1.65, maxWidth:640, margin:"0 auto 40px" },
   ctaWrapper: { display:"flex", flexDirection:"column", alignItems:"center", gap:0 },
-  mainCta: { background:"linear-gradient(135deg,#7950F2 0%,#A78BFA 100%)", color:"#fff", padding:"20px 44px", borderRadius:100, fontSize:18, fontWeight:700, border:"1px solid rgba(255,255,255,0.2)", cursor:"pointer", fontFamily:"Inter", boxShadow:"0 0 20px rgba(121,80,242,0.4), inset 0 0 10px rgba(255,255,255,0.2)" },
+  mainCta: { background:"linear-gradient(135deg,#7950F2 0%,#A78BFA 100%)", color:"#fff", padding:"20px 44px", borderRadius:100, fontSize:18, fontWeight:700, border:"1px solid rgba(255,255,255,0.2)", cursor:"pointer", boxShadow:"0 0 20px rgba(121,80,242,0.4), inset 0 0 10px rgba(255,255,255,0.2)" },
   socialProof: { marginTop:28, display:"flex", flexDirection:"column", alignItems:"center", gap:10 },
   avatarGroup: { display:"flex" },
   avatarPlaceholder: { width:40, height:40, borderRadius:"50%", border:"2px solid #0A0A1A", marginLeft:-12 },
@@ -386,8 +386,8 @@ const s = {
   // Final CTA
   finalCta: { background:"linear-gradient(180deg, rgba(121,80,242,0.08) 0%, transparent 100%)", padding:"72px 40px", borderRadius:32, border:"1px solid rgba(121,80,242,0.15)" },
   inputGroup: { display:"flex", maxWidth:460, margin:"0 auto 16px", gap:10 },
-  emailInput: { flex:1, padding:"14px 20px", borderRadius:100, border:"1px solid rgba(255,255,255,0.1)", backgroundColor:"rgba(0,0,0,0.3)", color:"#fff", outline:"none", fontSize:14, fontFamily:"Inter" },
-  inputCta: { backgroundColor:"#fff", color:"#0A0A1A", padding:"14px 28px", borderRadius:100, fontWeight:700, border:"none", cursor:"pointer", fontSize:14, fontFamily:"Inter", whiteSpace:"nowrap" },
+  emailInput: { flex:1, padding:"14px 20px", borderRadius:100, border:"1px solid rgba(255,255,255,0.1)", backgroundColor:"rgba(0,0,0,0.3)", color:"#fff", outline:"none", fontSize:14 },
+  inputCta: { backgroundColor:"#fff", color:"#0A0A1A", padding:"14px 28px", borderRadius:100, fontWeight:700, border:"none", cursor:"pointer", fontSize:14, whiteSpace:"nowrap" },
 
   // Footer
   footer: { padding:"24px 32px", borderTop:"1px solid rgba(255,255,255,0.04)", display:"flex", alignItems:"center", justifyContent:"space-between" },

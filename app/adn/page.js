@@ -123,7 +123,7 @@ function ADNContent() {
     setTimeout(() => setSaved(false), 2000);
   };
 
-  const inp = { width:"100%", backgroundColor:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:10, padding:"12px 16px", fontSize:14, color:"#fff", outline:"none", fontFamily:"Inter, sans-serif", transition:"all 0.2s ease" };
+  const inp = { width:"100%", backgroundColor:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:10, padding:"12px 16px", fontSize:14, color:"#fff", outline:"none", transition:"all 0.2s ease" };
 
   return (
     <AppLayout>
