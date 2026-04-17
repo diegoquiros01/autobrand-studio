@@ -54,21 +54,22 @@ function LoginContent() {
   };
 
   const inp = { width:"100%", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, padding:"10px 13px", fontSize:14, fontFamily:"Inter, sans-serif", background:"#0A0A18", color:"#fff", outline:"none" };
+  const inpClass = "input-focus";
 
   return (
     <div style={{ minHeight:"100vh", background:"#0D0D1F", fontFamily:"Inter, sans-serif" }}>
-      <nav style={{ display:"flex", alignItems:"center", padding:"0 28px", height:60, borderBottom:"1px solid rgba(255,255,255,0.08)", background:"#111122" }}>
+      <nav style={{ display:"flex", alignItems:"center", padding:"0 28px", height:60, borderBottom:"1px solid rgba(255,255,255,0.1)", background:"#111122" }}>
         <div style={{ display:"flex", alignItems:"center", gap:10, cursor:"pointer" }} onClick={() => router.push("/")}>
           <div style={{ width:32, height:32, background:"linear-gradient(135deg,#7950F2,#4C6EF5)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:500, fontSize:13 }}>Ai</div>
           <span style={{ fontSize:16, fontWeight:500, color:"#fff" }}>Ai<span style={{ color:"#7950F2" }}>Studio</span>Brand</span>
         </div>
       </nav>
       <div style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"calc(100vh - 60px)", padding:20 }}>
-        <div style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:20, padding:"36px 32px", width:"100%", maxWidth:380, boxShadow:"0 8px 40px rgba(0,0,0,0.08)" }}>
+        <div style={{ background:"#16162d", border:"1px solid rgba(255,255,255,0.1)", borderRadius:20, padding:"36px 32px", width:"100%", maxWidth:380, boxShadow:"0 8px 40px rgba(0,0,0,0.08)" }}>
           <div style={{ textAlign:"center", marginBottom:24 }}>
             <div style={{ width:44, height:44, background:"linear-gradient(135deg,#7950F2,#4C6EF5)", borderRadius:12, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:500, fontSize:18, margin:"0 auto 10px" }}>Ai</div>
             <div style={{ fontSize:20, fontWeight:500, color:"#fff", marginBottom:4 }}>Ai<span style={{ color:"#7950F2" }}>Studio</span>Brand</div>
-            <div style={{ fontSize:13.5, color:"rgba(255,255,255,0.4)" }}>Contenido que suena como tú</div>
+            <div style={{ fontSize:13.5, color:"rgba(255,255,255,0.7)" }}>Contenido que suena como tú</div>
           </div>
           <div style={{ display:"flex", background:"rgba(255,255,255,0.06)", borderRadius:10, padding:3, marginBottom:20, gap:3 }}>
             <button onClick={() => setMode("login")} style={{ flex:1, padding:8, borderRadius:8, fontSize:13.5, fontWeight:500, cursor:"pointer", background: mode==="login" ? "#fff" : "transparent", border:"none", fontFamily:"Inter, sans-serif", color: mode==="login" ? "#0A0A0A" : "#666", boxShadow: mode==="login" ? "0 1px 4px rgba(0,0,0,0.1)" : "none" }}>Iniciar sesión</button>
@@ -79,19 +80,20 @@ function LoginContent() {
           {mode === "register" && (
             <div style={{ marginBottom:12 }}>
               <label style={{ fontSize:13, fontWeight:500, color:"rgba(255,255,255,0.8)", display:"block", marginBottom:5 }}>Tu nombre</label>
-              <input style={inp} type="text" placeholder="Maria Garcia" value={nombre} onChange={e => setNombre(e.target.value)} />
+              <input className={inpClass} style={inp} type="text" placeholder="Maria Garcia" value={nombre} onChange={e => setNombre(e.target.value)} />
             </div>
           )}
           <div style={{ marginBottom:12 }}>
             <label style={{ fontSize:13, fontWeight:500, color:"rgba(255,255,255,0.8)", display:"block", marginBottom:5 }}>Email</label>
-            <input style={inp} type="email" placeholder="tu@email.com" value={email} onChange={e => setEmail(e.target.value)} />
+            <input className={inpClass} style={inp} type="email" placeholder="tu@email.com" value={email} onChange={e => setEmail(e.target.value)} />
           </div>
           <div style={{ marginBottom:4 }}>
             <label style={{ fontSize:13, fontWeight:500, color:"rgba(255,255,255,0.8)", display:"block", marginBottom:5 }}>Contrasena</label>
-            <input style={inp} type="password" placeholder="Minimo 6 caracteres" value={password} onChange={e => setPassword(e.target.value)} />
+            <input className={inpClass} style={inp} type="password" placeholder="Minimo 6 caracteres" value={password} onChange={e => setPassword(e.target.value)} />
           </div>
           <button
-            style={{ width:"100%", padding:13, background: loading ? "#C5B8FB" : "linear-gradient(135deg,#7950F2,#4C6EF5)", color:"#fff", border:"none", borderRadius:10, fontSize:14.5, fontWeight:500, cursor: loading ? "not-allowed" : "pointer", fontFamily:"Inter, sans-serif", marginTop:6, marginBottom:14 }}
+            className="btn-primary"
+            style={{ width:"100%", padding:13, background: loading ? "#C5B8FB" : "linear-gradient(135deg,#7950F2,#4C6EF5)", color:"#fff", border:"none", borderRadius:10, fontSize:14.5, fontWeight:500, cursor: loading ? "not-allowed" : "pointer", fontFamily:"Inter, sans-serif", marginTop:6, marginBottom:14, boxShadow:"0 4px 14px rgba(121,80,242,0.4)" }}
             onClick={mode === "login" ? handleLogin : handleRegister}
             disabled={loading}
           >

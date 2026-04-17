@@ -10,9 +10,9 @@ export default function Cuenta() {
   const [loading, setLoading] = useState(true);
 
   const D = {
-    bg:"#0D0D1F", bg2:"#111122", bg3:"rgba(255,255,255,0.04)",
-    border:"rgba(255,255,255,0.08)", text:"#fff", text2:"rgba(255,255,255,0.55)",
-    text3:"rgba(255,255,255,0.3)", purple:"#7950F2", purpleLight:"#A78BFA",
+    bg:"#0D0D1F", bg2:"#111122", bg3:"#16162d",
+    border:"rgba(255,255,255,0.1)", text:"#fff", text2:"rgba(255,255,255,0.7)",
+    text3:"rgba(255,255,255,0.4)", purple:"#7950F2", purpleLight:"#A78BFA",
   };
 
   const PLANS = {

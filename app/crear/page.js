@@ -12,8 +12,8 @@ const FORMATOS = [
 ];
 
 const D = {
-  bg3:"rgba(255,255,255,0.04)", border:"rgba(255,255,255,0.08)",
-  text:"#fff", text2:"rgba(255,255,255,0.55)", text3:"rgba(255,255,255,0.3)",
+  bg3:"#16162d", border:"rgba(255,255,255,0.1)",
+  text:"#fff", text2:"rgba(255,255,255,0.7)", text3:"rgba(255,255,255,0.4)",
   purple:"#7950F2", purpleLight:"#A78BFA",
 };
 
@@ -243,7 +243,7 @@ function CrearContent() {
     </div>
   );
 
-  const NB = { width:"100%", padding:12, background:"linear-gradient(135deg,#7950F2,#4C6EF5)", color:"#fff", border:"none", borderRadius:9, fontSize:13, fontWeight:500, cursor:"pointer", marginBottom:8, fontFamily:"Inter, sans-serif" };
+  const NB = { width:"100%", padding:12, background:"linear-gradient(135deg,#7950F2,#4C6EF5)", color:"#fff", border:"none", borderRadius:9, fontSize:13, fontWeight:500, cursor:"pointer", marginBottom:8, fontFamily:"Inter, sans-serif", boxShadow:"0 4px 14px rgba(121,80,242,0.4)" };
   const SB = { width:"100%", padding:11, background:"rgba(255,255,255,0.04)", color:D.text2, border:"1px solid rgba(255,255,255,0.1)", borderRadius:9, fontSize:13, cursor:"pointer", fontFamily:"Inter, sans-serif" };
 
   const UploadZone = ({ onClick, children }) => (
@@ -272,9 +272,9 @@ function CrearContent() {
 
         {step === 1 && (
           <div>
-            <div style={{ background:D.bg3, border:"1px solid " + D.border, borderRadius:12, padding:20, marginBottom:14 }}>
+            <div className="card-hover" style={{ background:D.bg3, border:"1px solid " + D.border, borderRadius:16, padding:20, marginBottom:14 }}>
               <label style={{ fontSize:13, color:D.text2, display:"block", marginBottom:8, fontWeight:500 }}>¿Qué quieres comunicar hoy?</label>
-              <textarea rows={4} value={prompt} onChange={e => setPrompt(e.target.value)}
+              <textarea className="input-focus" rows={4} value={prompt} onChange={e => setPrompt(e.target.value)}
                 placeholder="Ej: Quiero anunciar mis 3 spots de coaching 1:1 para este mes. Solo quedan 3 lugares disponibles y quiero crear urgencia."
                 style={{ width:"100%", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:9, padding:"11px 13px", fontSize:13, color:D.text, outline:"none", resize:"none", fontFamily:"Inter, sans-serif" }} />
               <div style={{ fontSize:12, color:D.text3, marginTop:12, marginBottom:8 }}>¿Qué tipo de pieza es?</div>
@@ -314,7 +314,7 @@ function CrearContent() {
                   ))}
                 </div>
               </div>
-            <button onClick={() => prompt.trim() && goToStep(2)}
+            <button className="btn-primary" onClick={() => prompt.trim() && goToStep(2)}
               style={{ ...NB, background: !prompt.trim() ? "rgba(121,80,242,0.3)" : "linear-gradient(135deg,#7950F2,#4C6EF5)", cursor: !prompt.trim() ? "not-allowed" : "pointer" }}>
               Continuar → Agregar referencias visuales
             </button>
@@ -324,7 +324,7 @@ function CrearContent() {
         {step === 2 && (
           <div>
             <BackBtn toStep={1} />
-            <div style={{ background:D.bg3, border:"1px solid " + D.border, borderRadius:12, padding:20, marginBottom:14 }}>
+            <div style={{ background:D.bg3, border:"1px solid " + D.border, borderRadius:16, padding:20, marginBottom:14 }}>
               <div style={{ fontSize:14, fontWeight:500, color:D.text, marginBottom:4 }}>Referencias visuales</div>
               <div style={{ fontSize:12, color:D.text2, marginBottom:16, lineHeight:1.6 }}>
                 Sube fotos que inspiren el estilo de tu pieza — pueden ser fotos tuyas, de tu producto, de tu estilo visual o de diseños que te gustan. Hasta 3 imágenes.
@@ -357,7 +357,7 @@ function CrearContent() {
                 </UploadZone>
               )}
             </div>
-            <button onClick={() => goToStep(3)} style={NB}>Continuar → Agregar foto de talento</button>
+            <button className="btn-primary" onClick={() => goToStep(3)} style={NB}>Continuar → Agregar foto de talento</button>
             <button onClick={() => { setReferencias([]); setSkipRefs(true); goToStep(3); }} style={SB}>Saltar — continuar sin referencias</button>
           </div>
         )}
@@ -365,7 +365,7 @@ function CrearContent() {
         {step === 3 && (
           <div>
             <BackBtn toStep={2} />
-            <div style={{ background:D.bg3, border:"1px solid " + D.border, borderRadius:12, padding:20, marginBottom:14 }}>
+            <div style={{ background:D.bg3, border:"1px solid " + D.border, borderRadius:16, padding:20, marginBottom:14 }}>
               <div style={{ fontSize:14, fontWeight:500, color:D.text, marginBottom:4 }}>Foto de talento</div>
               <div style={{ fontSize:12, color:D.text2, marginBottom:16, lineHeight:1.6 }}>
                 Sube fotos de personas que quieres incluir en la imagen — puede ser una foto tuya, de tu equipo o de modelos. La IA las incorporará naturalmente en la composición. Hasta 3 fotos.
@@ -398,7 +398,7 @@ function CrearContent() {
                 </UploadZone>
               )}
             </div>
-            <button onClick={() => { goToStep(4); generarImagen(); }} style={{ ...NB, background:"linear-gradient(135deg,#E64980,#7950F2)" }}>
+            <button className="btn-primary" onClick={() => { goToStep(4); generarImagen(); }} style={{ ...NB, background:"linear-gradient(135deg,#E64980,#7950F2)" }}>
               Generar imagen con IA →
             </button>
             <button onClick={() => { setTalentos([]); setSkipTalent(true); goToStep(4); generarImagen(); }} style={SB}>
@@ -457,7 +457,7 @@ function CrearContent() {
                 <div style={{ background:D.bg3, border:"1px solid " + D.border, borderRadius:10, padding:14 }}>
                   <div style={{ fontSize:12, fontWeight:500, color:D.text, marginBottom:6 }}>¿Qué quieres cambiar?</div>
                   <div style={{ fontSize:11, color:D.text3, marginBottom:8, lineHeight:1.5 }}>Describe qué ajustar y regenera una nueva versión</div>
-                  <textarea value={feedback} onChange={e => setFeedback(e.target.value)} rows={4}
+                  <textarea className="input-focus" value={feedback} onChange={e => setFeedback(e.target.value)} rows={4}
                     placeholder="Ej: Hazla más colorida. Agrega texto con el precio. Cambia el fondo por algo más cálido..."
                     style={{ width:"100%", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, padding:"8px 10px", fontSize:12, color:D.text, outline:"none", resize:"none", fontFamily:"Inter, sans-serif", marginBottom:8 }} />
                   <button onClick={() => { if (!generatingImg && feedback.trim()) generarImagen(feedback); }} disabled={generatingImg || !feedback.trim()}
@@ -591,7 +591,7 @@ function CrearContent() {
                 {copies.find(c => c.id === copySeleccionado) && (() => {
                   const copy = copies.find(c => c.id === copySeleccionado);
                   return (
-                    <div style={{ background:D.bg3, border:"1px solid " + D.border, borderRadius:12, padding:16, height:"100%" }}>
+                    <div style={{ background:D.bg3, border:"1px solid " + D.border, borderRadius:16, padding:16, height:"100%" }}>
                       <div style={{ fontSize:10, fontWeight:500, color:D.purpleLight, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:10 }}>Copy final</div>
                       <div style={{ fontSize:14, fontWeight:500, color:D.text, marginBottom:8, lineHeight:1.4 }}>{copy.hook}</div>
                       <div style={{ fontSize:12, color:D.text2, lineHeight:1.7, marginBottom:8 }}>{copy.copy}</div>

@@ -78,10 +78,10 @@ export default function Landing() {
   };
 
   const S = {
-    nav: { display:"flex", alignItems:"center", padding:"0 32px", height:62, borderBottom:"1px solid #F0F0F0", background:"#0D0D1F", position:"sticky", top:0, zIndex:100 },
+    nav: { display:"flex", alignItems:"center", padding:"0 32px", height:62, borderBottom:"1px solid rgba(255,255,255,0.1)", background:"#0D0D1F", position:"sticky", top:0, zIndex:100 },
     logoIcon: { width:30, height:30, background:"#7950F2", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:12, fontWeight:500 },
     logoText: { fontSize:15, fontWeight:500, color:"#fff" },
-    navLink: { padding:"6px 13px", borderRadius:8, fontSize:13, color:"rgba(255,255,255,0.55)", cursor:"pointer", background:"none", border:"none", fontFamily:"Inter, sans-serif" },
+    navLink: { padding:"6px 13px", borderRadius:8, fontSize:13, color:"rgba(255,255,255,0.7)", cursor:"pointer", background:"none", border:"none", fontFamily:"Inter, sans-serif" },
     navCta: { padding:"8px 18px", background:"#7950F2", color:"#fff", border:"none", borderRadius:8, fontSize:13, fontWeight:500, cursor:"pointer", fontFamily:"Inter, sans-serif" },
     sectionBadge: { display:"inline-block", background:"rgba(121,80,242,0.15)", color:"#A78BFA", fontSize:11, fontWeight:500, padding:"4px 12px", borderRadius:20, marginBottom:12 },
     btnPrimary: { padding:"13px 28px", background:"#7950F2", color:"#fff", border:"none", borderRadius:10, fontSize:15, fontWeight:500, cursor:"pointer", fontFamily:"Inter, sans-serif" },
@@ -115,21 +115,21 @@ export default function Landing() {
               <span style={{ width:6, height:6, borderRadius:"50%", background:"#7950F2", display:"inline-block" }}></span>
               {t.badge}
             </div>
-            <h1 style={{ fontSize:42, fontWeight:500, color:"#fff", lineHeight:1.12, letterSpacing:"-0.03em", marginBottom:16 }}>
+            <h1 style={{ fontSize:42, fontWeight:800, lineHeight:1.12, letterSpacing:"-0.04em", marginBottom:16, background:"linear-gradient(180deg, #FFFFFF 0%, rgba(255,255,255,0.75) 100%)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>
               {t.title1}<br />
               <span style={{ color:"#A78BFA" }}>{t.title2}</span>
             </h1>
-            <p style={{ fontSize:16, color:"rgba(255,255,255,0.5)", lineHeight:1.7, marginBottom:28 }}>{t.sub}</p>
+            <p style={{ fontSize:16, color:"rgba(255,255,255,0.7)", lineHeight:1.7, marginBottom:28 }}>{t.sub}</p>
             <div style={{ display:"flex", gap:10, marginBottom:14 }}>
-              <button style={S.btnPrimary} onClick={() => router.push("/login?tab=register")}>{t.btn1}</button>
+              <button className="btn-primary" style={{...S.btnPrimary, boxShadow:"0 4px 14px rgba(121,80,242,0.4)"}} onClick={() => router.push("/login?tab=register")}>{t.btn1}</button>
               <button style={S.btnSecondary} onClick={() => router.push("/crear")}>{t.btn2}</button>
             </div>
-            <div style={{ fontSize:12, color:"rgba(255,255,255,0.3)" }}>{t.note}</div>
+            <div style={{ fontSize:12, color:"rgba(255,255,255,0.4)" }}>{t.note}</div>
             <div style={{ display:"flex", gap:24, marginTop:28 }}>
               {t.stats.map((s, i) => (
                 <div key={i}>
                   <div style={{ fontSize:22, fontWeight:500, color:"#A78BFA", letterSpacing:"-0.02em" }}>{s.num}</div>
-                  <div style={{ fontSize:11, color:"rgba(255,255,255,0.3)", marginTop:2 }}>{s.label}</div>
+                  <div style={{ fontSize:11, color:"rgba(255,255,255,0.4)", marginTop:2 }}>{s.label}</div>
                 </div>
               ))}
             </div>
@@ -155,7 +155,7 @@ export default function Landing() {
               </div>
               <div style={{ background:"#1A1A2E", borderRadius:8, padding:"8px 10px", display:"flex", alignItems:"center", gap:8 }}>
                 <div style={{ width:16, height:16, borderRadius:"50%", background:"#40C057", display:"flex", alignItems:"center", justifyContent:"center", fontSize:8, color:"#fff", flexShrink:0 }}>✓</div>
-                <div style={{ fontSize:9, color:"rgba(255,255,255,0.55)" }}>{t.savedLib}</div>
+                <div style={{ fontSize:9, color:"rgba(255,255,255,0.7)" }}>{t.savedLib}</div>
               </div>
             </div>
           </div>
@@ -166,13 +166,13 @@ export default function Landing() {
         <div style={{ maxWidth:900, margin:"0 auto" }}>
           <div style={S.sectionBadge}>{t.featBadge}</div>
           <h2 style={{ fontSize:28, fontWeight:500, color:"#fff", letterSpacing:"-0.02em", marginBottom:10 }}>{t.featTitle}</h2>
-          <p style={{ fontSize:15, color:"rgba(255,255,255,0.5)", lineHeight:1.65, maxWidth:500, marginBottom:40 }}>{t.featSub}</p>
+          <p style={{ fontSize:15, color:"rgba(255,255,255,0.7)", lineHeight:1.65, maxWidth:500, marginBottom:40 }}>{t.featSub}</p>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(3, minmax(0,1fr))", gap:12 }}>
             {t.features.map((f, i) => (
-              <div key={i} style={{ background:"#0D0D1F", border:"0.5px solid #E8E8E8", borderRadius:14, padding:22 }}>
+              <div key={i} className="card-hover" style={{ background:"#16162d", border:"1px solid rgba(121,80,242,0.15)", borderRadius:16, padding:22 }}>
                 <div style={{ width:36, height:36, borderRadius:9, display:"flex", alignItems:"center", justifyContent:"center", fontSize:16, marginBottom:12, background:f.color, color:f.tc }}>{f.icon}</div>
                 <div style={{ fontSize:14, fontWeight:500, color:"#fff", marginBottom:6 }}>{f.title}</div>
-                <div style={{ fontSize:13, color:"rgba(255,255,255,0.5)", lineHeight:1.6 }}>{f.desc}</div>
+                <div style={{ fontSize:13, color:"rgba(255,255,255,0.7)", lineHeight:1.6 }}>{f.desc}</div>
               </div>
             ))}
           </div>
@@ -185,7 +185,7 @@ export default function Landing() {
           <h2 style={{ fontSize:28, fontWeight:500, color:"#fff", letterSpacing:"-0.02em", marginBottom:0 }}>{t.howTitle}</h2>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(3, minmax(0,1fr))", gap:0, marginTop:40 }}>
             {t.steps.map((s, i) => (
-              <div key={i} style={{ padding:"28px 24px", borderRight: i < 2 ? "1px solid rgba(255,255,255,0.06)" : "none" }}>
+              <div key={i} style={{ padding:"28px 24px", borderRight: i < 2 ? "1px solid rgba(255,255,255,0.1)" : "none" }}>
                 <div style={{ fontSize:36, fontWeight:500, color:"#E8E4FE", letterSpacing:"-0.04em", marginBottom:14 }}>{s.n}</div>
                 <div style={{ fontSize:15, fontWeight:500, color:"#fff", marginBottom:8 }}>{s.t}</div>
                 <div style={{ fontSize:13, color:"#777", lineHeight:1.65 }}>{s.d}</div>
@@ -198,24 +198,24 @@ export default function Landing() {
       <div style={{ padding:"72px 32px", background:"#7950F2", textAlign:"center" }}>
         <h2 style={{ fontSize:32, fontWeight:500, color:"#fff", letterSpacing:"-0.02em", marginBottom:12 }}>{t.ctaTitle}</h2>
         <p style={{ fontSize:15, color:"rgba(255,255,255,0.75)", marginBottom:28 }}>{t.ctaSub}</p>
-        <button style={{ padding:"14px 32px", background:"#0D0D1F", color:"#7950F2", border:"none", borderRadius:10, fontSize:15, fontWeight:500, cursor:"pointer", fontFamily:"Inter, sans-serif" }} onClick={() => router.push("/login?tab=register")}>
+        <button className="btn-primary" style={{ padding:"14px 32px", background:"#0D0D1F", color:"#7950F2", border:"none", borderRadius:10, fontSize:15, fontWeight:500, cursor:"pointer", fontFamily:"Inter, sans-serif", boxShadow:"0 4px 14px rgba(121,80,242,0.4)" }} onClick={() => router.push("/login?tab=register")}>
           {t.ctaBtn}
         </button>
-        <div style={{ fontSize:12, color:"rgba(255,255,255,0.55)", marginTop:12 }}>{t.ctaNote}</div>
+        <div style={{ fontSize:12, color:"rgba(255,255,255,0.7)", marginTop:12 }}>{t.ctaNote}</div>
       </div>
 
-      <div style={{ padding:32, borderTop:"1px solid rgba(255,255,255,0.08)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+      <div style={{ padding:32, borderTop:"1px solid rgba(255,255,255,0.1)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
         <div style={{ display:"flex", alignItems:"center", gap:9 }}>
           <div style={{ width:26, height:26, background:"#7950F2", borderRadius:7, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:11, fontWeight:500 }}>Ai</div>
           <div>
             <div style={{ fontSize:13, fontWeight:500, color:"#fff" }}>Ai<span style={{ color:"#A78BFA" }}>Studio</span>Brand</div>
-            <div style={{ fontSize:12, color:"rgba(255,255,255,0.3)", marginTop:2 }}>{t.footerTag}</div>
+            <div style={{ fontSize:12, color:"rgba(255,255,255,0.4)", marginTop:2 }}>{t.footerTag}</div>
           </div>
         </div>
         <div style={{ display:"flex", gap:16, alignItems:"center" }}>
-          <button onClick={() => router.push("/terminos")} style={{ fontSize:12, color:"rgba(255,255,255,0.25)", background:"none", border:"none", cursor:"pointer" }}>{lang === "en" ? "Terms" : "Términos"}</button>
-          <button onClick={() => router.push("/privacidad")} style={{ fontSize:12, color:"rgba(255,255,255,0.25)", background:"none", border:"none", cursor:"pointer" }}>{lang === "en" ? "Privacy" : "Privacidad"}</button>
-          <span style={{ fontSize:12, color:"rgba(255,255,255,0.25)" }}>{t.footerRights}</span>
+          <button onClick={() => router.push("/terminos")} style={{ fontSize:12, color:"rgba(255,255,255,0.4)", background:"none", border:"none", cursor:"pointer" }}>{lang === "en" ? "Terms" : "Términos"}</button>
+          <button onClick={() => router.push("/privacidad")} style={{ fontSize:12, color:"rgba(255,255,255,0.4)", background:"none", border:"none", cursor:"pointer" }}>{lang === "en" ? "Privacy" : "Privacidad"}</button>
+          <span style={{ fontSize:12, color:"rgba(255,255,255,0.4)" }}>{t.footerRights}</span>
         </div>
       </div>
     </div>

@@ -28,8 +28,8 @@ function ADNContent() {
   });
 
   const D = {
-    bg3:"rgba(255,255,255,0.04)", border:"rgba(255,255,255,0.08)",
-    text:"#fff", text2:"rgba(255,255,255,0.55)", text3:"rgba(255,255,255,0.3)",
+    bg3:"#16162d", border:"rgba(255,255,255,0.1)",
+    text:"#fff", text2:"rgba(255,255,255,0.7)", text3:"rgba(255,255,255,0.4)",
     purple:"#7950F2", purpleLight:"#A78BFA",
   };
 
@@ -123,7 +123,7 @@ function ADNContent() {
     setTimeout(() => setSaved(false), 2000);
   };
 
-  const inp = { width:"100%", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, padding:"10px 12px", fontSize:13, color:D.text, outline:"none", fontFamily:"Inter, sans-serif" };
+  const inp = { width:"100%", backgroundColor:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:10, padding:"12px 16px", fontSize:14, color:"#fff", outline:"none", fontFamily:"Inter, sans-serif", transition:"all 0.2s ease" };
 
   return (
     <AppLayout>
@@ -150,8 +150,8 @@ function ADNContent() {
             <h1 style={{ fontSize:22, fontWeight:500, color:D.text, marginBottom:4, letterSpacing:"-0.02em" }}>{isOnboarding ? "Define el ADN de tu marca" : "ADN de tu marca"}</h1>
             <p style={{ fontSize:13, color:D.text2 }}>{isOnboarding ? "Completa tu perfil para que la IA genere contenido que suena exactamente como tú" : "Esta información guía toda la generación de contenido — edítala cuando quieras"}</p>
           </div>
-          <button onClick={guardar} disabled={saving}
-            style={{ padding:"9px 20px", background: saved ? "#40C057" : saving ? "rgba(121,80,242,0.4)" : D.purple, color:"#fff", border:"none", borderRadius:9, fontSize:13, fontWeight:500, cursor:"pointer" }}>
+          <button className="btn-primary" onClick={guardar} disabled={saving}
+            style={{ padding:"9px 20px", background: saved ? "#40C057" : saving ? "rgba(121,80,242,0.4)" : D.purple, color:"#fff", border:"none", borderRadius:9, fontSize:13, fontWeight:500, cursor:"pointer", boxShadow:"0 4px 14px rgba(121,80,242,0.4)" }}>
             {saved ? "✓ Guardado" : saving ? "Guardando..." : isOnboarding ? "Guardar y crear mi primera pieza →" : "Guardar cambios"}
           </button>
         </div>
@@ -240,53 +240,53 @@ function ADNContent() {
         </div>
 
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14, marginBottom:14 }}>
-          <div style={{ background:D.bg3, border:"1px solid " + D.border, borderRadius:12, padding:18 }}>
+          <div style={{ background:D.bg3, border:"1px solid " + D.border, borderRadius:12, padding:18, transition:"all 0.2s ease" }}>
             <div style={{ fontSize:11, fontWeight:500, color:D.text3, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:14 }}>Tu marca</div>
             <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
               <div>
                 <label style={{ fontSize:12, color:D.text2, display:"block", marginBottom:5 }}>Nombre / cuenta</label>
-                <input style={inp} placeholder="@tumarca" value={profile.nombre} onChange={e => setProfile(p => ({ ...p, nombre: e.target.value }))} />
+                <input className="input-focus" style={inp} placeholder="@tumarca" value={profile.nombre} onChange={e => setProfile(p => ({ ...p, nombre: e.target.value }))} />
               </div>
               <div>
                 <label style={{ fontSize:12, color:D.text2, display:"block", marginBottom:5 }}>Qué haces</label>
-                <textarea style={{ ...inp, minHeight:70, resize:"none" }} placeholder="Soy coach de negocios para mujeres latinas..." value={profile.descripcion} onChange={e => setProfile(p => ({ ...p, descripcion: e.target.value }))} />
+                <textarea className="input-focus" style={{ ...inp, minHeight:70, resize:"none" }} placeholder="Soy coach de negocios para mujeres latinas..." value={profile.descripcion} onChange={e => setProfile(p => ({ ...p, descripcion: e.target.value }))} />
               </div>
               <div>
                 <label style={{ fontSize:12, color:D.text2, display:"block", marginBottom:5 }}>A quién le hablas</label>
-                <input style={inp} placeholder="Mujeres latinas 28-42 en EE.UU." value={profile.audiencia} onChange={e => setProfile(p => ({ ...p, audiencia: e.target.value }))} />
+                <input className="input-focus" style={inp} placeholder="Mujeres latinas 28-42 en EE.UU." value={profile.audiencia} onChange={e => setProfile(p => ({ ...p, audiencia: e.target.value }))} />
               </div>
               <div>
                 <label style={{ fontSize:12, color:D.text2, display:"block", marginBottom:5 }}>Propuesta de valor</label>
-                <input style={inp} placeholder="Tu ventaja única" value={profile.propuestaValor} onChange={e => setProfile(p => ({ ...p, propuestaValor: e.target.value }))} />
+                <input className="input-focus" style={inp} placeholder="Tu ventaja única" value={profile.propuestaValor} onChange={e => setProfile(p => ({ ...p, propuestaValor: e.target.value }))} />
               </div>
             </div>
           </div>
 
           <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-            <div style={{ background:D.bg3, border:"1px solid " + D.border, borderRadius:12, padding:18 }}>
+            <div style={{ background:D.bg3, border:"1px solid " + D.border, borderRadius:12, padding:18, transition:"all 0.2s ease" }}>
               <div style={{ fontSize:11, fontWeight:500, color:D.text3, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:14 }}>Tus canales</div>
               <div style={{ fontSize:11, color:"rgba(121,80,242,0.7)", marginBottom:10 }}>Recomendado: agrega al menos uno</div>
               <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
                 <div style={{ display:"flex", alignItems:"center", gap:8 }}>
                   <span style={{ fontSize:14 }}>📸</span>
-                  <input style={{ ...inp, flex:1 }} placeholder="instagram.com/tucuenta" value={profile.instagramUrl} onChange={e => setProfile(p => ({ ...p, instagramUrl: e.target.value }))} />
+                  <input className="input-focus" style={{ ...inp, flex:1 }} placeholder="instagram.com/tucuenta" value={profile.instagramUrl} onChange={e => setProfile(p => ({ ...p, instagramUrl: e.target.value }))} />
                 </div>
                 <div style={{ display:"flex", alignItems:"center", gap:8 }}>
                   <span style={{ fontSize:14 }}>🎵</span>
-                  <input style={{ ...inp, flex:1 }} placeholder="tiktok.com/@tucuenta" value={profile.tiktokUrl} onChange={e => setProfile(p => ({ ...p, tiktokUrl: e.target.value }))} />
+                  <input className="input-focus" style={{ ...inp, flex:1 }} placeholder="tiktok.com/@tucuenta" value={profile.tiktokUrl} onChange={e => setProfile(p => ({ ...p, tiktokUrl: e.target.value }))} />
                 </div>
                 <div style={{ display:"flex", alignItems:"center", gap:8 }}>
                   <span style={{ fontSize:14 }}>🌐</span>
-                  <input style={{ ...inp, flex:1 }} placeholder="tuweb.com" value={profile.webUrl} onChange={e => setProfile(p => ({ ...p, webUrl: e.target.value }))} />
+                  <input className="input-focus" style={{ ...inp, flex:1 }} placeholder="tuweb.com" value={profile.webUrl} onChange={e => setProfile(p => ({ ...p, webUrl: e.target.value }))} />
                 </div>
                 <div style={{ display:"flex", alignItems:"center", gap:8 }}>
                   <span style={{ fontSize:14 }}>🎨</span>
-                  <input style={{ ...inp, flex:1 }} placeholder="canva.com/tucuenta" value={profile.canvaUrl} onChange={e => setProfile(p => ({ ...p, canvaUrl: e.target.value }))} />
+                  <input className="input-focus" style={{ ...inp, flex:1 }} placeholder="canva.com/tucuenta" value={profile.canvaUrl} onChange={e => setProfile(p => ({ ...p, canvaUrl: e.target.value }))} />
                 </div>
               </div>
             </div>
 
-            <div style={{ background:D.bg3, border:"1px solid " + D.border, borderRadius:12, padding:18 }}>
+            <div style={{ background:D.bg3, border:"1px solid " + D.border, borderRadius:12, padding:18, transition:"all 0.2s ease" }}>
               <div style={{ fontSize:11, fontWeight:500, color:D.text3, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:12 }}>Comunicación</div>
               <div style={{ marginBottom:12 }}>
                 <div style={{ fontSize:12, color:D.text2, marginBottom:8 }}>Idioma</div>
@@ -326,23 +326,23 @@ function ADNContent() {
         </div>
 
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14, marginBottom:14 }}>
-          <div style={{ background:D.bg3, border:"1px solid " + D.border, borderRadius:12, padding:18 }}>
+          <div style={{ background:D.bg3, border:"1px solid " + D.border, borderRadius:12, padding:18, transition:"all 0.2s ease" }}>
             <div style={{ fontSize:11, fontWeight:500, color:D.text3, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:14 }}>Personalidad de marca</div>
             <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
               <div>
                 <label style={{ fontSize:12, color:D.text2, display:"block", marginBottom:5 }}>Personalidad y voz</label>
-                <textarea style={{ ...inp, minHeight:80, resize:"none" }} placeholder="Cómo habla tu marca, qué evita, frases típicas... Ej: Hablo directo, uso humor, evito ser formal, digo 'reina' y 'amiga'..." value={profile.personalidad} onChange={e => setProfile(p => ({ ...p, personalidad: e.target.value }))} />
+                <textarea className="input-focus" style={{ ...inp, minHeight:80, resize:"none" }} placeholder="Cómo habla tu marca, qué evita, frases típicas... Ej: Hablo directo, uso humor, evito ser formal, digo 'reina' y 'amiga'..." value={profile.personalidad} onChange={e => setProfile(p => ({ ...p, personalidad: e.target.value }))} />
               </div>
               <div>
                 <label style={{ fontSize:12, color:D.text2, display:"block", marginBottom:5 }}>Estilo visual</label>
-                <textarea style={{ ...inp, minHeight:60, resize:"none" }} placeholder="Ej: Minimalista con toques de color, lifestyle, editorial, colorido y vibrante..." value={profile.estiloVisual} onChange={e => setProfile(p => ({ ...p, estiloVisual: e.target.value }))} />
+                <textarea className="input-focus" style={{ ...inp, minHeight:60, resize:"none" }} placeholder="Ej: Minimalista con toques de color, lifestyle, editorial, colorido y vibrante..." value={profile.estiloVisual} onChange={e => setProfile(p => ({ ...p, estiloVisual: e.target.value }))} />
               </div>
               <div>
                 <label style={{ fontSize:12, color:D.text2, display:"block", marginBottom:5 }}>Colores de marca</label>
                 <div style={{ display:"flex", gap:8, flexWrap:"wrap", alignItems:"center" }}>
                   {profile.coloresMarca.map((c, i) => (
                     <div key={i} style={{ display:"flex", alignItems:"center", gap:4 }}>
-                      <input type="color" value={c} onChange={e => { const arr = [...profile.coloresMarca]; arr[i] = e.target.value; setProfile(p => ({ ...p, coloresMarca: arr })); }}
+                      <input className="input-focus" type="color" value={c} onChange={e => { const arr = [...profile.coloresMarca]; arr[i] = e.target.value; setProfile(p => ({ ...p, coloresMarca: arr })); }}
                         style={{ width:28, height:28, border:"none", borderRadius:6, cursor:"pointer", background:"transparent" }} />
                       <span style={{ fontSize:10, color:D.text3, fontFamily:"monospace" }}>{c}</span>
                       <button onClick={() => setProfile(p => ({ ...p, coloresMarca: p.coloresMarca.filter((_, j) => j !== i) }))}
@@ -359,23 +359,23 @@ function ADNContent() {
           </div>
 
           <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-            <div style={{ background:D.bg3, border:"1px solid " + D.border, borderRadius:12, padding:18 }}>
+            <div style={{ background:D.bg3, border:"1px solid " + D.border, borderRadius:12, padding:18, transition:"all 0.2s ease" }}>
               <div style={{ fontSize:11, fontWeight:500, color:D.text3, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:14 }}>Ejemplos de copy ideal</div>
               <div style={{ fontSize:11, color:"rgba(121,80,242,0.7)", marginBottom:10 }}>Pega 3 textos que consideras perfectos para tu marca</div>
               <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
                 {profile.ejemplosCopy.map((ej, i) => (
-                  <textarea key={i} style={{ ...inp, minHeight:50, resize:"none" }} placeholder={"Ejemplo " + (i + 1) + "..."} value={ej}
+                  <textarea key={i} className="input-focus" style={{ ...inp, minHeight:50, resize:"none" }} placeholder={"Ejemplo " + (i + 1) + "..."} value={ej}
                     onChange={e => { const arr = [...profile.ejemplosCopy]; arr[i] = e.target.value; setProfile(p => ({ ...p, ejemplosCopy: arr })); }} />
                 ))}
               </div>
             </div>
 
-            <div style={{ background:D.bg3, border:"1px solid " + D.border, borderRadius:12, padding:18 }}>
+            <div style={{ background:D.bg3, border:"1px solid " + D.border, borderRadius:12, padding:18, transition:"all 0.2s ease" }}>
               <div style={{ fontSize:11, fontWeight:500, color:D.text3, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:14 }}>Marcas de referencia</div>
               <div style={{ fontSize:11, color:"rgba(121,80,242,0.7)", marginBottom:10 }}>Marcas que admiras o que son tu inspiración</div>
               <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
                 {profile.competidores.map((comp, i) => (
-                  <input key={i} style={inp} placeholder={"@cuenta o URL " + (i + 1)} value={comp}
+                  <input key={i} className="input-focus" style={inp} placeholder={"@cuenta o URL " + (i + 1)} value={comp}
                     onChange={e => { const arr = [...profile.competidores]; arr[i] = e.target.value; setProfile(p => ({ ...p, competidores: arr })); }} />
                 ))}
               </div>
@@ -383,8 +383,8 @@ function ADNContent() {
           </div>
         </div>
 
-        <button onClick={() => router.push("/crear")}
-          style={{ width:"100%", padding:13, background:"linear-gradient(135deg,#7950F2,#4C6EF5)", color:"#fff", border:"none", borderRadius:10, fontSize:14, fontWeight:500, cursor:"pointer" }}>
+        <button className="btn-primary" onClick={() => router.push("/crear")}
+          style={{ width:"100%", padding:13, background:"linear-gradient(135deg,#7950F2,#4C6EF5)", color:"#fff", border:"none", borderRadius:10, fontSize:14, fontWeight:500, cursor:"pointer", boxShadow:"0 4px 14px rgba(121,80,242,0.4)" }}>
           Listo — crear mi primera pieza →
         </button>
       </div>

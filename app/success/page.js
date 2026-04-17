@@ -10,8 +10,8 @@ export default function Success() {
   }, []);
 
   const D = {
-    bg:"#0D0D1F", bg2:"#111122", border:"rgba(255,255,255,0.08)",
-    text:"#fff", text2:"rgba(255,255,255,0.55)", purple:"#7950F2", purpleLight:"#A78BFA",
+    bg:"#0D0D1F", bg2:"#111122", bg3:"#16162d", border:"rgba(255,255,255,0.1)",
+    text:"#fff", text2:"rgba(255,255,255,0.7)", text3:"rgba(255,255,255,0.4)", purple:"#7950F2", purpleLight:"#A78BFA",
   };
 
   return (
@@ -26,7 +26,7 @@ export default function Success() {
           style={{ width:"100%", padding:14, background:"linear-gradient(135deg,#7950F2,#4C6EF5)", color:"#fff", border:"none", borderRadius:10, fontSize:15, fontWeight:500, cursor:"pointer", fontFamily:"Inter, sans-serif", marginBottom:10 }}>
           Empezar a generar →
         </button>
-        <div style={{ fontSize:12, color:"rgba(255,255,255,0.3)" }}>Serás redirigido automáticamente en 5 segundos</div>
+        <div style={{ fontSize:12, color:"rgba(255,255,255,0.4)" }}>Serás redirigido automáticamente en 5 segundos</div>
       </div>
     </div>
   );

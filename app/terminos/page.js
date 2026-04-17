@@ -4,8 +4,8 @@ import { useRouter } from "next/navigation";
 export default function Terminos() {
   const router = useRouter();
   const D = {
-    bg:"#0D0D1F", bg2:"#111122", border:"rgba(255,255,255,0.08)",
-    text:"#fff", text2:"rgba(255,255,255,0.55)", text3:"rgba(255,255,255,0.3)",
+    bg:"#0D0D1F", bg2:"#111122", bg3:"#16162d", border:"rgba(255,255,255,0.1)",
+    text:"#fff", text2:"rgba(255,255,255,0.7)", text3:"rgba(255,255,255,0.4)",
     purple:"#7950F2", purpleLight:"#A78BFA",
   };
 
@@ -41,7 +41,7 @@ export default function Terminos() {
         ))}
       </div>
 
-      <div style={{ borderTop:"1px solid rgba(255,255,255,0.08)", padding:"24px 28px", display:"flex", justifyContent:"center", gap:24 }}>
+      <div style={{ borderTop:"1px solid rgba(255,255,255,0.1)", padding:"24px 28px", display:"flex", justifyContent:"center", gap:24 }}>
         <button onClick={() => router.push("/privacidad")} style={{ fontSize:13, color:D.text3, background:"none", border:"none", cursor:"pointer" }}>Política de Privacidad</button>
         <button onClick={() => router.push("/")} style={{ fontSize:13, color:D.text3, background:"none", border:"none", cursor:"pointer" }}>AiStudioBrand</button>
       </div>

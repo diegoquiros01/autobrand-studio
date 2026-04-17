@@ -88,7 +88,7 @@ export default function Contacto() {
   };
 
   const inp = { width:"100%", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, padding:"11px 13px", fontSize:14, fontFamily:"Inter, sans-serif", background:"#0A0A18", color:"#fff", outline:"none" };
-  const nav = { display:"flex", alignItems:"center", padding:"0 32px", height:62, borderBottom:"1px solid rgba(255,255,255,0.08)", background:"#111122", position:"sticky", top:0, zIndex:100 };
+  const nav = { display:"flex", alignItems:"center", padding:"0 32px", height:62, borderBottom:"1px solid rgba(255,255,255,0.1)", background:"#111122", position:"sticky", top:0, zIndex:100 };
 
   return (
     <div style={{ minHeight:"100vh", background:"#0D0D1F", fontFamily:"Inter, sans-serif" }}>
@@ -98,8 +98,8 @@ export default function Contacto() {
           <span style={{ fontSize:15, fontWeight:500, color:"#fff" }}>Ai<span style={{ color:"#7950F2" }}>Studio</span>Brand</span>
         </div>
         <div style={{ display:"flex", gap:4, marginLeft:"auto", alignItems:"center" }}>
-          <button onClick={() => router.push("/")} style={{ padding:"6px 13px", borderRadius:8, fontSize:13, color:"rgba(255,255,255,0.55)", cursor:"pointer", background:"none", border:"none", fontFamily:"Inter, sans-serif" }}>{lang === "en" ? "Home" : "Inicio"}</button>
-          <button onClick={() => router.push("/pricing")} style={{ padding:"6px 13px", borderRadius:8, fontSize:13, color:"rgba(255,255,255,0.55)", cursor:"pointer", background:"none", border:"none", fontFamily:"Inter, sans-serif" }}>{lang === "en" ? "Pricing" : "Precios"}</button>
+          <button onClick={() => router.push("/")} style={{ padding:"6px 13px", borderRadius:8, fontSize:13, color:"rgba(255,255,255,0.7)", cursor:"pointer", background:"none", border:"none", fontFamily:"Inter, sans-serif" }}>{lang === "en" ? "Home" : "Inicio"}</button>
+          <button onClick={() => router.push("/pricing")} style={{ padding:"6px 13px", borderRadius:8, fontSize:13, color:"rgba(255,255,255,0.7)", cursor:"pointer", background:"none", border:"none", fontFamily:"Inter, sans-serif" }}>{lang === "en" ? "Pricing" : "Precios"}</button>
           <button onClick={() => router.push("/contacto")} style={{ padding:"6px 13px", borderRadius:8, fontSize:13, color:"#7950F2", cursor:"pointer", background:"#F3F0FF", border:"none", fontFamily:"Inter, sans-serif", fontWeight:500 }}>{lang === "en" ? "Contact" : "Contacto"}</button>
           <div style={{ display:"flex", background:"rgba(255,255,255,0.06)", borderRadius:8, padding:3, gap:2, marginLeft:8 }}>
             <button onClick={() => { setLang("es"); localStorage.setItem("lang", "es"); }} style={{ padding:"5px 10px", borderRadius:6, fontSize:12, fontWeight:500, cursor:"pointer", background: lang==="es" ? "#fff" : "transparent", border:"none", fontFamily:"Inter, sans-serif", color: lang==="es" ? "#0A0A0A" : "#888" }}>ES</button>
@@ -130,7 +130,7 @@ export default function Contacto() {
                 </button>
               </div>
             ) : (
-              <div style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:16, padding:28, boxShadow:"0 2px 16px rgba(0,0,0,0.05)" }}>
+              <div style={{ background:"#16162d", border:"1px solid rgba(255,255,255,0.1)", borderRadius:16, padding:28, boxShadow:"0 2px 16px rgba(0,0,0,0.05)" }}>
                 <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14, marginBottom:14 }}>
                   <div>
                     <label style={{ fontSize:13, fontWeight:500, color:"rgba(255,255,255,0.8)", display:"block", marginBottom:6 }}>{t.nameLabel}</label>
@@ -161,26 +161,26 @@ export default function Contacto() {
           </div>
 
           <div>
-            <div style={{ background:"#0A0A18", border:"1px solid rgba(255,255,255,0.08)", borderRadius:16, padding:28, marginBottom:20 }}>
+            <div style={{ background:"#0A0A18", border:"1px solid rgba(255,255,255,0.1)", borderRadius:16, padding:28, marginBottom:20 }}>
               <h3 style={{ fontSize:16, fontWeight:500, color:"#fff", marginBottom:20 }}>{t.infoTitle}</h3>
               {t.infoItems.map((item, i) => (
                 <div key={i} style={{ display:"flex", alignItems:"center", gap:14, marginBottom:18 }}>
                   <div style={{ width:38, height:38, background:"#F3F0FF", borderRadius:9, display:"flex", alignItems:"center", justifyContent:"center", color:"#7950F2", fontSize:16, flexShrink:0 }}>{item.icon}</div>
                   <div>
-                    <div style={{ fontSize:11, fontWeight:500, color:"rgba(255,255,255,0.3)", textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:2 }}>{item.label}</div>
+                    <div style={{ fontSize:11, fontWeight:500, color:"rgba(255,255,255,0.4)", textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:2 }}>{item.label}</div>
                     <div style={{ fontSize:13.5, color:"#fff", fontWeight:500 }}>{item.value}</div>
                   </div>
                 </div>
               ))}
             </div>
 
-            <div style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:16, padding:28 }}>
+            <div style={{ background:"#16162d", border:"1px solid rgba(255,255,255,0.1)", borderRadius:16, padding:28 }}>
               <h3 style={{ fontSize:16, fontWeight:500, color:"#fff", marginBottom:16 }}>{t.faqTitle}</h3>
               {t.faqs.map((faq, i) => (
                 <div key={i} style={{ borderBottom: i < t.faqs.length - 1 ? "0.5px solid #F0F0F0" : "none" }}>
                   <button onClick={() => setOpenFaq(openFaq === i ? null : i)} style={{ width:"100%", padding:"13px 0", display:"flex", alignItems:"center", justifyContent:"space-between", background:"none", border:"none", cursor:"pointer", fontFamily:"Inter, sans-serif", textAlign:"left" }}>
                     <span style={{ fontSize:13.5, fontWeight:500, color:"#fff" }}>{faq.q}</span>
-                    <span style={{ fontSize:16, color:"rgba(255,255,255,0.3)", transform: openFaq === i ? "rotate(45deg)" : "none", transition:"transform 0.15s", flexShrink:0 }}>+</span>
+                    <span style={{ fontSize:16, color:"rgba(255,255,255,0.4)", transform: openFaq === i ? "rotate(45deg)" : "none", transition:"transform 0.15s", flexShrink:0 }}>+</span>
                   </button>
                   {openFaq === i && (
                     <div style={{ paddingBottom:13, fontSize:13, color:"rgba(255,255,255,0.5)", lineHeight:1.7 }}>{faq.a}</div>

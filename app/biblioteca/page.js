@@ -14,8 +14,8 @@ export default function Biblioteca() {
   const PER_PAGE = 20;
 
   const D = {
-    bg3:"rgba(255,255,255,0.04)", border:"rgba(255,255,255,0.08)",
-    text:"#fff", text2:"rgba(255,255,255,0.55)", text3:"rgba(255,255,255,0.3)",
+    bg3:"#16162d", border:"rgba(255,255,255,0.1)",
+    text:"#fff", text2:"rgba(255,255,255,0.7)", text3:"rgba(255,255,255,0.4)",
     purple:"#7950F2", purpleLight:"#A78BFA",
   };
 
@@ -62,7 +62,7 @@ export default function Biblioteca() {
             <h1 style={{ fontSize:22, fontWeight:500, color:D.text, marginBottom:4, letterSpacing:"-0.02em" }}>Mi biblioteca</h1>
             <p style={{ fontSize:13, color:D.text2 }}>Tus piezas guardadas — editables y reutilizables en cualquier momento</p>
           </div>
-          <button onClick={() => router.push("/crear")}
+          <button className="btn-primary" onClick={() => router.push("/crear")}
             style={{ padding:"9px 18px", background:D.purple, color:"#fff", border:"none", borderRadius:9, fontSize:13, fontWeight:500, cursor:"pointer" }}>
             + Nueva pieza
           </button>
@@ -95,8 +95,8 @@ export default function Biblioteca() {
           <div style={{ display:"grid", gridTemplateColumns: selected ? "1fr 380px" : "1fr", gap:20, alignItems:"start" }}>
             <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(175px,1fr))", gap:12 }}>
               {filtered.map((g, idx) => (
-                <div key={g.id} onClick={() => setSelected(selected?.id === g.id ? null : g)}
-                  style={{ background: selected?.id===g.id ? "rgba(121,80,242,0.08)" : D.bg3, border: selected?.id===g.id ? "1.5px solid " + D.purple : "1px solid " + D.border, borderRadius:12, overflow:"hidden", cursor:"pointer", transition:"all 0.15s" }}
+                <div key={g.id} className="card-hover" onClick={() => setSelected(selected?.id === g.id ? null : g)}
+                  style={{ background: selected?.id===g.id ? "rgba(121,80,242,0.08)" : D.bg3, border: selected?.id===g.id ? "1.5px solid " + D.purple : "1px solid " + D.border, borderRadius:16, overflow:"hidden", cursor:"pointer", transition:"all 0.15s" }}
                   onMouseEnter={e => { if (selected?.id !== g.id) e.currentTarget.style.borderColor="rgba(121,80,242,0.3)"; }}
                   onMouseLeave={e => { if (selected?.id !== g.id) e.currentTarget.style.borderColor=D.border; }}>
                   {g.url ? (
@@ -174,7 +174,7 @@ export default function Biblioteca() {
                     style={{ width:"100%", padding:10, background:"rgba(255,255,255,0.06)", color:D.text2, border:"1px solid " + D.border, borderRadius:8, fontSize:12, fontWeight:500, cursor:"pointer" }}>
                     ⎘ Copiar texto
                   </button>
-                  <button onClick={() => router.push("/crear?prompt=" + encodeURIComponent(selected.prompt || "") + "&tipo=" + encodeURIComponent(selected.tipo || "Comercial"))}
+                  <button className="btn-primary" onClick={() => router.push("/crear?prompt=" + encodeURIComponent(selected.prompt || "") + "&tipo=" + encodeURIComponent(selected.tipo || "Comercial"))}
                     style={{ width:"100%", padding:10, background:D.purple, color:"#fff", border:"none", borderRadius:8, fontSize:12, fontWeight:500, cursor:"pointer" }}>
                     ✦ Crear pieza similar
                   </button>
