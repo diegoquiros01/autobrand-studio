@@ -70,34 +70,36 @@ export default function Landing() {
       <section style={s.heroSection}>
         <div style={s.heroGradient} />
         <div style={s.heroGradient2} />
+        {/* Grid overlay */}
+        <div style={{ position:"absolute", inset:0, backgroundImage:"linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px)", backgroundSize:"60px 60px", maskImage:"radial-gradient(circle at center, black, transparent 80%)", WebkitMaskImage:"radial-gradient(circle at center, black, transparent 80%)", pointerEvents:"none", zIndex:0 }} />
         <div style={s.contentWrapper}>
-          <div className="fade-in-up" style={s.heroBadge}>
+          <div className="animate-hero" style={{ ...s.heroBadge, backdropFilter:"blur(10px)", WebkitBackdropFilter:"blur(10px)" }}>
             <span style={s.badgeNew}>NEW</span>
             <span>{en ? "Art Director AI — visual brief + quality validation" : "Art Director IA — brief visual + validación de calidad"}</span>
           </div>
 
-          <h1 className="fade-in-up" style={s.heroHeadline}>
+          <h1 className="animate-hero" style={{ ...s.heroHeadline, animationDelay:"0.1s" }}>
             {en ? "Your brand. " : "Tu marca. "}
             <span style={s.textAccent}>{en ? "Your voice." : "Tu voz."}</span>
             <br />
             {en ? "AI content in 30 seconds." : "Contenido IA en 30 segundos."}
           </h1>
 
-          <p className="fade-in-up-delay" style={s.heroSub}>
+          <p className="animate-hero" style={{ ...s.heroSub, animationDelay:"0.2s" }}>
             {en
               ? "The first bicultural AI that learns your brand DNA to create Instagram posts that sound exactly like you. "
               : "La primera IA bicultural que aprende tu ADN de marca para crear posts de Instagram que suenan exactamente como tú. "}
             <span style={{ color:"#fff" }}>Spanglish included.</span>
           </p>
 
-          <div className="fade-in-up-delay-2" style={s.ctaWrapper}>
-            <button className="pulse-glow" onClick={() => router.push("/login?tab=register")} style={s.mainCta}>
+          <div className="animate-hero" style={{ ...s.ctaWrapper, animationDelay:"0.35s" }}>
+            <button className="magnetic-btn" onClick={() => router.push("/login?tab=register")} style={s.mainCta}>
               {en ? "Try 20 Free Generations" : "Prueba 20 Generaciones Gratis"}
             </button>
             <div style={s.socialProof}>
               <div style={s.avatarGroup}>
                 {["#7950F2","#E64980","#F59E0B","#40C057"].map((c, i) => (
-                  <div key={i} style={{ ...s.avatarPlaceholder, background:c, zIndex:4-i }} />
+                  <div key={i} style={{ ...s.avatarPlaceholder, background:c, zIndex:4-i, boxShadow:"0 0 10px rgba(121,80,242,0.3)" }} />
                 ))}
               </div>
               <span style={s.socialText}>{en ? "500+ creators already use it" : "500+ creadoras ya lo usan"}</span>
@@ -271,13 +273,18 @@ export default function Landing() {
 const GlobalAnimations = () => (
   <style>{`
     @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
+      from { opacity: 0; transform: translateY(20px); filter: blur(10px); }
+      to { opacity: 1; transform: translateY(0); filter: blur(0); }
     }
     @keyframes pulseGlow {
-      0% { box-shadow: 0 0 0 0 rgba(121,80,242,0.4); }
-      70% { box-shadow: 0 0 0 20px rgba(121,80,242,0); }
-      100% { box-shadow: 0 0 0 0 rgba(121,80,242,0); }
+      0% { box-shadow: 0 0 20px rgba(121,80,242,0.4), inset 0 0 10px rgba(255,255,255,0.2); }
+      70% { box-shadow: 0 0 35px rgba(121,80,242,0.6), inset 0 0 10px rgba(255,255,255,0.2); }
+      100% { box-shadow: 0 0 20px rgba(121,80,242,0.4), inset 0 0 10px rgba(255,255,255,0.2); }
+    }
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0px); }
     }
     @keyframes shimmer {
       0% { transform: translateX(-100%); }
@@ -293,10 +300,14 @@ const GlobalAnimations = () => (
     }
     .hidden { opacity: 0; transform: translateY(40px); transition: all 0.8s cubic-bezier(0.4,0,0.2,1); }
     .visible { opacity: 1; transform: translateY(0); transition: all 0.8s cubic-bezier(0.4,0,0.2,1); }
-    .fade-in-up { animation: fadeInUp 0.8s ease-out forwards; }
-    .fade-in-up-delay { animation: fadeInUp 0.8s ease-out 0.2s forwards; opacity: 0; }
-    .fade-in-up-delay-2 { animation: fadeInUp 0.8s ease-out 0.4s forwards; opacity: 0; }
-    .pulse-glow { animation: pulseGlow 2.5s infinite; }
+    .fade-in-up { animation: fadeInUp 0.8s cubic-bezier(0.16,1,0.3,1) forwards; }
+    .fade-in-up-delay { animation: fadeInUp 0.8s cubic-bezier(0.16,1,0.3,1) 0.2s forwards; opacity: 0; }
+    .fade-in-up-delay-2 { animation: fadeInUp 0.8s cubic-bezier(0.16,1,0.3,1) 0.4s forwards; opacity: 0; }
+    .animate-hero { animation: fadeInUp 0.8s cubic-bezier(0.16,1,0.3,1) forwards; opacity: 0; }
+    .magnetic-btn { transition: all 0.3s ease; }
+    .magnetic-btn:hover { transform: scale(1.05) !important; box-shadow: 0 0 35px rgba(121,80,242,0.6), inset 0 0 10px rgba(255,255,255,0.2) !important; }
+    .magnetic-btn:active { transform: scale(0.97) !important; }
+    .float-anim { animation: float 4s ease-in-out infinite; }
     .image-reveal { animation: unveil 1.5s cubic-bezier(0.19,1,0.22,1) forwards; }
     .progress-fill { width:0%; height:100%; background:linear-gradient(90deg,#7950F2,#A78BFA); border-radius:4px; animation: typing 3s ease-in-out forwards; }
     .card-hover { transition: all 0.3s cubic-bezier(0.4,0,0.2,1); cursor: pointer; }
@@ -313,7 +324,7 @@ const s = {
   nav: { display:"flex", alignItems:"center", justifyContent:"space-between", padding:"0 32px", height:64, position:"sticky", top:0, zIndex:100, background:"rgba(10,10,26,0.8)", backdropFilter:"blur(20px)", WebkitBackdropFilter:"blur(20px)", borderBottom:"1px solid rgba(255,255,255,0.05)" },
   logoIcon: { width:30, height:30, background:"linear-gradient(135deg,#7950F2,#A78BFA)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:800, color:"#fff" },
   logoText: { fontSize:15, fontWeight:700, letterSpacing:"-0.03em" },
-  navLink: { padding:"6px 14px", background:"none", border:"none", color:"rgba(255,255,255,0.45)", fontSize:13, cursor:"pointer", fontFamily:"Inter" },
+  navLink: { padding:"8px 16px", background:"none", border:"none", color:"rgba(255,255,255,0.7)", fontSize:14, fontWeight:500, letterSpacing:"0.02em", cursor:"pointer", fontFamily:"Inter", borderRadius:8, transition:"all 0.2s" },
   langToggle: { display:"flex", background:"rgba(255,255,255,0.06)", borderRadius:7, padding:2, gap:1, marginLeft:8 },
   langBtn: { padding:"4px 9px", borderRadius:5, fontSize:11, fontWeight:600, cursor:"pointer", background:"transparent", border:"none", color:"rgba(255,255,255,0.35)", fontFamily:"Inter" },
   langActive: { background:"#fff", color:"#0A0A0A" },
@@ -322,19 +333,19 @@ const s = {
 
   // Hero
   heroSection: { minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", position:"relative", textAlign:"center", padding:"0 24px" },
-  heroGradient: { position:"absolute", top:0, left:0, right:0, bottom:0, background:"radial-gradient(circle at 50% 40%, rgba(121,80,242,0.15) 0%, transparent 50%)", zIndex:0 },
-  heroGradient2: { position:"absolute", top:"20%", right:"-10%", width:400, height:400, background:"radial-gradient(circle, rgba(230,73,128,0.08) 0%, transparent 60%)", filter:"blur(60px)", zIndex:0 },
+  heroGradient: { position:"absolute", top:0, left:0, right:0, bottom:0, background:"radial-gradient(circle at 50% -20%, rgba(121,80,242,0.18) 0%, transparent 50%), radial-gradient(circle at 0% 100%, rgba(167,139,250,0.05) 0%, transparent 40%)", zIndex:0 },
+  heroGradient2: { position:"absolute", top:"10%", right:"-10%", width:500, height:500, background:"radial-gradient(circle, rgba(230,73,128,0.06) 0%, transparent 60%)", filter:"blur(80px)", zIndex:0 },
   contentWrapper: { zIndex:2, maxWidth:900 },
   heroBadge: { display:"inline-flex", alignItems:"center", gap:8, background:"rgba(121,80,242,0.1)", border:"1px solid rgba(121,80,242,0.2)", borderRadius:100, padding:"6px 16px 6px 8px", marginBottom:32, fontSize:13, color:"#A78BFA", fontWeight:500 },
   badgeNew: { background:"#7950F2", color:"#fff", fontSize:10, fontWeight:800, padding:"2px 8px", borderRadius:100 },
-  heroHeadline: { fontSize:"clamp(40px, 8vw, 72px)", fontWeight:800, lineHeight:1.08, letterSpacing:"-0.045em", marginBottom:24 },
+  heroHeadline: { fontSize:"clamp(44px, 9vw, 84px)", fontWeight:800, lineHeight:0.95, letterSpacing:"-0.05em", marginBottom:28, background:"linear-gradient(180deg, #FFFFFF 0%, rgba(255,255,255,0.6) 100%)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" },
   textAccent: { background:"linear-gradient(90deg,#7950F2,#A78BFA)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" },
   heroSub: { fontSize:"clamp(16px, 3vw, 20px)", color:"rgba(255,255,255,0.5)", marginBottom:40, lineHeight:1.65, maxWidth:640, margin:"0 auto 40px" },
   ctaWrapper: { display:"flex", flexDirection:"column", alignItems:"center", gap:0 },
-  mainCta: { backgroundColor:"#7950F2", color:"#fff", padding:"18px 44px", borderRadius:100, fontSize:17, fontWeight:700, border:"none", cursor:"pointer", transition:"transform 0.2s", fontFamily:"Inter" },
+  mainCta: { background:"linear-gradient(135deg,#7950F2 0%,#A78BFA 100%)", color:"#fff", padding:"20px 44px", borderRadius:100, fontSize:18, fontWeight:700, border:"1px solid rgba(255,255,255,0.2)", cursor:"pointer", fontFamily:"Inter", boxShadow:"0 0 20px rgba(121,80,242,0.4), inset 0 0 10px rgba(255,255,255,0.2)" },
   socialProof: { marginTop:28, display:"flex", flexDirection:"column", alignItems:"center", gap:10 },
   avatarGroup: { display:"flex" },
-  avatarPlaceholder: { width:30, height:30, borderRadius:"50%", border:"2px solid #0A0A1A", marginLeft:-8 },
+  avatarPlaceholder: { width:40, height:40, borderRadius:"50%", border:"2px solid #0A0A1A", marginLeft:-12 },
   socialText: { fontSize:13, color:"rgba(255,255,255,0.35)" },
 
   // Demo
@@ -374,7 +385,7 @@ const s = {
   // Bento
   bentoGrid: { display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:16, textAlign:"left" },
   bentoCard: { background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.06)", padding:"28px 24px", borderRadius:20 },
-  cardEmoji: { fontSize:32, display:"block", marginBottom:16 },
+  cardEmoji: { fontSize:32, display:"block", marginBottom:16, animation:"float 4s ease-in-out infinite" },
   cardTitle: { fontSize:16, fontWeight:700, color:"#fff", marginBottom:6, letterSpacing:"-0.02em" },
   cardDesc: { fontSize:13, color:"rgba(255,255,255,0.4)", lineHeight:1.6, margin:0 },
 
