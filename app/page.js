@@ -1,11 +1,37 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../lib/supabase";
 
+// --- SCROLL REVEAL HOOK ---
+const useScrollReveal = () => {
+  const [isVisible, setIsVisible] = useState(false);
+  const ref = useRef(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) { setIsVisible(true); observer.unobserve(el); }
+    }, { threshold: 0.1 });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+  return [ref, isVisible];
+};
+
+const RevealSection = ({ children, style }) => {
+  const [ref, isVisible] = useScrollReveal();
+  return (
+    <section ref={ref} className={isVisible ? "visible" : "hidden"} style={{ ...s.section, ...style }}>
+      {children}
+    </section>
+  );
+};
+
 export default function Landing() {
   const router = useRouter();
-  const [lang, setLang] = useState("en");
+  const [lang, setLang] = useState("es");
+  const [email, setEmail] = useState("");
 
   useEffect(() => {
     const saved = localStorage.getItem("lang");
@@ -19,239 +45,346 @@ export default function Landing() {
   const en = lang === "en";
 
   return (
-    <div style={{ minHeight:"100vh", background:"#0A0A1A", fontFamily:"Inter, sans-serif", color:"#fff", overflowX:"hidden" }}>
-
-      {/* ═══ AMBIENT GLOWS ═══ */}
-      <div style={{ position:"fixed", top:"-300px", left:"50%", transform:"translateX(-50%)", width:800, height:800, background:"radial-gradient(circle, rgba(121,80,242,0.12) 0%, transparent 60%)", filter:"blur(80px)", pointerEvents:"none", zIndex:0 }} />
-      <div style={{ position:"fixed", bottom:"-200px", right:"-100px", width:500, height:500, background:"radial-gradient(circle, rgba(230,73,128,0.06) 0%, transparent 60%)", filter:"blur(60px)", pointerEvents:"none", zIndex:0 }} />
+    <div style={s.container}>
+      <GlobalAnimations />
 
       {/* ═══ NAV ═══ */}
-      <nav style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"0 40px", height:64, position:"sticky", top:0, zIndex:100, background:"rgba(10,10,26,0.8)", backdropFilter:"blur(20px)", WebkitBackdropFilter:"blur(20px)", borderBottom:"1px solid rgba(255,255,255,0.05)" }}>
+      <nav style={s.nav}>
         <div style={{ display:"flex", alignItems:"center", gap:10, cursor:"pointer" }} onClick={() => router.push("/")}>
-          <div style={{ width:30, height:30, background:"linear-gradient(135deg,#7950F2,#A78BFA)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:800, color:"#fff" }}>Ai</div>
-          <span style={{ fontSize:15, fontWeight:700, letterSpacing:"-0.03em" }}>Ai<span style={{ color:"#A78BFA" }}>Studio</span>Brand</span>
+          <div style={s.logoIcon}>Ai</div>
+          <span style={s.logoText}>Ai<span style={{ color:"#A78BFA" }}>Studio</span>Brand</span>
         </div>
         <div style={{ display:"flex", alignItems:"center", gap:6 }}>
-          <button onClick={() => router.push("/pricing")} style={{ padding:"6px 14px", background:"none", border:"none", color:"rgba(255,255,255,0.5)", fontSize:13, cursor:"pointer", fontFamily:"Inter" }}>{en ? "Pricing" : "Precios"}</button>
-          <button onClick={() => router.push("/contacto")} style={{ padding:"6px 14px", background:"none", border:"none", color:"rgba(255,255,255,0.5)", fontSize:13, cursor:"pointer", fontFamily:"Inter" }}>{en ? "Contact" : "Contacto"}</button>
-          <div style={{ display:"flex", background:"rgba(255,255,255,0.06)", borderRadius:7, padding:2, gap:1, marginLeft:8 }}>
-            <button onClick={() => setLanguage("en")} style={{ padding:"4px 9px", borderRadius:5, fontSize:11, fontWeight:600, cursor:"pointer", background: en ? "#fff" : "transparent", border:"none", color: en ? "#0A0A0A" : "rgba(255,255,255,0.4)", fontFamily:"Inter" }}>EN</button>
-            <button onClick={() => setLanguage("es")} style={{ padding:"4px 9px", borderRadius:5, fontSize:11, fontWeight:600, cursor:"pointer", background: !en ? "#fff" : "transparent", border:"none", color: !en ? "#0A0A0A" : "rgba(255,255,255,0.4)", fontFamily:"Inter" }}>ES</button>
+          <button onClick={() => router.push("/pricing")} style={s.navLink}>{en ? "Pricing" : "Precios"}</button>
+          <button onClick={() => router.push("/contacto")} style={s.navLink}>{en ? "Contact" : "Contacto"}</button>
+          <div style={s.langToggle}>
+            <button onClick={() => setLanguage("en")} style={{ ...s.langBtn, ...(en ? s.langActive : {}) }}>EN</button>
+            <button onClick={() => setLanguage("es")} style={{ ...s.langBtn, ...(!en ? s.langActive : {}) }}>ES</button>
           </div>
-          <button onClick={() => router.push("/login")} style={{ padding:"7px 16px", background:"none", border:"1px solid rgba(255,255,255,0.12)", borderRadius:8, color:"rgba(255,255,255,0.7)", fontSize:13, fontWeight:500, cursor:"pointer", marginLeft:6, fontFamily:"Inter" }}>{en ? "Log in" : "Entrar"}</button>
-          <button className="btn-primary" onClick={() => router.push("/login?tab=register")} style={{ padding:"8px 18px", background:"#7950F2", border:"none", borderRadius:8, color:"#fff", fontSize:13, fontWeight:600, cursor:"pointer", fontFamily:"Inter", boxShadow:"0 2px 12px rgba(121,80,242,0.4)" }}>{en ? "Start free" : "Empieza gratis"}</button>
+          <button onClick={() => router.push("/login")} style={s.navSignin}>{en ? "Log in" : "Entrar"}</button>
+          <button className="pulse-glow" onClick={() => router.push("/login?tab=register")} style={s.navCta}>{en ? "Start free" : "Empieza gratis"}</button>
         </div>
       </nav>
 
-      {/* ═══ HERO — CENTERED ═══ */}
-      <section style={{ textAlign:"center", padding:"100px 24px 60px", position:"relative", zIndex:1 }}>
-        <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"rgba(121,80,242,0.1)", border:"1px solid rgba(121,80,242,0.2)", borderRadius:100, padding:"6px 16px 6px 8px", marginBottom:32 }}>
-          <span style={{ background:"#7950F2", color:"#fff", fontSize:10, fontWeight:700, padding:"2px 8px", borderRadius:100 }}>NEW</span>
-          <span style={{ fontSize:13, color:"#A78BFA", fontWeight:500 }}>{en ? "Art Director AI — visual brief + validation" : "Art Director IA — brief visual + validación"}</span>
-        </div>
+      {/* ═══ HERO — FULL VIEWPORT ═══ */}
+      <section style={s.heroSection}>
+        <div style={s.heroGradient} />
+        <div style={s.heroGradient2} />
+        <div style={s.contentWrapper}>
+          <div className="fade-in-up" style={s.heroBadge}>
+            <span style={s.badgeNew}>NEW</span>
+            <span>{en ? "Art Director AI — visual brief + quality validation" : "Art Director IA — brief visual + validación de calidad"}</span>
+          </div>
 
-        <h1 style={{ fontSize:64, fontWeight:800, lineHeight:1.05, letterSpacing:"-0.045em", maxWidth:800, margin:"0 auto 24px", background:"linear-gradient(180deg, #FFFFFF 0%, rgba(255,255,255,0.65) 100%)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>
-          {en ? "Your brand voice," : "Tu voz de marca,"}
-          <br />
-          {en ? "powered by AI" : "potenciada por IA"}
-        </h1>
+          <h1 className="fade-in-up" style={s.heroHeadline}>
+            {en ? "Your brand. " : "Tu marca. "}
+            <span style={s.textAccent}>{en ? "Your voice." : "Tu voz."}</span>
+            <br />
+            {en ? "AI content in 30 seconds." : "Contenido IA en 30 segundos."}
+          </h1>
 
-        <p style={{ fontSize:18, color:"rgba(255,255,255,0.5)", lineHeight:1.7, maxWidth:520, margin:"0 auto 40px" }}>
-          {en
-            ? "Generate Instagram posts that sound exactly like you — copy, image, and everything in between. In 30 seconds."
-            : "Genera posts de Instagram que suenan exactamente como tú — copy, imagen, y todo lo demás. En 30 segundos."}
-        </p>
+          <p className="fade-in-up-delay" style={s.heroSub}>
+            {en
+              ? "The first bicultural AI that learns your brand DNA to create Instagram posts that sound exactly like you. "
+              : "La primera IA bicultural que aprende tu ADN de marca para crear posts de Instagram que suenan exactamente como tú. "}
+            <span style={{ color:"#fff" }}>Spanglish included.</span>
+          </p>
 
-        <div style={{ display:"flex", gap:12, justifyContent:"center", marginBottom:16 }}>
-          <button className="btn-primary" onClick={() => router.push("/login?tab=register")} style={{ padding:"15px 36px", background:"#7950F2", border:"none", borderRadius:12, color:"#fff", fontSize:16, fontWeight:700, cursor:"pointer", fontFamily:"Inter", boxShadow:"0 4px 24px rgba(121,80,242,0.5)", transition:"all 0.2s" }}>
-            {en ? "Start creating — it's free" : "Empieza a crear — es gratis"}
-          </button>
-        </div>
-        <p style={{ fontSize:13, color:"rgba(255,255,255,0.3)" }}>{en ? "No credit card · 20 free generations" : "Sin tarjeta · 20 generaciones gratis"}</p>
-      </section>
-
-      {/* ═══ PRODUCT DEMO ═══ */}
-      <section style={{ padding:"0 40px 80px", position:"relative", zIndex:1 }}>
-        <div style={{ maxWidth:900, margin:"0 auto", borderRadius:20, border:"1px solid rgba(255,255,255,0.08)", background:"linear-gradient(180deg, rgba(22,22,45,0.8) 0%, rgba(10,10,26,0.9) 100%)", padding:2, boxShadow:"0 40px 120px rgba(0,0,0,0.6), 0 0 60px rgba(121,80,242,0.08)" }}>
-          <div style={{ background:"#111128", borderRadius:18, padding:"24px 32px" }}>
-            {/* Fake browser bar */}
-            <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:20 }}>
-              <div style={{ width:10, height:10, borderRadius:"50%", background:"rgba(255,255,255,0.1)" }} />
-              <div style={{ width:10, height:10, borderRadius:"50%", background:"rgba(255,255,255,0.1)" }} />
-              <div style={{ width:10, height:10, borderRadius:"50%", background:"rgba(255,255,255,0.1)" }} />
-              <div style={{ flex:1, height:24, background:"rgba(255,255,255,0.04)", borderRadius:6, marginLeft:12, display:"flex", alignItems:"center", paddingLeft:12 }}>
-                <span style={{ fontSize:11, color:"rgba(255,255,255,0.25)" }}>aistudiobrand.com/crear</span>
+          <div className="fade-in-up-delay-2" style={s.ctaWrapper}>
+            <button className="pulse-glow" onClick={() => router.push("/login?tab=register")} style={s.mainCta}>
+              {en ? "Try 20 Free Generations" : "Prueba 20 Generaciones Gratis"}
+            </button>
+            <div style={s.socialProof}>
+              <div style={s.avatarGroup}>
+                {["#7950F2","#E64980","#F59E0B","#40C057"].map((c, i) => (
+                  <div key={i} style={{ ...s.avatarPlaceholder, background:c, zIndex:4-i }} />
+                ))}
               </div>
-            </div>
-            {/* Product mockup */}
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:20 }}>
-              <div>
-                <div style={{ background:"linear-gradient(135deg,#7950F2 0%,#E64980 50%,#F59E0B 100%)", borderRadius:14, aspectRatio:"1", display:"flex", alignItems:"center", justifyContent:"center", position:"relative", overflow:"hidden" }}>
-                  <div style={{ textAlign:"center" }}>
-                    <div style={{ fontSize:48, opacity:0.3, marginBottom:4 }}>✦</div>
-                    <div style={{ fontSize:13, fontWeight:600, color:"rgba(255,255,255,0.8)" }}>AI Generated</div>
-                  </div>
-                  <div style={{ position:"absolute", bottom:12, left:12, background:"rgba(0,0,0,0.5)", backdropFilter:"blur(8px)", borderRadius:8, padding:"6px 12px", display:"flex", alignItems:"center", gap:6 }}>
-                    <div style={{ width:14, height:14, borderRadius:"50%", background:"#40C057", display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:"#fff" }}>✓</div>
-                    <span style={{ fontSize:10, color:"rgba(255,255,255,0.8)", fontWeight:500 }}>{en ? "Quality validated" : "Calidad validada"}</span>
-                  </div>
-                </div>
-              </div>
-              <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
-                <div style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.06)", borderRadius:12, padding:16, flex:1 }}>
-                  <div style={{ fontSize:10, fontWeight:700, color:"#A78BFA", textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:8 }}>Hook</div>
-                  <div style={{ fontSize:15, fontWeight:600, color:"#fff", lineHeight:1.4, marginBottom:8 }}>Mami, ya no más stress!</div>
-                  <div style={{ fontSize:12, color:"rgba(255,255,255,0.45)", lineHeight:1.6, marginBottom:8 }}>{en ? "Our coaching program is literally a lifesaver para todas las mujeres que..." : "Nuestro programa de coaching es literally a lifesaver para todas las mujeres que..."}</div>
-                  <div style={{ fontSize:12, color:"#A78BFA", fontWeight:600 }}>DM con LISTA y te cuento todo</div>
-                </div>
-                <div style={{ display:"flex", gap:8 }}>
-                  <div style={{ flex:1, background:"rgba(121,80,242,0.1)", border:"1px solid rgba(121,80,242,0.2)", borderRadius:10, padding:"10px 14px", textAlign:"center" }}>
-                    <div style={{ fontSize:10, fontWeight:700, color:"#A78BFA", textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:2 }}>{en ? "Type" : "Tipo"}</div>
-                    <div style={{ fontSize:13, fontWeight:600, color:"#fff" }}>Comercial</div>
-                  </div>
-                  <div style={{ flex:1, background:"rgba(121,80,242,0.1)", border:"1px solid rgba(121,80,242,0.2)", borderRadius:10, padding:"10px 14px", textAlign:"center" }}>
-                    <div style={{ fontSize:10, fontWeight:700, color:"#A78BFA", textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:2 }}>{en ? "Language" : "Idioma"}</div>
-                    <div style={{ fontSize:13, fontWeight:600, color:"#fff" }}>Spanglish</div>
-                  </div>
-                  <div style={{ flex:1, background:"rgba(64,192,87,0.1)", border:"1px solid rgba(64,192,87,0.2)", borderRadius:10, padding:"10px 14px", textAlign:"center" }}>
-                    <div style={{ fontSize:10, fontWeight:700, color:"#86EFAC", textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:2 }}>Status</div>
-                    <div style={{ fontSize:13, fontWeight:600, color:"#86EFAC" }}>{en ? "Saved" : "Guardado"}</div>
-                  </div>
-                </div>
-              </div>
+              <span style={s.socialText}>{en ? "500+ creators already use it" : "500+ creadoras ya lo usan"}</span>
             </div>
           </div>
         </div>
       </section>
 
+      {/* ═══ DEMO INTERACTIVO ═══ */}
+      <RevealSection>
+        <div style={s.demoWindow}>
+          <div style={s.windowHeader}>
+            <div style={s.windowDots}>
+              <span style={{ ...s.dot, background:"#FF5F56" }} />
+              <span style={{ ...s.dot, background:"#FFBD2E" }} />
+              <span style={{ ...s.dot, background:"#27C93F" }} />
+            </div>
+            <div style={s.windowUrl}>aistudiobrand.com/crear</div>
+          </div>
+          <div style={s.demoContent}>
+            <div style={s.demoLeft}>
+              <div style={s.miniLabel}>{en ? "POST IDEA" : "IDEA DEL POST"}</div>
+              <div className="typing-text" style={s.fakeInput}>
+                {en
+                  ? "\"I want to announce my new coaching spots for Latinas in tech...\""
+                  : "\"Quiero anunciar mis nuevos spots de coaching para latinas en tech...\""}
+              </div>
+              <div style={s.demoProgress}>
+                <div className="progress-fill" style={s.progressFill} />
+              </div>
+              <div style={s.statusSteps}>
+                {(en
+                  ? ["Claude analyzing brand...", "Creating visual brief...", "Gemini rendering image...", "Validating quality..."]
+                  : ["Claude analizando marca...", "Creando brief visual...", "Gemini renderizando imagen...", "Validando calidad..."]
+                ).map((step, i) => (
+                  <div key={i} style={{ display:"flex", alignItems:"center", gap:8, marginBottom:6 }}>
+                    <div style={{ width:16, height:16, borderRadius:"50%", background: i < 3 ? "#40C057" : "rgba(121,80,242,0.3)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:8, color:"#fff", flexShrink:0 }}>{i < 3 ? "✓" : "⟳"}</div>
+                    <span style={{ fontSize:12, color: i < 3 ? "rgba(255,255,255,0.5)" : "#A78BFA", fontWeight: i === 3 ? 600 : 400 }}>{step}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div style={s.demoRight}>
+              <div className="image-reveal" style={s.resultImage}>
+                <div style={{ textAlign:"center" }}>
+                  <div style={{ fontSize:48, opacity:0.4, marginBottom:8 }}>✦</div>
+                  <div style={{ fontSize:13, fontWeight:600, color:"rgba(255,255,255,0.6)" }}>{en ? "AI Generated" : "Generado con IA"}</div>
+                </div>
+                <div style={s.validatedBadge}>
+                  <span style={{ fontSize:8 }}>✓</span> {en ? "Quality validated" : "Calidad validada"}
+                </div>
+              </div>
+              <div style={s.copyPreview}>
+                <div style={s.copyLabel}>HOOK</div>
+                <div style={{ fontSize:14, fontWeight:600, color:"#fff", marginBottom:6 }}>Mami, ya no más stress!</div>
+                <div style={{ fontSize:12, color:"rgba(255,255,255,0.4)", lineHeight:1.5 }}>Our coaching program es literally a lifesaver para todas las mujeres...</div>
+                <div style={{ fontSize:12, color:"#A78BFA", fontWeight:600, marginTop:6 }}>DM con LISTA y te cuento todo →</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </RevealSection>
+
       {/* ═══ SOCIAL PROOF STRIP ═══ */}
-      <section style={{ borderTop:"1px solid rgba(255,255,255,0.05)", borderBottom:"1px solid rgba(255,255,255,0.05)", padding:"28px 40px", position:"relative", zIndex:1 }}>
-        <div style={{ maxWidth:700, margin:"0 auto", display:"flex", justifyContent:"center", gap:48 }}>
+      <RevealSection style={{ padding:"40px 20px" }}>
+        <div style={s.proofStrip}>
           {[
-            { n: "30s", l: en ? "to generate a post" : "para generar un post" },
-            { n: "3", l: en ? "steps to create" : "pasos para crear" },
-            { n: "ES+EN", l: en ? "bicultural content" : "contenido bicultural" },
-            { n: "20", l: en ? "free generations" : "generaciones gratis" },
-          ].map((s, i) => (
+            { n:"30s", l: en ? "to generate" : "para generar" },
+            { n:"3", l: en ? "steps" : "pasos" },
+            { n:"ES+EN", l: "bicultural" },
+            { n:"20", l: en ? "free gens" : "gratis" },
+          ].map((item, i) => (
             <div key={i} style={{ textAlign:"center" }}>
-              <div style={{ fontSize:22, fontWeight:800, letterSpacing:"-0.03em", background:"linear-gradient(180deg,#fff 0%,rgba(255,255,255,0.5) 100%)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>{s.n}</div>
-              <div style={{ fontSize:11, color:"rgba(255,255,255,0.3)", marginTop:2 }}>{s.l}</div>
+              <div style={s.proofNum}>{item.n}</div>
+              <div style={s.proofLabel}>{item.l}</div>
             </div>
           ))}
         </div>
-      </section>
+      </RevealSection>
 
       {/* ═══ HOW IT WORKS ═══ */}
-      <section style={{ padding:"100px 40px", position:"relative", zIndex:1 }}>
-        <div style={{ maxWidth:900, margin:"0 auto" }}>
-          <div style={{ textAlign:"center", marginBottom:64 }}>
-            <div style={{ display:"inline-block", background:"rgba(121,80,242,0.1)", border:"1px solid rgba(121,80,242,0.15)", borderRadius:20, padding:"5px 14px", fontSize:11, fontWeight:600, color:"#A78BFA", letterSpacing:"0.02em", marginBottom:16 }}>{en ? "How it works" : "Cómo funciona"}</div>
-            <h2 style={{ fontSize:36, fontWeight:800, letterSpacing:"-0.04em", background:"linear-gradient(180deg,#fff,rgba(255,255,255,0.7))", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>{en ? "From idea to post in three steps" : "De la idea al post en tres pasos"}</h2>
-          </div>
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:24 }}>
-            {(en ? [
-              { n:"01", t:"Define your brand DNA", d:"Upload screenshots, connect your web. Our AI analyzes your style, tone, and audience in seconds.", icon:"◉" },
-              { n:"02", t:"Describe your idea", d:"Write what you want to say. Choose the type, format, and language. One sentence is enough.", icon:"✦" },
-              { n:"03", t:"Get your post", d:"Art Director AI creates a visual brief, generates the image, validates quality, and writes 3 copy options.", icon:"◈" },
-            ] : [
-              { n:"01", t:"Define tu ADN de marca", d:"Sube screenshots, conecta tu web. Nuestra IA analiza tu estilo, tono y audiencia en segundos.", icon:"◉" },
-              { n:"02", t:"Describe tu idea", d:"Escribe qué quieres comunicar. Elige tipo, formato e idioma. Una frase es suficiente.", icon:"✦" },
-              { n:"03", t:"Recibe tu post", d:"Art Director IA crea un brief visual, genera la imagen, valida calidad, y escribe 3 opciones de copy.", icon:"◈" },
-            ]).map((s, i) => (
-              <div key={i} style={{ background:"#16162d", border:"1px solid rgba(255,255,255,0.06)", borderRadius:20, padding:"32px 28px", position:"relative", overflow:"hidden" }}>
-                <div style={{ position:"absolute", top:-20, right:-10, fontSize:100, fontWeight:900, color:"rgba(121,80,242,0.04)", letterSpacing:"-0.05em", lineHeight:1 }}>{s.n}</div>
-                <div style={{ width:44, height:44, borderRadius:12, background:"rgba(121,80,242,0.12)", border:"1px solid rgba(121,80,242,0.2)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, color:"#A78BFA", marginBottom:20 }}>{s.icon}</div>
-                <div style={{ fontSize:16, fontWeight:700, color:"#fff", marginBottom:8, letterSpacing:"-0.02em" }}>{s.t}</div>
-                <div style={{ fontSize:13, color:"rgba(255,255,255,0.45)", lineHeight:1.65 }}>{s.d}</div>
-              </div>
-            ))}
-          </div>
+      <RevealSection>
+        <div style={s.sectionBadge}>{en ? "How it works" : "Cómo funciona"}</div>
+        <h2 style={s.sectionTitle}>{en ? "From idea to post in three steps" : "De la idea al post en tres pasos"}</h2>
+        <div style={s.stepsGrid}>
+          {(en ? [
+            { n:"01", icon:"◉", t:"Define your brand DNA", d:"Upload screenshots, connect your web. AI analyzes your style, tone, and audience in seconds." },
+            { n:"02", icon:"✦", t:"Describe your idea", d:"Write what you want to say. Choose type, format, and language. One sentence is enough." },
+            { n:"03", icon:"◈", t:"Get your post", d:"Art Director AI creates a brief, generates the image, validates quality, and writes 3 copy options." },
+          ] : [
+            { n:"01", icon:"◉", t:"Define tu ADN de marca", d:"Sube screenshots, conecta tu web. La IA analiza tu estilo, tono y audiencia en segundos." },
+            { n:"02", icon:"✦", t:"Describe tu idea", d:"Escribe qué quieres comunicar. Elige tipo, formato e idioma. Una frase es suficiente." },
+            { n:"03", icon:"◈", t:"Recibe tu post", d:"Art Director IA crea el brief, genera la imagen, valida calidad y escribe 3 opciones de copy." },
+          ]).map((step, i) => (
+            <div key={i} className="card-hover" style={s.stepCard}>
+              <div style={s.stepBigNum}>{step.n}</div>
+              <div style={s.stepIcon}>{step.icon}</div>
+              <div style={{ fontSize:17, fontWeight:700, color:"#fff", marginBottom:8, letterSpacing:"-0.02em" }}>{step.t}</div>
+              <div style={{ fontSize:13, color:"rgba(255,255,255,0.4)", lineHeight:1.65 }}>{step.d}</div>
+            </div>
+          ))}
         </div>
-      </section>
+      </RevealSection>
 
       {/* ═══ BENTO FEATURES ═══ */}
-      <section style={{ padding:"0 40px 100px", position:"relative", zIndex:1 }}>
-        <div style={{ maxWidth:900, margin:"0 auto" }}>
-          <div style={{ textAlign:"center", marginBottom:48 }}>
-            <div style={{ display:"inline-block", background:"rgba(121,80,242,0.1)", border:"1px solid rgba(121,80,242,0.15)", borderRadius:20, padding:"5px 14px", fontSize:11, fontWeight:600, color:"#A78BFA", letterSpacing:"0.02em", marginBottom:16 }}>{en ? "Features" : "Funcionalidades"}</div>
-            <h2 style={{ fontSize:36, fontWeight:800, letterSpacing:"-0.04em", background:"linear-gradient(180deg,#fff,rgba(255,255,255,0.7))", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>{en ? "Built for creators who mean business" : "Hecho para creadoras que van en serio"}</h2>
+      <RevealSection>
+        <div style={s.sectionBadge}>{en ? "Features" : "Funcionalidades"}</div>
+        <h2 style={s.sectionTitle}>{en ? "Built for creators who mean business" : "Hecho para creadoras que van en serio"}</h2>
+        <div style={s.bentoGrid}>
+          <div className="card-hover" style={{ ...s.bentoCard, gridColumn:"span 2", background:"linear-gradient(135deg, #16162d, #0A0A1A)" }}>
+            <span style={s.cardEmoji}>🧠</span>
+            <h3 style={s.cardTitle}>Claude Art Director</h3>
+            <p style={s.cardDesc}>{en ? "Claude analyzes your brand and dictates the brief to Gemini. Results are validated before you see them." : "Claude analiza tu marca y dicta el brief a Gemini. Resultados validados antes de que los veas."}</p>
           </div>
-          {/* Bento grid — 2 big + 2 small top, 2 small + 1 big bottom */}
-          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14 }}>
-            {/* Big card — Brand DNA */}
-            <div className="card-hover" style={{ background:"#16162d", border:"1px solid rgba(255,255,255,0.06)", borderRadius:20, padding:"36px 28px", gridRow:"span 2", display:"flex", flexDirection:"column", justifyContent:"space-between", transition:"all 0.2s cubic-bezier(0.4,0,0.2,1)", cursor:"pointer" }}>
-              <div>
-                <div style={{ width:44, height:44, borderRadius:12, background:"rgba(121,80,242,0.12)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:20, color:"#A78BFA", marginBottom:20 }}>◉</div>
-                <div style={{ fontSize:18, fontWeight:700, color:"#fff", marginBottom:8, letterSpacing:"-0.02em" }}>{en ? "Your brand DNA" : "Tu ADN de marca"}</div>
-                <div style={{ fontSize:14, color:"rgba(255,255,255,0.45)", lineHeight:1.65 }}>{en ? "AI analyzes your Instagram, TikTok, and website to extract your visual style, tone, colors, and personality. Every post sounds like you." : "La IA analiza tu Instagram, TikTok y web para extraer tu estilo visual, tono, colores y personalidad. Cada post suena como tú."}</div>
-              </div>
-              <div style={{ display:"flex", gap:8, marginTop:24 }}>
-                {["#7950F2","#E64980","#F59E0B","#40C057"].map((c,i) => (
-                  <div key={i} style={{ width:24, height:24, borderRadius:6, background:c, opacity:0.7 }} />
-                ))}
-                <div style={{ width:24, height:24, borderRadius:6, border:"1px dashed rgba(255,255,255,0.15)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:10, color:"rgba(255,255,255,0.3)" }}>+</div>
-              </div>
-            </div>
-            {/* Small card — Speed */}
-            <div className="card-hover" style={{ background:"#16162d", border:"1px solid rgba(255,255,255,0.06)", borderRadius:20, padding:"28px 24px", transition:"all 0.2s cubic-bezier(0.4,0,0.2,1)", cursor:"pointer" }}>
-              <div style={{ fontSize:32, fontWeight:800, letterSpacing:"-0.04em", background:"linear-gradient(135deg,#7950F2,#A78BFA)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent", marginBottom:8 }}>30s</div>
-              <div style={{ fontSize:15, fontWeight:700, color:"#fff", marginBottom:4 }}>{en ? "Generate in seconds" : "Genera en segundos"}</div>
-              <div style={{ fontSize:13, color:"rgba(255,255,255,0.4)", lineHeight:1.5 }}>{en ? "One sentence → image + 3 copy options" : "Una frase → imagen + 3 opciones de copy"}</div>
-            </div>
-            {/* Small card — Bicultural */}
-            <div className="card-hover" style={{ background:"#16162d", border:"1px solid rgba(255,255,255,0.06)", borderRadius:20, padding:"28px 24px", transition:"all 0.2s cubic-bezier(0.4,0,0.2,1)", cursor:"pointer" }}>
-              <div style={{ display:"flex", gap:6, marginBottom:12 }}>
-                {["ES","EN","MIX"].map((l,i) => (
-                  <span key={i} style={{ padding:"3px 10px", borderRadius:6, fontSize:11, fontWeight:700, background: i===2 ? "rgba(121,80,242,0.15)" : "rgba(255,255,255,0.06)", color: i===2 ? "#A78BFA" : "rgba(255,255,255,0.5)", border: i===2 ? "1px solid rgba(121,80,242,0.3)" : "1px solid rgba(255,255,255,0.06)" }}>{l}</span>
-                ))}
-              </div>
-              <div style={{ fontSize:15, fontWeight:700, color:"#fff", marginBottom:4 }}>{en ? "Bicultural by design" : "Bicultural por diseño"}</div>
-              <div style={{ fontSize:13, color:"rgba(255,255,255,0.4)", lineHeight:1.5 }}>{en ? "Spanish, English, or Spanglish — your voice" : "Español, inglés o Spanglish — tu voz"}</div>
-            </div>
+          <div className="card-hover" style={s.bentoCard}>
+            <span style={s.cardEmoji}>🇲🇽</span>
+            <h3 style={s.cardTitle}>{en ? "Native Spanglish" : "Spanglish Nativo"}</h3>
+            <p style={s.cardDesc}>{en ? "Copy that connects. We understand culture, not just language." : "Copy que conecta. Entendemos la cultura, no solo el idioma."}</p>
           </div>
-          {/* Second row */}
-          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14, marginTop:14 }}>
-            <div className="card-hover" style={{ background:"#16162d", border:"1px solid rgba(255,255,255,0.06)", borderRadius:20, padding:"28px 24px", transition:"all 0.2s cubic-bezier(0.4,0,0.2,1)", cursor:"pointer" }}>
-              <div style={{ width:44, height:44, borderRadius:12, background:"rgba(64,192,87,0.12)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, color:"#86EFAC", marginBottom:16 }}>◈</div>
-              <div style={{ fontSize:15, fontWeight:700, color:"#fff", marginBottom:4 }}>{en ? "Your library" : "Tu biblioteca"}</div>
-              <div style={{ fontSize:13, color:"rgba(255,255,255,0.4)", lineHeight:1.5 }}>{en ? "Every piece auto-saved. Filter, reuse, remix." : "Cada pieza se guarda automáticamente. Filtra, reutiliza, remezcla."}</div>
-            </div>
-            <div className="card-hover" style={{ background:"linear-gradient(135deg,rgba(121,80,242,0.15),rgba(230,73,128,0.08))", border:"1px solid rgba(121,80,242,0.15)", borderRadius:20, padding:"28px 24px", transition:"all 0.2s cubic-bezier(0.4,0,0.2,1)", cursor:"pointer" }}>
-              <div style={{ width:44, height:44, borderRadius:12, background:"rgba(121,80,242,0.2)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, color:"#A78BFA", marginBottom:16 }}>✦</div>
-              <div style={{ fontSize:15, fontWeight:700, color:"#fff", marginBottom:4 }}>{en ? "Art Director AI" : "Art Director IA"}</div>
-              <div style={{ fontSize:13, color:"rgba(255,255,255,0.4)", lineHeight:1.5 }}>{en ? "Claude creates the brief, Gemini renders, Claude validates. You only see approved results." : "Claude crea el brief, Gemini renderiza, Claude valida. Solo ves resultados aprobados."}</div>
-            </div>
+          <div className="card-hover" style={s.bentoCard}>
+            <span style={s.cardEmoji}>⚡</span>
+            <h3 style={s.cardTitle}>{en ? "30 Seconds" : "30 Segundos"}</h3>
+            <p style={s.cardDesc}>{en ? "From idea to final art in under a minute." : "De la idea al arte final en menos de un minuto."}</p>
+          </div>
+          <div className="card-hover" style={{ ...s.bentoCard, gridColumn:"span 2" }}>
+            <span style={s.cardEmoji}>🎨</span>
+            <h3 style={s.cardTitle}>{en ? "Unique Brand DNA" : "ADN de Marca Único"}</h3>
+            <p style={s.cardDesc}>{en ? "Your colors, your typography, and your personality in every generated pixel." : "Tus colores, tu tipografía y tu personalidad en cada píxel generado."}</p>
+          </div>
+          <div className="card-hover" style={s.bentoCard}>
+            <span style={s.cardEmoji}>📚</span>
+            <h3 style={s.cardTitle}>{en ? "Auto Library" : "Biblioteca Auto"}</h3>
+            <p style={s.cardDesc}>{en ? "Every piece saved automatically. Filter, reuse, remix." : "Cada pieza se guarda automáticamente. Filtra, reutiliza, remezcla."}</p>
           </div>
         </div>
-      </section>
+      </RevealSection>
 
       {/* ═══ CTA FINAL ═══ */}
-      <section style={{ padding:"100px 40px", textAlign:"center", position:"relative", zIndex:1, background:"linear-gradient(180deg, #0A0A1A 0%, #16162d 50%, #0A0A1A 100%)" }}>
-        <div style={{ maxWidth:600, margin:"0 auto" }}>
-          <h2 style={{ fontSize:40, fontWeight:800, letterSpacing:"-0.04em", marginBottom:16, background:"linear-gradient(180deg,#fff,rgba(255,255,255,0.65))", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>
-            {en ? "Your content, your voice, your brand." : "Tu contenido, tu voz, tu marca."}
+      <RevealSection>
+        <div style={s.finalCta}>
+          <h2 style={{ ...s.heroHeadline, fontSize:"clamp(32px, 6vw, 52px)", marginBottom:16 }}>
+            {en ? "Ready to sound like yourself?" : "¿Lista para sonar como tú misma?"}
           </h2>
-          <p style={{ fontSize:16, color:"rgba(255,255,255,0.45)", marginBottom:36, lineHeight:1.7 }}>
+          <p style={{ fontSize:17, color:"rgba(255,255,255,0.5)", marginBottom:36, lineHeight:1.7, maxWidth:500, margin:"0 auto 36px" }}>
             {en ? "Join creators who stopped outsourcing their voice." : "Únete a las creadoras que dejaron de tercerizar su voz."}
           </p>
-          <button className="btn-primary" onClick={() => router.push("/login?tab=register")} style={{ padding:"16px 40px", background:"#7950F2", border:"none", borderRadius:14, color:"#fff", fontSize:16, fontWeight:700, cursor:"pointer", fontFamily:"Inter", boxShadow:"0 4px 30px rgba(121,80,242,0.5)", transition:"all 0.2s" }}>
-            {en ? "Start creating — it's free" : "Empieza a crear — es gratis"}
-          </button>
-          <p style={{ fontSize:12, color:"rgba(255,255,255,0.25)", marginTop:14 }}>{en ? "No credit card required · Cancel anytime" : "Sin tarjeta de crédito · Cancela cuando quieras"}</p>
+          <div style={s.inputGroup}>
+            <input type="email" placeholder="tu@email.com" style={s.emailInput} value={email} onChange={e => setEmail(e.target.value)} />
+            <button onClick={() => router.push("/login?tab=register")} style={s.inputCta}>{en ? "Start Now" : "Empezar Ahora"}</button>
+          </div>
+          <span style={{ fontSize:12, color:"rgba(255,255,255,0.3)" }}>{en ? "20 free credits · Setup in 2 min" : "20 créditos gratis · Setup en 2 min"}</span>
         </div>
-      </section>
+      </RevealSection>
 
       {/* ═══ FOOTER ═══ */}
-      <footer style={{ padding:"24px 40px", borderTop:"1px solid rgba(255,255,255,0.05)", display:"flex", alignItems:"center", justifyContent:"space-between", position:"relative", zIndex:1 }}>
+      <footer style={s.footer}>
         <div style={{ display:"flex", alignItems:"center", gap:8 }}>
           <div style={{ width:22, height:22, background:"#7950F2", borderRadius:6, display:"flex", alignItems:"center", justifyContent:"center", fontSize:9, fontWeight:800, color:"#fff" }}>Ai</div>
-          <span style={{ fontSize:12, color:"rgba(255,255,255,0.3)" }}>AiStudioBrand · {en ? "Content that sounds like you" : "Contenido que suena como tú"}</span>
+          <span style={{ fontSize:12, color:"rgba(255,255,255,0.25)" }}>AiStudioBrand · {en ? "Content that sounds like you" : "Contenido que suena como tú"}</span>
         </div>
         <div style={{ display:"flex", gap:16 }}>
-          <button onClick={() => router.push("/terminos")} style={{ fontSize:11, color:"rgba(255,255,255,0.25)", background:"none", border:"none", cursor:"pointer" }}>{en ? "Terms" : "Términos"}</button>
-          <button onClick={() => router.push("/privacidad")} style={{ fontSize:11, color:"rgba(255,255,255,0.25)", background:"none", border:"none", cursor:"pointer" }}>{en ? "Privacy" : "Privacidad"}</button>
+          <button onClick={() => router.push("/terminos")} style={s.footerLink}>{en ? "Terms" : "Términos"}</button>
+          <button onClick={() => router.push("/privacidad")} style={s.footerLink}>{en ? "Privacy" : "Privacidad"}</button>
         </div>
       </footer>
     </div>
   );
 }
+
+// --- GLOBAL ANIMATIONS ---
+const GlobalAnimations = () => (
+  <style>{`
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulseGlow {
+      0% { box-shadow: 0 0 0 0 rgba(121,80,242,0.4); }
+      70% { box-shadow: 0 0 0 20px rgba(121,80,242,0); }
+      100% { box-shadow: 0 0 0 0 rgba(121,80,242,0); }
+    }
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+    @keyframes unveil {
+      from { clip-path: inset(100% 0 0 0); }
+      to { clip-path: inset(0 0 0 0); }
+    }
+    @keyframes typing {
+      from { width: 0% }
+      to { width: 100% }
+    }
+    .hidden { opacity: 0; transform: translateY(40px); transition: all 0.8s cubic-bezier(0.4,0,0.2,1); }
+    .visible { opacity: 1; transform: translateY(0); transition: all 0.8s cubic-bezier(0.4,0,0.2,1); }
+    .fade-in-up { animation: fadeInUp 0.8s ease-out forwards; }
+    .fade-in-up-delay { animation: fadeInUp 0.8s ease-out 0.2s forwards; opacity: 0; }
+    .fade-in-up-delay-2 { animation: fadeInUp 0.8s ease-out 0.4s forwards; opacity: 0; }
+    .pulse-glow { animation: pulseGlow 2.5s infinite; }
+    .image-reveal { animation: unveil 1.5s cubic-bezier(0.19,1,0.22,1) forwards; }
+    .progress-fill { width:0%; height:100%; background:linear-gradient(90deg,#7950F2,#A78BFA); border-radius:4px; animation: typing 3s ease-in-out forwards; }
+    .card-hover { transition: all 0.3s cubic-bezier(0.4,0,0.2,1); cursor: pointer; }
+    .card-hover:hover { transform: translateY(-6px); border-color: rgba(121,80,242,0.4) !important; box-shadow: 0 20px 50px rgba(0,0,0,0.4); }
+  `}</style>
+);
+
+// --- STYLES ---
+const s = {
+  container: { backgroundColor:"#0A0A1A", color:"#fff", fontFamily:"Inter, sans-serif", overflowX:"hidden" },
+  section: { padding:"100px 20px", maxWidth:1100, margin:"0 auto", textAlign:"center" },
+
+  // Nav
+  nav: { display:"flex", alignItems:"center", justifyContent:"space-between", padding:"0 32px", height:64, position:"sticky", top:0, zIndex:100, background:"rgba(10,10,26,0.8)", backdropFilter:"blur(20px)", WebkitBackdropFilter:"blur(20px)", borderBottom:"1px solid rgba(255,255,255,0.05)" },
+  logoIcon: { width:30, height:30, background:"linear-gradient(135deg,#7950F2,#A78BFA)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:800, color:"#fff" },
+  logoText: { fontSize:15, fontWeight:700, letterSpacing:"-0.03em" },
+  navLink: { padding:"6px 14px", background:"none", border:"none", color:"rgba(255,255,255,0.45)", fontSize:13, cursor:"pointer", fontFamily:"Inter" },
+  langToggle: { display:"flex", background:"rgba(255,255,255,0.06)", borderRadius:7, padding:2, gap:1, marginLeft:8 },
+  langBtn: { padding:"4px 9px", borderRadius:5, fontSize:11, fontWeight:600, cursor:"pointer", background:"transparent", border:"none", color:"rgba(255,255,255,0.35)", fontFamily:"Inter" },
+  langActive: { background:"#fff", color:"#0A0A0A" },
+  navSignin: { padding:"7px 16px", background:"none", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, color:"rgba(255,255,255,0.6)", fontSize:13, fontWeight:500, cursor:"pointer", marginLeft:4, fontFamily:"Inter" },
+  navCta: { padding:"8px 18px", background:"#7950F2", border:"none", borderRadius:8, color:"#fff", fontSize:13, fontWeight:600, cursor:"pointer", fontFamily:"Inter", boxShadow:"0 2px 12px rgba(121,80,242,0.4)" },
+
+  // Hero
+  heroSection: { minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", position:"relative", textAlign:"center", padding:"0 24px" },
+  heroGradient: { position:"absolute", top:0, left:0, right:0, bottom:0, background:"radial-gradient(circle at 50% 40%, rgba(121,80,242,0.15) 0%, transparent 50%)", zIndex:0 },
+  heroGradient2: { position:"absolute", top:"20%", right:"-10%", width:400, height:400, background:"radial-gradient(circle, rgba(230,73,128,0.08) 0%, transparent 60%)", filter:"blur(60px)", zIndex:0 },
+  contentWrapper: { zIndex:2, maxWidth:900 },
+  heroBadge: { display:"inline-flex", alignItems:"center", gap:8, background:"rgba(121,80,242,0.1)", border:"1px solid rgba(121,80,242,0.2)", borderRadius:100, padding:"6px 16px 6px 8px", marginBottom:32, fontSize:13, color:"#A78BFA", fontWeight:500 },
+  badgeNew: { background:"#7950F2", color:"#fff", fontSize:10, fontWeight:800, padding:"2px 8px", borderRadius:100 },
+  heroHeadline: { fontSize:"clamp(40px, 8vw, 72px)", fontWeight:800, lineHeight:1.08, letterSpacing:"-0.045em", marginBottom:24 },
+  textAccent: { background:"linear-gradient(90deg,#7950F2,#A78BFA)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" },
+  heroSub: { fontSize:"clamp(16px, 3vw, 20px)", color:"rgba(255,255,255,0.5)", marginBottom:40, lineHeight:1.65, maxWidth:640, margin:"0 auto 40px" },
+  ctaWrapper: { display:"flex", flexDirection:"column", alignItems:"center", gap:0 },
+  mainCta: { backgroundColor:"#7950F2", color:"#fff", padding:"18px 44px", borderRadius:100, fontSize:17, fontWeight:700, border:"none", cursor:"pointer", transition:"transform 0.2s", fontFamily:"Inter" },
+  socialProof: { marginTop:28, display:"flex", flexDirection:"column", alignItems:"center", gap:10 },
+  avatarGroup: { display:"flex" },
+  avatarPlaceholder: { width:30, height:30, borderRadius:"50%", border:"2px solid #0A0A1A", marginLeft:-8 },
+  socialText: { fontSize:13, color:"rgba(255,255,255,0.35)" },
+
+  // Demo
+  demoWindow: { background:"#16162d", borderRadius:20, border:"1px solid rgba(255,255,255,0.08)", overflow:"hidden", boxShadow:"0 40px 120px rgba(0,0,0,0.6), 0 0 60px rgba(121,80,242,0.06)", maxWidth:960, margin:"0 auto" },
+  windowHeader: { padding:"14px 20px", borderBottom:"1px solid rgba(255,255,255,0.06)", display:"flex", alignItems:"center", gap:12, background:"rgba(0,0,0,0.2)" },
+  windowDots: { display:"flex", gap:7 },
+  dot: { width:10, height:10, borderRadius:"50%", display:"inline-block" },
+  windowUrl: { flex:1, height:26, background:"rgba(255,255,255,0.04)", borderRadius:6, display:"flex", alignItems:"center", paddingLeft:12, fontSize:11, color:"rgba(255,255,255,0.2)" },
+  demoContent: { display:"grid", gridTemplateColumns:"1fr 1fr", padding:"32px 36px", gap:32 },
+  demoLeft: { textAlign:"left" },
+  miniLabel: { fontSize:10, fontWeight:700, color:"#A78BFA", textTransform:"uppercase", letterSpacing:"0.12em", marginBottom:10 },
+  fakeInput: { background:"rgba(0,0,0,0.3)", padding:"16px 18px", borderRadius:12, fontSize:13, color:"rgba(167,139,250,0.8)", border:"1px solid rgba(121,80,242,0.25)", marginBottom:16, lineHeight:1.5, fontStyle:"italic" },
+  demoProgress: { height:3, background:"rgba(255,255,255,0.06)", borderRadius:4, overflow:"hidden", marginBottom:16 },
+  progressFill: {},
+  statusSteps: { marginTop:4 },
+  demoRight: { display:"flex", flexDirection:"column", gap:12 },
+  resultImage: { flex:1, background:"linear-gradient(135deg,#7950F2 0%,#E64980 50%,#F59E0B 100%)", borderRadius:14, display:"flex", alignItems:"center", justifyContent:"center", position:"relative", minHeight:200 },
+  validatedBadge: { position:"absolute", bottom:10, left:10, background:"rgba(0,0,0,0.6)", backdropFilter:"blur(8px)", borderRadius:8, padding:"5px 12px", fontSize:10, color:"rgba(255,255,255,0.8)", fontWeight:600, display:"flex", alignItems:"center", gap:6 },
+  copyPreview: { background:"rgba(0,0,0,0.2)", border:"1px solid rgba(255,255,255,0.06)", borderRadius:12, padding:"14px 16px", textAlign:"left" },
+  copyLabel: { fontSize:9, fontWeight:700, color:"#A78BFA", textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:6 },
+
+  // Proof strip
+  proofStrip: { display:"flex", justifyContent:"center", gap:56, padding:"20px 0", borderTop:"1px solid rgba(255,255,255,0.04)", borderBottom:"1px solid rgba(255,255,255,0.04)" },
+  proofNum: { fontSize:24, fontWeight:800, letterSpacing:"-0.03em", background:"linear-gradient(180deg,#fff,rgba(255,255,255,0.5))", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" },
+  proofLabel: { fontSize:11, color:"rgba(255,255,255,0.25)", marginTop:2 },
+
+  // Section common
+  sectionBadge: { display:"inline-block", background:"rgba(121,80,242,0.1)", border:"1px solid rgba(121,80,242,0.15)", borderRadius:20, padding:"5px 14px", fontSize:11, fontWeight:600, color:"#A78BFA", letterSpacing:"0.02em", marginBottom:16 },
+  sectionTitle: { fontSize:36, fontWeight:800, letterSpacing:"-0.04em", marginBottom:48, background:"linear-gradient(180deg,#fff,rgba(255,255,255,0.7))", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" },
+
+  // Steps
+  stepsGrid: { display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:20, textAlign:"left" },
+  stepCard: { background:"#16162d", border:"1px solid rgba(255,255,255,0.06)", borderRadius:20, padding:"32px 24px", position:"relative", overflow:"hidden" },
+  stepBigNum: { position:"absolute", top:-24, right:-8, fontSize:110, fontWeight:900, color:"rgba(121,80,242,0.04)", letterSpacing:"-0.05em", lineHeight:1, pointerEvents:"none" },
+  stepIcon: { width:44, height:44, borderRadius:12, background:"rgba(121,80,242,0.12)", border:"1px solid rgba(121,80,242,0.2)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, color:"#A78BFA", marginBottom:18 },
+
+  // Bento
+  bentoGrid: { display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:16, textAlign:"left" },
+  bentoCard: { background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.06)", padding:"28px 24px", borderRadius:20 },
+  cardEmoji: { fontSize:32, display:"block", marginBottom:16 },
+  cardTitle: { fontSize:16, fontWeight:700, color:"#fff", marginBottom:6, letterSpacing:"-0.02em" },
+  cardDesc: { fontSize:13, color:"rgba(255,255,255,0.4)", lineHeight:1.6, margin:0 },
+
+  // Final CTA
+  finalCta: { background:"linear-gradient(180deg, rgba(121,80,242,0.08) 0%, transparent 100%)", padding:"72px 40px", borderRadius:32, border:"1px solid rgba(121,80,242,0.15)" },
+  inputGroup: { display:"flex", maxWidth:460, margin:"0 auto 16px", gap:10 },
+  emailInput: { flex:1, padding:"14px 20px", borderRadius:100, border:"1px solid rgba(255,255,255,0.1)", backgroundColor:"rgba(0,0,0,0.3)", color:"#fff", outline:"none", fontSize:14, fontFamily:"Inter" },
+  inputCta: { backgroundColor:"#fff", color:"#0A0A1A", padding:"14px 28px", borderRadius:100, fontWeight:700, border:"none", cursor:"pointer", fontSize:14, fontFamily:"Inter", whiteSpace:"nowrap" },
+
+  // Footer
+  footer: { padding:"24px 32px", borderTop:"1px solid rgba(255,255,255,0.04)", display:"flex", alignItems:"center", justifyContent:"space-between" },
+  footerLink: { fontSize:11, color:"rgba(255,255,255,0.2)", background:"none", border:"none", cursor:"pointer" },
+};
