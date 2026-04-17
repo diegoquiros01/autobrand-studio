@@ -246,6 +246,20 @@ function CrearContent() {
   const NB = { width:"100%", padding:12, background:"linear-gradient(135deg,#7950F2,#4C6EF5)", color:"#fff", border:"none", borderRadius:9, fontSize:13, fontWeight:500, cursor:"pointer", marginBottom:8, fontFamily:"Inter, sans-serif", boxShadow:"0 4px 14px rgba(121,80,242,0.4)" };
   const SB = { width:"100%", padding:11, background:"rgba(255,255,255,0.04)", color:D.text2, border:"1px solid rgba(255,255,255,0.1)", borderRadius:9, fontSize:13, cursor:"pointer", fontFamily:"Inter, sans-serif" };
 
+  // Typing placeholder effect
+  const placeholders = [
+    "Quiero anunciar mis 3 spots de coaching 1:1...",
+    "Lanzar mi nuevo programa de mentoría para latinas en tech...",
+    "Promocionar mi descuento de Black Friday...",
+    "Compartir 3 tips sobre productividad para emprendedoras...",
+    "Celebrar que llegué a 10K seguidoras...",
+  ];
+  const [phIdx, setPhIdx] = useState(0);
+  useEffect(() => {
+    const iv = setInterval(() => setPhIdx(p => (p + 1) % placeholders.length), 3500);
+    return () => clearInterval(iv);
+  }, []);
+
   const UploadZone = ({ onClick, children }) => (
     <div onClick={onClick}
       style={{ border:"2px dashed rgba(121,80,242,0.3)", borderRadius:12, padding:"28px 20px", textAlign:"center", cursor:"pointer", transition:"all 0.15s", background:"rgba(121,80,242,0.04)" }}
@@ -255,27 +269,90 @@ function CrearContent() {
     </div>
   );
 
+  // Instagram preview component
+  const selectedCopy = copies.find(c => c.id === copySeleccionado);
+  const hasImage = versiones.length > 0;
+  const currentImage = hasImage ? versiones[versionActiva] : null;
+
+  const InstagramPreview = () => (
+    <div style={{ width:"100%", maxWidth:380, background:"#fff", borderRadius:10, boxShadow:"0 20px 60px rgba(0,0,0,0.7)", overflow:"hidden" }}>
+      {/* IG Header */}
+      <div style={{ display:"flex", alignItems:"center", gap:8, padding:"10px 14px" }}>
+        <div style={{ width:28, height:28, borderRadius:"50%", background:"linear-gradient(135deg,#7950F2,#A78BFA)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:9, fontWeight:800, color:"#fff" }}>
+          {(brandProfile?.nombre || "M").charAt(0).toUpperCase()}
+        </div>
+        <div>
+          <div style={{ fontSize:12, fontWeight:600, color:"#000" }}>{brandProfile?.nombre || "tu_marca"}</div>
+          <div style={{ fontSize:10, color:"#999" }}>{tipo}</div>
+        </div>
+      </div>
+      {/* Image */}
+      <div style={{ width:"100%", aspectRatio:"1", background:"#f0f0f0", position:"relative", overflow:"hidden" }}>
+        {generatingImg ? (
+          <div style={{ position:"absolute", inset:0, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", background:"linear-gradient(135deg,#f8f0ff,#fff0f5)" }}>
+            <div style={{ position:"absolute", inset:0, background:"linear-gradient(90deg, transparent, rgba(121,80,242,0.15), transparent)", animation:"shimmer 1.5s infinite" }} />
+            <div style={{ fontSize:11, color:"#7950F2", fontWeight:600, zIndex:1 }}>{genMsg}</div>
+            <div style={{ fontSize:10, color:"#999", marginTop:4, zIndex:1 }}>{Math.round(Math.min(genProgress,95))}%</div>
+          </div>
+        ) : currentImage ? (
+          <img src={"data:" + currentImage.mimeType + ";base64," + currentImage.image} alt="" style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
+        ) : (
+          <div style={{ position:"absolute", inset:0, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", background:"linear-gradient(135deg,#f8f0ff,#fff0f5)" }}>
+            <div style={{ fontSize:40, opacity:0.15, marginBottom:4 }}>✦</div>
+            <div style={{ fontSize:11, color:"#bbb" }}>Vista previa</div>
+          </div>
+        )}
+      </div>
+      {/* Copy */}
+      <div style={{ padding:"12px 14px" }}>
+        {selectedCopy ? (
+          <div>
+            <div style={{ fontSize:12, color:"#000", lineHeight:1.5 }}>
+              <span style={{ fontWeight:600 }}>{brandProfile?.nombre || "tu_marca"}</span>{" "}
+              {selectedCopy.hook}
+            </div>
+            <div style={{ fontSize:12, color:"#333", lineHeight:1.5, marginTop:4 }}>{selectedCopy.copy}</div>
+            <div style={{ fontSize:12, color:"#7950F2", fontWeight:600, marginTop:4 }}>{selectedCopy.cta}</div>
+            {selectedCopy.hashtags && <div style={{ fontSize:11, color:"#999", marginTop:4 }}>{selectedCopy.hashtags}</div>}
+          </div>
+        ) : (
+          <div>
+            <div style={{ fontSize:12, color:"#ccc", lineHeight:1.5 }}>
+              <span style={{ fontWeight:600, color:"#bbb" }}>{brandProfile?.nombre || "tu_marca"}</span>{" "}
+              {prompt ? prompt.substring(0, 80) + "..." : "Tu copy aparecerá aquí..."}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
   return (
     <AppLayout>
-      <div style={{ maxWidth:700, margin:"0 auto", padding:"32px 24px" }}>
-        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:20 }}>
-          <h1 style={{ fontSize:20, fontWeight:500, color:D.text, letterSpacing:"-0.02em" }}>Nueva pieza</h1>
-          {brandProfile && (
-            <div style={{ display:"inline-flex", alignItems:"center", gap:6, background:"rgba(121,80,242,0.1)", borderRadius:20, padding:"4px 12px", border:"1px solid rgba(121,80,242,0.2)", cursor:"pointer" }} onClick={() => router.push("/adn")}>
-              <span style={{ width:5, height:5, borderRadius:"50%", background:D.purpleLight, display:"inline-block" }}></span>
-              <span style={{ fontSize:11, color:D.purpleLight, fontWeight:500 }}>{brandProfile.nombre || "Tu marca"} · {brandProfile.tono} · {brandProfile.idioma}</span>
-            </div>
-          )}
-        </div>
+      <style>{`
+        @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+      `}</style>
+      <div style={{ display:"grid", gridTemplateColumns:"minmax(400px, 480px) 1fr", height:"calc(100vh - 56px)" }}>
+        {/* ═══ LEFT: EDITOR PANEL ═══ */}
+        <div style={{ padding:"28px 24px", borderRight:"1px solid rgba(255,255,255,0.06)", overflowY:"auto", background:"#0D0D1F" }}>
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:16 }}>
+            <h1 style={{ fontSize:18, fontWeight:700, color:D.text, letterSpacing:"-0.03em" }}>Nueva pieza</h1>
+            {brandProfile && (
+              <div style={{ display:"inline-flex", alignItems:"center", gap:5, background:"rgba(121,80,242,0.1)", borderRadius:20, padding:"3px 10px", border:"1px solid rgba(121,80,242,0.2)", cursor:"pointer" }} onClick={() => router.push("/adn")}>
+                <span style={{ width:5, height:5, borderRadius:"50%", background:D.purpleLight, display:"inline-block" }} />
+                <span style={{ fontSize:10, color:D.purpleLight, fontWeight:500 }}>{brandProfile.nombre || "Tu marca"}</span>
+              </div>
+            )}
+          </div>
 
-        <StepBar />
+          <StepBar />
 
         {step === 1 && (
           <div>
             <div className="card-hover" style={{ background:D.bg3, border:"1px solid " + D.border, borderRadius:16, padding:20, marginBottom:14 }}>
               <label style={{ fontSize:13, color:D.text2, display:"block", marginBottom:8, fontWeight:500 }}>¿Qué quieres comunicar hoy?</label>
               <textarea className="input-focus" rows={4} value={prompt} onChange={e => setPrompt(e.target.value)}
-                placeholder="Ej: Quiero anunciar mis 3 spots de coaching 1:1 para este mes. Solo quedan 3 lugares disponibles y quiero crear urgencia."
+                placeholder={placeholders[phIdx]}
                 style={{ width:"100%", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:9, padding:"11px 13px", fontSize:13, color:D.text, outline:"none", resize:"none", fontFamily:"Inter, sans-serif" }} />
               <div style={{ fontSize:12, color:D.text3, marginTop:12, marginBottom:8 }}>¿Qué tipo de pieza es?</div>
               <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:6 }}>
@@ -619,6 +696,39 @@ function CrearContent() {
             </div>
           </div>
         )}
+        </div>
+
+        {/* ═══ RIGHT: PREVIEW PANEL ═══ */}
+        <div style={{ background:"#080814", display:"flex", alignItems:"center", justifyContent:"center", padding:40, position:"relative", overflow:"hidden" }}>
+          {/* Ambient glow */}
+          <div style={{ position:"absolute", top:"20%", left:"30%", width:300, height:300, background:"radial-gradient(circle, rgba(121,80,242,0.06) 0%, transparent 60%)", filter:"blur(60px)", pointerEvents:"none" }} />
+
+          {step <= 3 && !hasImage && (
+            <div style={{ textAlign:"center" }}>
+              <InstagramPreview />
+              <div style={{ marginTop:16, fontSize:11, color:"rgba(255,255,255,0.2)" }}>Vista previa en tiempo real</div>
+            </div>
+          )}
+
+          {step >= 4 && (
+            <div style={{ textAlign:"center" }}>
+              <InstagramPreview />
+              {versiones.length > 1 && (
+                <div style={{ display:"flex", gap:6, justifyContent:"center", marginTop:14 }}>
+                  {versiones.map((v,i) => (
+                    <div key={i} onClick={() => setVersionActiva(i)}
+                      style={{ width:40, height:40, borderRadius:8, overflow:"hidden", cursor:"pointer", border: versionActiva === i ? "2px solid #7950F2" : "1px solid rgba(255,255,255,0.1)", flexShrink:0 }}>
+                      <img src={"data:" + v.mimeType + ";base64," + v.image} alt="" style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                    </div>
+                  ))}
+                </div>
+              )}
+              <div style={{ marginTop:12, fontSize:11, color:"rgba(255,255,255,0.2)" }}>
+                {step === 6 && savedFinal ? "Guardado en tu biblioteca" : versiones.length > 0 ? "v" + (versionActiva + 1) + " de " + versiones.length : ""}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </AppLayout>
   );
