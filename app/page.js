@@ -115,17 +115,47 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ═══ VIDEO DEMO ═══ */}
+      {/* ═══ LIVE PRODUCT DEMO (CSS) ═══ */}
       <RevealSection style={{ paddingTop:0 }}>
-        <div style={{ maxWidth:900, margin:"0 auto", borderRadius:20, border:"1px solid rgba(255,255,255,0.08)", overflow:"hidden", boxShadow:"0 40px 120px rgba(0,0,0,0.6), 0 0 60px rgba(121,80,242,0.06)" }}>
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            style={{ width:"100%", display:"block" }}
-            src="/assets/hero-video.mp4"
-          />
+        <div style={{ maxWidth:900, margin:"0 auto", background:"#16162d", borderRadius:14, border:"1px solid rgba(255,255,255,0.1)", boxShadow:"0 50px 100px rgba(0,0,0,0.6)", overflow:"hidden" }}>
+          {/* Window header */}
+          <div style={{ padding:"12px 20px", background:"rgba(255,255,255,0.03)", borderBottom:"1px solid rgba(255,255,255,0.08)", display:"flex", alignItems:"center" }}>
+            <div style={{ display:"flex", gap:6 }}>
+              <div style={{ width:10, height:10, borderRadius:"50%", background:"#FF5F56" }} />
+              <div style={{ width:10, height:10, borderRadius:"50%", background:"#FFBD2E" }} />
+              <div style={{ width:10, height:10, borderRadius:"50%", background:"#27C93F" }} />
+            </div>
+            <div style={{ margin:"0 auto", background:"rgba(0,0,0,0.2)", padding:"4px 40px", borderRadius:6, fontSize:12, color:"rgba(255,255,255,0.5)" }}>aistudiobrand.com/crear</div>
+          </div>
+          {/* Demo body */}
+          <div style={{ display:"grid", gridTemplateColumns:"1.2fr 1fr", gap:30, padding:40 }}>
+            {/* Left: AI Input */}
+            <div style={{ textAlign:"left" }}>
+              <div style={{ fontSize:10, fontWeight:800, color:"#7950F2", letterSpacing:"0.1em", marginBottom:15 }}>{en ? "POST IDEA" : "IDEA DEL POST"}</div>
+              <div className="typing-effect" style={{ background:"rgba(0,0,0,0.2)", padding:20, borderRadius:10, border:"1px solid rgba(121,80,242,0.3)", fontSize:14, color:"#A78BFA", marginBottom:20, overflow:"hidden", whiteSpace:"nowrap", borderRight:"2px solid #7950F2" }}>
+                {en ? "\"New coaching spots for Latinas in tech, Spanglish + energy...\"" : "\"Nuevas mentorías de negocios, usando Spanglish y mucha energía...\""}
+              </div>
+              <div style={{ display:"flex", flexDirection:"column", gap:10, fontSize:13 }}>
+                <div style={{ color:"#10B981", fontWeight:600 }}>✓ {en ? "Claude analyzing brand..." : "Claude analizando marca..."}</div>
+                <div style={{ color:"#10B981", fontWeight:600 }}>✓ {en ? "Generating visual brief..." : "Generando brief visual..."}</div>
+                <div className="pulse-text" style={{ color:"#A78BFA", fontWeight:400 }}>⚡ {en ? "Gemini creating final art..." : "Gemini creando arte final..."}</div>
+              </div>
+            </div>
+            {/* Right: Instagram Post */}
+            <div style={{ display:"flex", justifyContent:"center" }}>
+              <div className="reveal-animation" style={{ width:"100%", maxWidth:280, background:"#000", borderRadius:10, overflow:"hidden", border:"1px solid rgba(255,255,255,0.1)" }}>
+                <div style={{ width:"100%", aspectRatio:"1", background:"linear-gradient(45deg, #7950F2, #E02EBE, #FFBD2E)", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                  <div style={{ padding:"6px 14px", borderRadius:100, background:"rgba(255,255,255,0.1)", backdropFilter:"blur(10px)", WebkitBackdropFilter:"blur(10px)", fontSize:10, fontWeight:800, color:"#fff", border:"1px solid rgba(255,255,255,0.2)" }}>AI GENERATED</div>
+                </div>
+                <div style={{ padding:15, textAlign:"left" }}>
+                  <div style={{ fontWeight:700, marginBottom:4, fontSize:13 }}>@tumarca</div>
+                  <div style={{ fontSize:12, color:"rgba(255,255,255,0.8)", lineHeight:1.5 }}>
+                    {en ? "Mami, it's time to scale! 🚀 My new mentoring spots are here..." : "¡Mami, it's time to scale! 🚀 Mis nuevas mentorías están aquí..."}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </RevealSection>
 
@@ -296,6 +326,12 @@ const GlobalAnimations = () => (
     .magnetic-btn:active { transform: scale(0.97) !important; }
     .float-anim { animation: float 4s ease-in-out infinite; }
     .image-reveal { animation: unveil 1.5s cubic-bezier(0.19,1,0.22,1) forwards; }
+    @keyframes reveal { from { clip-path: inset(100% 0 0 0); opacity: 0; } to { clip-path: inset(0 0 0 0); opacity: 1; } }
+    @keyframes blink { from, to { border-color: transparent } 50% { border-color: #7950F2 } }
+    .reveal-animation { animation: reveal 1.5s cubic-bezier(0.19,1,0.22,1) forwards; }
+    .pulse-text { animation: pulse-glow-text 2s infinite; }
+    @keyframes pulse-glow-text { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    .typing-effect { animation: typing 3s steps(40, end), blink 0.75s step-end infinite; }
     .progress-fill { width:0%; height:100%; background:linear-gradient(90deg,#7950F2,#A78BFA); border-radius:4px; animation: typing 3s ease-in-out forwards; }
     .card-hover { transition: all 0.3s cubic-bezier(0.4,0,0.2,1); cursor: pointer; }
     .card-hover:hover { transform: translateY(-6px); border-color: rgba(121,80,242,0.4) !important; box-shadow: 0 20px 50px rgba(0,0,0,0.4); }
