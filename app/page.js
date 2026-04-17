@@ -74,8 +74,9 @@ export default function Landing() {
         <div style={{ position:"absolute", inset:0, backgroundImage:"linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px)", backgroundSize:"60px 60px", maskImage:"radial-gradient(circle at center, black, transparent 80%)", WebkitMaskImage:"radial-gradient(circle at center, black, transparent 80%)", pointerEvents:"none", zIndex:0 }} />
         <div style={s.contentWrapper}>
           <div className="animate-hero" style={{ ...s.heroBadge, backdropFilter:"blur(10px)", WebkitBackdropFilter:"blur(10px)" }}>
+            <span style={{ fontSize:16 }}>🧠</span>
             <span style={s.badgeNew}>NEW</span>
-            <span>{en ? "Art Director AI — visual brief + quality validation" : "Art Director IA — brief visual + validación de calidad"}</span>
+            <span>{en ? "Claude Art Director v2" : "Claude Art Director v2"}</span>
           </div>
 
           <h1 className="animate-hero" style={{ ...s.heroHeadline, animationDelay:"0.1s" }}>
@@ -108,8 +109,8 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ═══ DEMO INTERACTIVO ═══ */}
-      <RevealSection>
+      {/* ═══ DEMO — VIDEO/RENDER WINDOW ═══ */}
+      <RevealSection style={{ paddingTop:0 }}>
         <div style={s.demoWindow}>
           <div style={s.windowHeader}>
             <div style={s.windowDots}>
@@ -117,46 +118,39 @@ export default function Landing() {
               <span style={{ ...s.dot, background:"#FFBD2E" }} />
               <span style={{ ...s.dot, background:"#27C93F" }} />
             </div>
-            <div style={s.windowUrl}>aistudiobrand.com/crear</div>
+            <div style={s.windowUrl}>AiStudioBrand — {en ? "Live Demo" : "Demo en Vivo"}</div>
           </div>
-          <div style={s.demoContent}>
-            <div style={s.demoLeft}>
-              <div style={s.miniLabel}>{en ? "POST IDEA" : "IDEA DEL POST"}</div>
-              <div className="typing-text" style={s.fakeInput}>
-                {en
-                  ? "\"I want to announce my new coaching spots for Latinas in tech...\""
-                  : "\"Quiero anunciar mis nuevos spots de coaching para latinas en tech...\""}
-              </div>
-              <div style={s.demoProgress}>
-                <div className="progress-fill" style={s.progressFill} />
-              </div>
-              <div style={s.statusSteps}>
-                {(en
-                  ? ["Claude analyzing brand...", "Creating visual brief...", "Gemini rendering image...", "Validating quality..."]
-                  : ["Claude analizando marca...", "Creando brief visual...", "Gemini renderizando imagen...", "Validando calidad..."]
-                ).map((step, i) => (
-                  <div key={i} style={{ display:"flex", alignItems:"center", gap:8, marginBottom:6 }}>
-                    <div style={{ width:16, height:16, borderRadius:"50%", background: i < 3 ? "#40C057" : "rgba(121,80,242,0.3)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:8, color:"#fff", flexShrink:0 }}>{i < 3 ? "✓" : "⟳"}</div>
-                    <span style={{ fontSize:12, color: i < 3 ? "rgba(255,255,255,0.5)" : "#A78BFA", fontWeight: i === 3 ? 600 : 400 }}>{step}</span>
+          <div style={{ padding:4 }}>
+            {/* VIDEO: Descomenta y reemplaza src con tu video demo */}
+            {/* <video autoPlay loop muted playsInline style={{ width:"100%", borderRadius:16, display:"block" }} src="/assets/hero-demo.mp4" /> */}
+            <div style={{ aspectRatio:"16/10", background:"linear-gradient(135deg, #1e1e3f 0%, #16162d 50%, #1a1a35 100%)", borderRadius:16, position:"relative", overflow:"hidden" }}>
+              <div style={{ position:"absolute", inset:0, background:"linear-gradient(90deg, transparent 30%, rgba(121,80,242,0.06) 50%, transparent 70%)", backgroundSize:"400px 100%", animation:"shimmer 3s infinite linear" }} />
+              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:24, padding:"32px 40px", width:"100%", position:"relative", zIndex:1 }}>
+                <div style={{ textAlign:"left" }}>
+                  <div style={s.miniLabel}>{en ? "POST IDEA" : "IDEA DEL POST"}</div>
+                  <div style={s.fakeInput}>{en ? "\"Announce my new coaching spots for Latinas in tech...\"" : "\"Quiero anunciar mis nuevos spots de coaching para latinas en tech...\""}</div>
+                  <div style={s.demoProgress}><div className="progress-fill" style={s.progressFill} /></div>
+                  <div style={{ marginTop:12 }}>
+                    {(en ? ["Claude analyzing brand", "Creating visual brief", "Gemini rendering image", "Validating quality"] : ["Claude analizando marca", "Creando brief visual", "Gemini renderizando", "Validando calidad"]).map((st, i) => (
+                      <div key={i} style={{ display:"flex", alignItems:"center", gap:8, marginBottom:5 }}>
+                        <div style={{ width:14, height:14, borderRadius:"50%", background: i<3 ? "#40C057" : "rgba(121,80,242,0.4)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:"#fff" }}>{i<3 ? "✓" : "⟳"}</div>
+                        <span style={{ fontSize:11, color: i<3 ? "rgba(255,255,255,0.4)" : "#A78BFA", fontWeight: i===3 ? 600 : 400 }}>{st}</span>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </div>
-            <div style={s.demoRight}>
-              <div className="image-reveal" style={s.resultImage}>
-                <div style={{ textAlign:"center" }}>
-                  <div style={{ fontSize:48, opacity:0.4, marginBottom:8 }}>✦</div>
-                  <div style={{ fontSize:13, fontWeight:600, color:"rgba(255,255,255,0.6)" }}>{en ? "AI Generated" : "Generado con IA"}</div>
                 </div>
-                <div style={s.validatedBadge}>
-                  <span style={{ fontSize:8 }}>✓</span> {en ? "Quality validated" : "Calidad validada"}
+                <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+                  <div className="image-reveal" style={{ flex:1, background:"linear-gradient(135deg,#7950F2,#E64980,#F59E0B)", borderRadius:12, display:"flex", alignItems:"center", justifyContent:"center", position:"relative", minHeight:160 }}>
+                    <div style={{ textAlign:"center" }}><div style={{ fontSize:36, opacity:0.4 }}>✦</div><div style={{ fontSize:11, fontWeight:600, color:"rgba(255,255,255,0.7)" }}>AI Generated</div></div>
+                    <div style={{ position:"absolute", bottom:8, left:8, background:"rgba(0,0,0,0.6)", backdropFilter:"blur(8px)", borderRadius:6, padding:"4px 10px", fontSize:9, color:"rgba(255,255,255,0.8)", fontWeight:600, display:"flex", alignItems:"center", gap:4 }}><span style={{ fontSize:7 }}>✓</span> {en ? "Validated" : "Validado"}</div>
+                  </div>
+                  <div style={{ background:"rgba(0,0,0,0.3)", borderRadius:10, padding:"12px 14px", textAlign:"left" }}>
+                    <div style={{ fontSize:8, fontWeight:700, color:"#A78BFA", textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:4 }}>HOOK</div>
+                    <div style={{ fontSize:12, fontWeight:600, color:"#fff", marginBottom:3 }}>Mami, ya no más stress!</div>
+                    <div style={{ fontSize:10, color:"rgba(255,255,255,0.35)", lineHeight:1.4 }}>Our coaching program es literally a lifesaver...</div>
+                    <div style={{ fontSize:10, color:"#A78BFA", fontWeight:600, marginTop:4 }}>DM con LISTA →</div>
+                  </div>
                 </div>
-              </div>
-              <div style={s.copyPreview}>
-                <div style={s.copyLabel}>HOOK</div>
-                <div style={{ fontSize:14, fontWeight:600, color:"#fff", marginBottom:6 }}>Mami, ya no más stress!</div>
-                <div style={{ fontSize:12, color:"rgba(255,255,255,0.4)", lineHeight:1.5 }}>Our coaching program es literally a lifesaver para todas las mujeres...</div>
-                <div style={{ fontSize:12, color:"#A78BFA", fontWeight:600, marginTop:6 }}>DM con LISTA y te cuento todo →</div>
               </div>
             </div>
           </div>
@@ -374,7 +368,7 @@ const s = {
 
   // Section common
   sectionBadge: { display:"inline-block", background:"rgba(121,80,242,0.1)", border:"1px solid rgba(121,80,242,0.15)", borderRadius:20, padding:"5px 14px", fontSize:11, fontWeight:600, color:"#A78BFA", letterSpacing:"0.02em", marginBottom:16 },
-  sectionTitle: { fontSize:36, fontWeight:800, letterSpacing:"-0.04em", marginBottom:48, background:"linear-gradient(180deg,#fff,rgba(255,255,255,0.7))", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" },
+  sectionTitle: { fontSize:40, fontWeight:800, letterSpacing:"-0.04em", marginBottom:56, background:"linear-gradient(180deg,#fff,rgba(255,255,255,0.7))", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" },
 
   // Steps
   stepsGrid: { display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:20, textAlign:"left" },
@@ -384,7 +378,7 @@ const s = {
 
   // Bento
   bentoGrid: { display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:16, textAlign:"left" },
-  bentoCard: { background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.06)", padding:"28px 24px", borderRadius:20 },
+  bentoCard: { background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.08)", padding:"32px", borderRadius:24, transition:"all 0.3s ease" },
   cardEmoji: { fontSize:32, display:"block", marginBottom:16, animation:"float 4s ease-in-out infinite" },
   cardTitle: { fontSize:16, fontWeight:700, color:"#fff", marginBottom:6, letterSpacing:"-0.02em" },
   cardDesc: { fontSize:13, color:"rgba(255,255,255,0.4)", lineHeight:1.6, margin:0 },
