@@ -192,29 +192,44 @@ export default function Landing() {
       <RevealSection>
         <div style={s.sectionBadge}>{en ? "Features" : "Funcionalidades"}</div>
         <h2 style={s.sectionTitle}>{en ? "Built for creators who mean business" : "Hecho para creadoras que van en serio"}</h2>
-        <div style={s.bentoGrid}>
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(2, 1fr)", gap:16, textAlign:"left" }}>
+          {/* Claude Art Director — full width */}
           <div className="card-hover" style={{ ...s.bentoCard, gridColumn:"span 2", background:"linear-gradient(135deg, #16162d, #0A0A1A)" }}>
-            <span style={s.cardEmoji}>🧠</span>
+            <div style={s.featureIcon}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a4 4 0 0 1 4 4c0 1.5-.8 2.8-2 3.4V11h3a3 3 0 0 1 3 3v1a2 2 0 0 1-2 2h-1v3a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-3H6a2 2 0 0 1-2-2v-1a3 3 0 0 1 3-3h3V9.4C8.8 8.8 8 7.5 8 6a4 4 0 0 1 4-4z"/><circle cx="10" cy="6" r="1" fill="#A78BFA"/><circle cx="14" cy="6" r="1" fill="#A78BFA"/></svg>
+            </div>
             <h3 style={s.cardTitle}>Claude Art Director</h3>
             <p style={s.cardDesc}>{en ? "Claude analyzes your brand and dictates the brief to Gemini. Results are validated before you see them." : "Claude analiza tu marca y dicta el brief a Gemini. Resultados validados antes de que los veas."}</p>
           </div>
+          {/* Native Spanglish */}
           <div className="card-hover" style={s.bentoCard}>
-            <span style={s.cardEmoji}>🇲🇽</span>
+            <div style={s.featureIcon}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10A15.3 15.3 0 0 1 12 2z"/></svg>
+            </div>
             <h3 style={s.cardTitle}>{en ? "Native Spanglish" : "Spanglish Nativo"}</h3>
             <p style={s.cardDesc}>{en ? "Copy that connects. We understand culture, not just language." : "Copy que conecta. Entendemos la cultura, no solo el idioma."}</p>
           </div>
+          {/* 30 Seconds */}
           <div className="card-hover" style={s.bentoCard}>
-            <span style={s.cardEmoji}>⚡</span>
+            <div style={s.featureIcon}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            </div>
             <h3 style={s.cardTitle}>{en ? "30 Seconds" : "30 Segundos"}</h3>
             <p style={s.cardDesc}>{en ? "From idea to final art in under a minute." : "De la idea al arte final en menos de un minuto."}</p>
           </div>
-          <div className="card-hover" style={{ ...s.bentoCard, gridColumn:"span 2" }}>
-            <span style={s.cardEmoji}>🎨</span>
+          {/* Unique Brand DNA */}
+          <div className="card-hover" style={s.bentoCard}>
+            <div style={s.featureIcon}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/><circle cx="12" cy="12" r="3"/></svg>
+            </div>
             <h3 style={s.cardTitle}>{en ? "Unique Brand DNA" : "ADN de Marca Único"}</h3>
             <p style={s.cardDesc}>{en ? "Your colors, your typography, and your personality in every generated pixel." : "Tus colores, tu tipografía y tu personalidad en cada píxel generado."}</p>
           </div>
+          {/* Auto Library */}
           <div className="card-hover" style={s.bentoCard}>
-            <span style={s.cardEmoji}>📚</span>
+            <div style={s.featureIcon}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            </div>
             <h3 style={s.cardTitle}>{en ? "Auto Library" : "Biblioteca Auto"}</h3>
             <p style={s.cardDesc}>{en ? "Every piece saved automatically. Filter, reuse, remix." : "Cada pieza se guarda automáticamente. Filtra, reutiliza, remezcla."}</p>
           </div>
@@ -397,7 +412,7 @@ const s = {
   // Bento
   bentoGrid: { display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:16, textAlign:"left" },
   bentoCard: { background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.08)", padding:"32px", borderRadius:24, transition:"all 0.3s ease" },
-  cardEmoji: { fontSize:32, display:"block", marginBottom:16, animation:"float 4s ease-in-out infinite" },
+  featureIcon: { width:44, height:44, borderRadius:12, background:"rgba(121,80,242,0.12)", border:"1px solid rgba(121,80,242,0.2)", display:"flex", alignItems:"center", justifyContent:"center", marginBottom:18 },
   cardTitle: { fontSize:16, fontWeight:700, color:"#fff", marginBottom:6, letterSpacing:"-0.02em" },
   cardDesc: { fontSize:13, color:"rgba(255,255,255,0.4)", lineHeight:1.6, margin:0 },
 
