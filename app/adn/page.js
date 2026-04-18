@@ -5,7 +5,7 @@ import { supabase } from "../../lib/supabase";
 import AppLayout from "../components/AppLayout";
 
 const D = {
-  bg: "#0D0D1F", bg2: "#111122",
+  bg: "#0A0A1A", bg2: "#16162D",
   bg3: "rgba(255,255,255,0.04)",
   border: "rgba(255,255,255,0.08)",
   text: "#fff", text2: "rgba(255,255,255,0.55)",
@@ -18,32 +18,18 @@ const idiomas = ["Español","Inglés","Spanglish"];
 const cats = ["Coaching","Lifestyle","Moda","Belleza","Negocio","Motivación","Educación","Fitness","Recetas","Familia"];
 const presetColors = ["#FF6B35","#7950F2","#E64980","#FFD93D","#40C057","#1971C2","#F8F9FA","#0A0A0A"];
 
-// --- Accordion Section ---
-const Section = ({ title, badge, badgeColor, defaultOpen, children }) => {
-  const [open, setOpen] = useState(defaultOpen);
-  return (
-    <div style={{ background: D.bg2, border: "1px solid " + D.border, borderRadius: 16, marginBottom: 16, overflow: "hidden", transition: "all 0.2s" }}>
-      <button onClick={() => setOpen(!open)} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 22px", background: "none", border: "none", cursor: "pointer" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <span style={{ fontSize: 16, fontWeight: 700, color: D.text, letterSpacing: "-0.02em" }}>{title}</span>
-          {badge && (
-            <span style={{ fontSize: 11, fontWeight: 600, padding: "3px 10px", borderRadius: 20, background: badgeColor === "green" ? "rgba(64,192,87,0.15)" : badgeColor === "purple" ? "rgba(121,80,242,0.15)" : "rgba(255,255,255,0.06)", color: badgeColor === "green" ? "#40C057" : badgeColor === "purple" ? D.purpleLight : D.text3 }}>
-              {badge}
-            </span>
-          )}
-        </div>
-        <span style={{ fontSize: 18, color: D.text3, transition: "transform 0.2s", transform: open ? "rotate(180deg)" : "rotate(0)" }}>▾</span>
-      </button>
-      {open && <div style={{ padding: "0 22px 22px" }}>{children}</div>}
-    </div>
-  );
-};
+const STEPS = [
+  { n: 1, title: "Conexión y Análisis IA", sub: "Conecta tus canales y deja que Claude construya tu ADN" },
+  { n: 2, title: "Voz y Comunicación", sub: "Define quién eres, a quién le hablas y cómo suenas" },
+  { n: 3, title: "Estilo Visual y Referencias", sub: "Tu personalidad visual, colores y ejemplos de copy ideal" },
+];
 
 function ADNContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isOnboarding = searchParams.get("onboarding") === "true";
 
+  const [step, setStep] = useState(1);
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState({
     nombre: "", descripcion: "", audiencia: "", tono: "",
@@ -53,27 +39,26 @@ function ADNContent() {
     ejemplosCopy: ["", "", ""], competidores: ["", "", ""],
   });
 
-  const [saveStatus, setSaveStatus] = useState("idle"); // idle | saving | saved
+  const [saveStatus, setSaveStatus] = useState("idle");
   const [analyzing, setAnalyzing] = useState(false);
   const [analyzeProgress, setAnalyzeProgress] = useState(0);
   const [analyzeMsg, setAnalyzeMsg] = useState("");
   const [analyzeError, setAnalyzeError] = useState("");
   const [screenshots, setScreenshots] = useState([]);
   const [sources, setSources] = useState([]);
-  const [showAnalyze, setShowAnalyze] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [customColorInput, setCustomColorInput] = useState("");
+  const [exitWarning, setExitWarning] = useState(false);
 
   const debounceRef = useRef(null);
   const profileRef = useRef(profile);
   const userRef = useRef(user);
   const initialLoadDone = useRef(false);
 
-  // Keep refs in sync
   useEffect(() => { profileRef.current = profile; }, [profile]);
   useEffect(() => { userRef.current = user; }, [user]);
 
-  // --- Load from Supabase ---
+  // --- Load ---
   useEffect(() => {
     const init = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -84,7 +69,7 @@ function ADNContent() {
         const loaded = {
           nombre: data.nombre || "", descripcion: data.descripcion || "",
           audiencia: data.audiencia || "", tono: data.tono || "",
-          idioma: data.idioma || "Español", categorias: data.categorias || [],
+          idioma: data.idioma || "", categorias: data.categorias || [],
           propuestaValor: data.propuesta_valor || "",
           instagramUrl: data.instagram_url || "", tiktokUrl: data.tiktok_url || "",
           webUrl: data.web_url || "", canvaUrl: data.canva_url || "",
@@ -101,12 +86,13 @@ function ADNContent() {
     init();
   }, []);
 
-  // --- Autosave (debounced 1500ms) ---
-  const saveToSupabase = useCallback(async () => {
+  // --- Save ---
+  const handleSave = useCallback(async () => {
     const u = userRef.current;
     const p = profileRef.current;
     if (!u) return;
     setSaveStatus("saving");
+    localStorage.setItem("brandProfile", JSON.stringify(p));
     const payload = {
       nombre: p.nombre, descripcion: p.descripcion,
       audiencia: p.audiencia, tono: p.tono,
@@ -128,45 +114,49 @@ function ADNContent() {
     setTimeout(() => setSaveStatus("idle"), 2500);
   }, []);
 
+  // Autosave on change
   useEffect(() => {
     if (!initialLoadDone.current) return;
-    // Save to localStorage immediately
     localStorage.setItem("brandProfile", JSON.stringify(profile));
-    // Debounce Supabase save
     if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => saveToSupabase(), 1500);
+    debounceRef.current = setTimeout(() => handleSave(), 1500);
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
-  }, [profile, saveToSupabase]);
+  }, [profile, handleSave]);
 
   // --- Progress ---
   const progressFields = [
-    { key: "nombre", label: "Nombre", done: !!profile.nombre.trim() },
-    { key: "descripcion", label: "Descripción", done: !!profile.descripcion.trim() },
-    { key: "audiencia", label: "Audiencia", done: !!profile.audiencia.trim() },
-    { key: "tono", label: "Tono", done: !!profile.tono },
-    { key: "idioma", label: "Idioma", done: !!profile.idioma },
-    { key: "propuestaValor", label: "Propuesta de valor", done: !!profile.propuestaValor.trim() },
-    { key: "instagramUrl", label: "Instagram", done: !!profile.instagramUrl.trim() },
-    { key: "personalidad", label: "Personalidad", done: !!profile.personalidad.trim() },
-    { key: "coloresMarca", label: "Colores", done: profile.coloresMarca.length > 0 },
-    { key: "ejemplosCopy", label: "Ejemplos copy", done: profile.ejemplosCopy.some(e => e && e.trim()) },
+    { key: "nombre", done: !!profile.nombre.trim() },
+    { key: "descripcion", done: !!profile.descripcion.trim() },
+    { key: "audiencia", done: !!profile.audiencia.trim() },
+    { key: "tono", done: !!profile.tono },
+    { key: "idioma", done: !!profile.idioma },
+    { key: "propuestaValor", done: !!profile.propuestaValor.trim() },
+    { key: "instagramUrl", done: !!profile.instagramUrl.trim() },
+    { key: "personalidad", done: !!profile.personalidad.trim() },
+    { key: "coloresMarca", done: profile.coloresMarca.length > 0 },
+    { key: "ejemplosCopy", done: profile.ejemplosCopy.some(e => e && e.trim()) },
   ];
   const filledCount = progressFields.filter(f => f.done).length;
   const pct = Math.round((filledCount / progressFields.length) * 100);
-  const progressMsg = pct <= 30 ? "Empecemos por lo básico" : pct <= 60 ? "Vas muy bien, sigue completando" : pct <= 89 ? "Casi listo — agrega los últimos detalles" : "ADN completo — listo para crear!";
 
-  // --- Section badges ---
-  const marcaCount = [profile.nombre, profile.descripcion, profile.audiencia, profile.propuestaValor].filter(f => f && f.trim()).length;
-  const canalesCount = [profile.instagramUrl, profile.tiktokUrl, profile.webUrl, profile.canvaUrl].filter(f => f && f.trim()).length;
-  const comComplete = !!profile.tono && !!profile.idioma;
-
-  // --- Confetti on onboarding completion ---
+  // Confetti
   useEffect(() => {
-    if (isOnboarding && pct >= 90 && !showConfetti) {
+    if (pct === 100 && !showConfetti) {
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 4000);
     }
-  }, [pct, isOnboarding]);
+  }, [pct]);
+
+  // --- Navigation ---
+  const goNext = async () => {
+    await handleSave();
+    if (step < 3) setStep(step + 1);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+  const goPrev = () => {
+    if (step > 1) setStep(step - 1);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   // --- Helpers ---
   const toBase64 = (file) => new Promise((res, rej) => {
@@ -192,7 +182,6 @@ function ADNContent() {
       const data = await res.json();
       if (data.profile) {
         setProfile(prev => ({ ...prev, ...data.profile, instagramUrl: prev.instagramUrl, tiktokUrl: prev.tiktokUrl, webUrl: prev.webUrl, canvaUrl: prev.canvaUrl }));
-        setShowAnalyze(false);
       } else if (data.error) {
         setAnalyzeError("Error: " + data.error);
       }
@@ -200,331 +189,390 @@ function ADNContent() {
     clearInterval(iv); setAnalyzeProgress(100); setAnalyzing(false); setAnalyzeMsg("");
   };
 
-  // --- Input styles with state ---
-  const getInpStyle = (value) => ({
+  // --- Styles ---
+  const inp = (value) => ({
     width: "100%",
     backgroundColor: value && value.toString().trim() ? "rgba(121,80,242,0.06)" : D.bg3,
     border: "1px solid " + (value && value.toString().trim() ? "rgba(121,80,242,0.3)" : D.border),
     borderRadius: 10, padding: "12px 16px", fontSize: 14, color: D.text,
-    outline: "none", transition: "all 0.2s ease", fontFamily: "Inter, sans-serif",
+    outline: "none", transition: "all 0.3s ease", fontFamily: "Inter, sans-serif",
+    letterSpacing: "-0.02em",
   });
+
+  const card = { background: D.bg2, border: "1px solid " + D.border, borderRadius: 16, padding: "24px", transition: "all 0.3s ease" };
+  const label = { fontSize: 13, color: D.text2, display: "block", marginBottom: 6, fontWeight: 500, letterSpacing: "-0.02em" };
+  const chip = (active) => ({
+    padding: "8px 16px", borderRadius: 8, fontSize: 13, fontWeight: 500, cursor: "pointer",
+    border: active ? "1.5px solid " + D.purple : "1px solid " + D.border,
+    background: active ? "rgba(121,80,242,0.15)" : "transparent",
+    color: active ? D.purpleLight : D.text2,
+    transition: "all 0.3s ease",
+  });
+
+  // --- Progress Circle ---
+  const circleR = 38;
+  const circleC = 2 * Math.PI * circleR;
+  const circleOffset = circleC - (pct / 100) * circleC;
 
   return (
     <AppLayout>
-      {/* Confetti CSS */}
       {showConfetti && <ConfettiEffect />}
 
-      {/* Animated Header */}
-      <div style={{ position: "relative", overflow: "hidden", height: 200, background: "linear-gradient(180deg, #1a0a2e 0%, " + D.bg + " 100%)" }}>
-        <div className="orb-1" style={{ position: "absolute", top: "-30%", left: "20%", width: 300, height: 300, borderRadius: "50%", background: "radial-gradient(circle, rgba(121,80,242,0.5) 0%, transparent 70%)", filter: "blur(60px)", pointerEvents: "none" }} />
-        <div className="orb-2" style={{ position: "absolute", top: "-10%", right: "10%", width: 250, height: 250, borderRadius: "50%", background: "radial-gradient(circle, rgba(230,73,128,0.3) 0%, transparent 70%)", filter: "blur(70px)", pointerEvents: "none" }} />
-        <div className="orb-3" style={{ position: "absolute", bottom: "10%", left: "50%", width: 200, height: 200, borderRadius: "50%", background: "radial-gradient(circle, rgba(167,139,250,0.3) 0%, transparent 70%)", filter: "blur(60px)", pointerEvents: "none" }} />
-        {/* Scan line */}
-        <div className="scan-line" style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(121,80,242,0.4), transparent)", pointerEvents: "none" }} />
-        {/* Corner brackets */}
-        <div style={{ position: "absolute", top: 20, left: 24, width: 20, height: 20, borderTop: "2px solid rgba(121,80,242,0.3)", borderLeft: "2px solid rgba(121,80,242,0.3)" }} />
-        <div style={{ position: "absolute", top: 20, right: 24, width: 20, height: 20, borderTop: "2px solid rgba(121,80,242,0.3)", borderRight: "2px solid rgba(121,80,242,0.3)" }} />
+      <div style={{ background: D.bg, minHeight: "calc(100vh - 64px)", paddingBottom: 100 }}>
+        {/* Header with stepper */}
+        <div style={{ position: "relative", overflow: "hidden", background: "linear-gradient(180deg, #1a0a2e 0%, " + D.bg + " 100%)", padding: "36px 24px 40px" }}>
+          {/* Orbs */}
+          <div className="orb-1" style={{ position: "absolute", top: "-20%", left: "15%", width: 280, height: 280, borderRadius: "50%", background: "radial-gradient(circle, rgba(121,80,242,0.4) 0%, transparent 70%)", filter: "blur(60px)", pointerEvents: "none" }} />
+          <div className="orb-2" style={{ position: "absolute", top: "0%", right: "5%", width: 220, height: 220, borderRadius: "50%", background: "radial-gradient(circle, rgba(230,73,128,0.2) 0%, transparent 70%)", filter: "blur(60px)", pointerEvents: "none" }} />
+          {/* Scan line */}
+          <div className="scan-line" style={{ position: "absolute", left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(121,80,242,0.3), transparent)", pointerEvents: "none" }} />
+          {/* Brackets */}
+          <div style={{ position: "absolute", top: 16, left: 20, width: 16, height: 16, borderTop: "2px solid rgba(121,80,242,0.25)", borderLeft: "2px solid rgba(121,80,242,0.25)" }} />
+          <div style={{ position: "absolute", top: 16, right: 20, width: 16, height: 16, borderTop: "2px solid rgba(121,80,242,0.25)", borderRight: "2px solid rgba(121,80,242,0.25)" }} />
 
-        <div style={{ position: "relative", zIndex: 2, maxWidth: 760, margin: "0 auto", padding: "40px 24px 0", display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
-          <div>
-            <h1 style={{ fontSize: 28, fontWeight: 800, color: D.text, marginBottom: 6, letterSpacing: "-0.03em" }}>
-              {isOnboarding ? "Define el ADN de tu marca" : "ADN de tu marca"}
-            </h1>
-            <p style={{ fontSize: 14, color: D.text2, maxWidth: 500 }}>
-              {isOnboarding ? "Completa tu perfil para que la IA genere contenido que suena como tú" : "Esta información guía toda tu generación de contenido"}
-            </p>
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
-            {/* Autosave badge */}
-            {saveStatus === "saving" && <span style={{ fontSize: 12, color: D.text3 }}>Guardando...</span>}
-            {saveStatus === "saved" && <span style={{ fontSize: 12, color: "#40C057", fontWeight: 600 }}>✓ Guardado</span>}
-            {/* CTA */}
-            <button onClick={() => router.push("/crear")}
-              style={{ padding: "10px 20px", background: "#40C057", color: "#fff", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap", boxShadow: "0 4px 14px rgba(64,192,87,0.3)" }}>
-              {isOnboarding ? "Crear mi primera pieza →" : "Crear nueva pieza →"}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Content */}
-      <div style={{ maxWidth: 760, margin: "0 auto", padding: "0 24px 60px" }}>
-
-        {/* Onboarding welcome */}
-        {isOnboarding && (
-          <div style={{ background: "linear-gradient(135deg,rgba(121,80,242,0.12),rgba(230,73,128,0.08))", border: "1px solid rgba(121,80,242,0.2)", borderRadius: 14, padding: "18px 22px", marginTop: 24, marginBottom: 0 }}>
-            <div style={{ fontSize: 16, fontWeight: 600, color: D.text, marginBottom: 6 }}>Bienvenida a AiStudioBrand!</div>
-            <div style={{ fontSize: 13, color: D.text2, lineHeight: 1.6 }}>
-              Antes de crear tu primera pieza, cuéntanos sobre tu marca. La IA usa esta info para generar contenido que suena exactamente como tú.
-            </div>
-          </div>
-        )}
-
-        {/* Progress Bar */}
-        <div style={{ background: D.bg2, border: "1px solid " + D.border, borderRadius: 14, padding: "18px 22px", marginTop: 24, marginBottom: 24 }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-            <div style={{ fontSize: 14, fontWeight: 700, color: pct >= 90 ? "#40C057" : D.text }}>
-              {pct >= 90 ? "🎉 " : ""}Tu ADN está al {pct}% — {progressMsg}
-            </div>
-            <div style={{ fontSize: 12, color: D.text3 }}>{filledCount}/{progressFields.length}</div>
-          </div>
-          <div style={{ height: 6, background: "rgba(255,255,255,0.06)", borderRadius: 6, overflow: "hidden", marginBottom: 14 }}>
-            <div style={{ height: "100%", width: pct + "%", background: pct >= 90 ? "linear-gradient(90deg,#40C057,#2B8A3E)" : "linear-gradient(90deg,#7950F2,#A78BFA)", borderRadius: 6, transition: "width 0.6s cubic-bezier(0.4,0,0.2,1)" }} />
-          </div>
-          <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-            {progressFields.map(f => (
-              <span key={f.key} style={{ fontSize: 11, fontWeight: 500, padding: "4px 10px", borderRadius: 20, background: f.done ? "rgba(121,80,242,0.15)" : "rgba(255,255,255,0.04)", color: f.done ? D.purpleLight : D.text3, border: "1px solid " + (f.done ? "rgba(121,80,242,0.2)" : "rgba(255,255,255,0.06)") }}>
-                {f.done ? "✓ " : ""}{f.label}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        {/* === SECTION 1: Tu marca === */}
-        <Section title="Tu marca" badge={marcaCount + "/4 campos"} badgeColor={marcaCount === 4 ? "green" : "default"} defaultOpen={true}>
-          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-            <div>
-              <label style={labelStyle}>Nombre / cuenta</label>
-              <input className="input-focus" style={getInpStyle(profile.nombre)} placeholder="@tumarca" value={profile.nombre} onChange={e => setProfile(p => ({ ...p, nombre: e.target.value }))} />
-            </div>
-            <div>
-              <label style={labelStyle}>Qué haces</label>
-              <textarea className="input-focus" style={{ ...getInpStyle(profile.descripcion), minHeight: 80, resize: "none" }} placeholder="Soy coach de negocios para mujeres latinas..." value={profile.descripcion} onChange={e => setProfile(p => ({ ...p, descripcion: e.target.value }))} />
-            </div>
-            <div>
-              <label style={labelStyle}>A quién le hablas</label>
-              <input className="input-focus" style={getInpStyle(profile.audiencia)} placeholder="Mujeres latinas 28-42 en EE.UU." value={profile.audiencia} onChange={e => setProfile(p => ({ ...p, audiencia: e.target.value }))} />
-            </div>
-            <div>
-              <label style={labelStyle}>Propuesta de valor</label>
-              <input className="input-focus" style={getInpStyle(profile.propuestaValor)} placeholder="Tu ventaja única — qué te hace diferente" value={profile.propuestaValor} onChange={e => setProfile(p => ({ ...p, propuestaValor: e.target.value }))} />
-            </div>
-          </div>
-        </Section>
-
-        {/* === SECTION 2: Tus canales === */}
-        <Section title="Tus canales" badge={canalesCount + " conectado" + (canalesCount !== 1 ? "s" : "")} badgeColor={canalesCount > 0 ? "purple" : "default"} defaultOpen={true}>
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {[
-              { icon: "📸", placeholder: "instagram.com/tucuenta", key: "instagramUrl" },
-              { icon: "🎵", placeholder: "tiktok.com/@tucuenta", key: "tiktokUrl" },
-              { icon: "🌐", placeholder: "tuweb.com", key: "webUrl" },
-              { icon: "🎨", placeholder: "canva.com/tucuenta", key: "canvaUrl" },
-            ].map(ch => (
-              <div key={ch.key} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <span style={{ fontSize: 16, width: 24, textAlign: "center" }}>{ch.icon}</span>
-                <input className="input-focus" style={{ ...getInpStyle(profile[ch.key]), flex: 1 }} placeholder={ch.placeholder} value={profile[ch.key]} onChange={e => setProfile(p => ({ ...p, [ch.key]: e.target.value }))} />
+          <div style={{ position: "relative", zIndex: 2, maxWidth: 760, margin: "0 auto" }}>
+            {/* Top row: title + progress circle */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 32 }}>
+              <div>
+                <h1 style={{ fontSize: 26, fontWeight: 800, color: D.text, marginBottom: 4, letterSpacing: "-0.03em" }}>
+                  {isOnboarding ? "Entrena a tu clon digital" : "ADN de tu marca"}
+                </h1>
+                <p style={{ fontSize: 14, color: D.text2, letterSpacing: "-0.02em" }}>
+                  {STEPS[step - 1].sub}
+                </p>
               </div>
-            ))}
-          </div>
-        </Section>
-
-        {/* AI Analyze Banner — after channels */}
-        <div style={{ background: "linear-gradient(135deg,#7950F2 0%,#4C1D95 100%)", borderRadius: 16, padding: "24px 22px", marginBottom: 16, boxShadow: "0 12px 32px rgba(121,80,242,0.25)" }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: showAnalyze ? 16 : 0 }}>
-            <div>
-              <div style={{ fontSize: 16, fontWeight: 700, color: "#fff", marginBottom: 4 }}>Analiza tu marca con IA</div>
-              <div style={{ fontSize: 13, color: "rgba(255,255,255,0.7)" }}>Claude lee tus redes y web para construir tu ADN automáticamente</div>
-            </div>
-            <button onClick={() => setShowAnalyze(!showAnalyze)}
-              style={{ padding: "9px 18px", background: showAnalyze ? "rgba(255,255,255,0.15)" : "#fff", color: showAnalyze ? "#fff" : "#7950F2", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", flexShrink: 0 }}>
-              {showAnalyze ? "Ocultar" : "Analizar con IA"}
-            </button>
-          </div>
-          {showAnalyze && (
-            <div>
-              {!profile.instagramUrl && !profile.webUrl && !profile.tiktokUrl && !profile.canvaUrl && (
-                <div style={{ fontSize: 12, color: "rgba(255,200,100,0.9)", marginBottom: 12, padding: "8px 12px", background: "rgba(255,200,100,0.1)", borderRadius: 8 }}>
-                  Agrega al menos una URL en &ldquo;Tus canales&rdquo; arriba para poder analizar
+              {/* Progress circle */}
+              <div style={{ position: "relative", width: 86, height: 86, flexShrink: 0 }}>
+                <svg width="86" height="86" style={{ transform: "rotate(-90deg)" }}>
+                  <circle cx="43" cy="43" r={circleR} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="5" />
+                  <circle cx="43" cy="43" r={circleR} fill="none" stroke={pct === 100 ? "#40C057" : D.purple} strokeWidth="5" strokeDasharray={circleC} strokeDashoffset={circleOffset} strokeLinecap="round" style={{ transition: "stroke-dashoffset 0.6s ease, stroke 0.3s ease" }} />
+                </svg>
+                <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+                  <span style={{ fontSize: 20, fontWeight: 800, color: pct === 100 ? "#40C057" : D.text, letterSpacing: "-0.03em" }}>{pct}%</span>
+                  <span style={{ fontSize: 9, color: D.text3, textTransform: "uppercase", letterSpacing: "0.05em" }}>ADN</span>
                 </div>
-              )}
-              <div style={{ fontSize: 12, color: "rgba(255,255,255,0.7)", marginBottom: 10 }}>Selecciona fuentes para el análisis:</div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
-                {[
-                  { key: "screenshots", label: "Screenshots de posts", icon: "🖼", available: true, hint: "Claude analiza tus imágenes directamente" },
-                  { key: "web", label: "Página web", icon: "🌐", available: !!profile.webUrl, hint: profile.webUrl || "Agrega URL primero" },
-                  { key: "instagram", label: "Instagram", icon: "📸", available: !!profile.instagramUrl, hint: profile.instagramUrl || "Agrega URL primero" },
-                  { key: "tiktok", label: "TikTok", icon: "🎵", available: !!profile.tiktokUrl, hint: profile.tiktokUrl || "Agrega URL primero" },
-                ].map(source => (
-                  <div key={source.key}
-                    style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 9, background: sources.includes(source.key) ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.05)", border: "1px solid " + (sources.includes(source.key) ? "rgba(255,255,255,0.25)" : "rgba(255,255,255,0.08)"), opacity: source.available ? 1 : 0.4, cursor: source.available ? "pointer" : "not-allowed" }}
-                    onClick={() => { if (!source.available) return; setSources(prev => prev.includes(source.key) ? prev.filter(s => s !== source.key) : [...prev, source.key]); }}>
-                    <div style={{ width: 18, height: 18, borderRadius: 5, border: "1.5px solid " + (sources.includes(source.key) ? "#fff" : "rgba(255,255,255,0.3)"), background: sources.includes(source.key) ? "#fff" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, color: "#7950F2", flexShrink: 0 }}>
-                      {sources.includes(source.key) ? "✓" : ""}
-                    </div>
-                    <span style={{ fontSize: 14 }}>{source.icon}</span>
-                    <div>
-                      <div style={{ fontSize: 12, fontWeight: 600, color: "#fff" }}>{source.label}</div>
-                      <div style={{ fontSize: 10, color: "rgba(255,255,255,0.5)" }}>{source.hint}</div>
-                    </div>
-                  </div>
-                ))}
               </div>
-              {sources.includes("screenshots") && (
-                <div style={{ marginBottom: 12 }}>
-                  <input type="file" accept="image/*" multiple id="screenshots" style={{ display: "none" }} onChange={e => { const arr = Array.from(e.target.files).slice(0, 6).map(f => ({ file: f, url: URL.createObjectURL(f) })); setScreenshots(prev => [...prev, ...arr].slice(0, 6)); }} />
-                  {screenshots.length > 0 ? (
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(6,1fr)", gap: 6, marginBottom: 8 }}>
-                      {screenshots.map((s, i) => (
-                        <div key={i} style={{ position: "relative" }}>
-                          <img src={s.url} alt="" style={{ width: "100%", aspectRatio: "1", objectFit: "cover", borderRadius: 8, display: "block" }} />
-                          <button onClick={() => setScreenshots(prev => prev.filter((_, j) => j !== i))} style={{ position: "absolute", top: 2, right: 2, width: 16, height: 16, borderRadius: "50%", background: "#DC2626", border: "none", color: "#fff", fontSize: 9, cursor: "pointer" }}>x</button>
-                        </div>
-                      ))}
-                      {screenshots.length < 6 && <label htmlFor="screenshots" style={{ aspectRatio: "1", border: "2px dashed rgba(255,255,255,0.2)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 20, color: "rgba(255,255,255,0.4)" }}>+</label>}
+            </div>
+
+            {/* Stepper */}
+            <div style={{ display: "flex", alignItems: "center", gap: 0 }}>
+              {STEPS.map((s, i) => (
+                <div key={s.n} style={{ display: "flex", alignItems: "center", flex: i < STEPS.length - 1 ? 1 : "none" }}>
+                  <button onClick={() => setStep(s.n)} style={{ display: "flex", alignItems: "center", gap: 10, background: "none", border: "none", cursor: "pointer", padding: 0 }}>
+                    <div style={{
+                      width: 32, height: 32, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: 13, fontWeight: 700, transition: "all 0.3s ease",
+                      background: step === s.n ? D.purple : step > s.n ? "rgba(64,192,87,0.2)" : "rgba(255,255,255,0.06)",
+                      color: step === s.n ? "#fff" : step > s.n ? "#40C057" : D.text3,
+                      border: step === s.n ? "2px solid " + D.purpleLight : step > s.n ? "2px solid rgba(64,192,87,0.4)" : "2px solid rgba(255,255,255,0.08)",
+                    }}>
+                      {step > s.n ? "✓" : s.n}
                     </div>
-                  ) : (
-                    <label htmlFor="screenshots" style={{ display: "block", border: "2px dashed rgba(255,255,255,0.2)", borderRadius: 10, padding: 16, textAlign: "center", cursor: "pointer" }}>
-                      <div style={{ fontSize: 13, color: "rgba(255,255,255,0.7)", fontWeight: 500 }}>Sube screenshots de tus posts · Hasta 6</div>
-                    </label>
+                    <span style={{ fontSize: 13, fontWeight: step === s.n ? 600 : 400, color: step === s.n ? D.text : D.text3, letterSpacing: "-0.02em", whiteSpace: "nowrap", transition: "all 0.3s ease" }}>{s.title}</span>
+                  </button>
+                  {i < STEPS.length - 1 && (
+                    <div style={{ flex: 1, height: 2, margin: "0 12px", background: step > s.n ? "rgba(64,192,87,0.3)" : "rgba(255,255,255,0.06)", borderRadius: 2, transition: "background 0.3s ease" }} />
                   )}
                 </div>
-              )}
-              {analyzing && (
-                <div style={{ marginBottom: 10 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
-                    <span style={{ fontSize: 11, color: "rgba(255,255,255,0.8)" }}>{analyzeMsg}</span>
-                    <span style={{ fontSize: 11, color: "rgba(255,255,255,0.8)" }}>{Math.round(Math.min(analyzeProgress, 95))}%</span>
-                  </div>
-                  <div style={{ height: 4, background: "rgba(255,255,255,0.1)", borderRadius: 4, overflow: "hidden" }}>
-                    <div style={{ height: "100%", width: Math.min(analyzeProgress, 95) + "%", background: "#fff", borderRadius: 4, transition: "width 0.5s" }} />
-                  </div>
-                </div>
-              )}
-              {analyzeError && <div style={{ background: "rgba(220,38,38,0.15)", borderRadius: 8, padding: 10, fontSize: 11, color: "#FCA5A5", marginBottom: 10 }}>{analyzeError}</div>}
-              <button onClick={analyzeInstagram} disabled={analyzing || sources.length === 0}
-                style={{ width: "100%", padding: 11, background: analyzing || sources.length === 0 ? "rgba(255,255,255,0.15)" : "#fff", color: analyzing || sources.length === 0 ? "rgba(255,255,255,0.5)" : "#7950F2", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: analyzing || sources.length === 0 ? "not-allowed" : "pointer" }}>
-                {analyzing ? "Analizando con Claude..." : "Analizar " + sources.length + " fuente" + (sources.length !== 1 ? "s" : "") + " →"}
-              </button>
+              ))}
             </div>
-          )}
+          </div>
         </div>
 
-        {/* === SECTION 3: Comunicación === */}
-        <Section title="Comunicación" badge={comComplete ? "Completo ✓" : "Pendiente"} badgeColor={comComplete ? "green" : "default"} defaultOpen={true}>
-          <div style={{ marginBottom: 16 }}>
-            <div style={{ fontSize: 13, color: D.text2, marginBottom: 10, fontWeight: 500 }}>Idioma</div>
-            <div style={{ display: "flex", gap: 8 }}>
-              {idiomas.map(i => (
-                <button key={i} onClick={() => setProfile(p => ({ ...p, idioma: i }))}
-                  style={{ padding: "8px 16px", borderRadius: 8, border: profile.idioma === i ? "1.5px solid " + D.purple : "1px solid " + D.border, background: profile.idioma === i ? "rgba(121,80,242,0.15)" : "transparent", color: profile.idioma === i ? D.purpleLight : D.text2, fontSize: 13, fontWeight: 500, cursor: "pointer", transition: "all 0.2s" }}>
-                  {i}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div style={{ marginBottom: 16 }}>
-            <div style={{ fontSize: 13, color: D.text2, marginBottom: 10, fontWeight: 500 }}>Tono de voz</div>
-            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-              {tonos.map(t => (
-                <button key={t} onClick={() => setProfile(p => ({ ...p, tono: t }))}
-                  style={{ padding: "7px 14px", borderRadius: 8, border: profile.tono === t ? "1.5px solid " + D.purple : "1px solid " + D.border, background: profile.tono === t ? "rgba(121,80,242,0.15)" : "transparent", color: profile.tono === t ? D.purpleLight : D.text2, fontSize: 12, fontWeight: 500, cursor: "pointer", transition: "all 0.2s" }}>
-                  {t}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div>
-            <div style={{ fontSize: 13, color: D.text2, marginBottom: 10, fontWeight: 500 }}>Categorías</div>
-            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-              {cats.map(c => (
-                <button key={c} onClick={() => setProfile(p => ({ ...p, categorias: p.categorias.includes(c) ? p.categorias.filter(x => x !== c) : [...p.categorias, c] }))}
-                  style={{ padding: "6px 12px", borderRadius: 8, border: profile.categorias.includes(c) ? "1.5px solid " + D.purple : "1px solid " + D.border, background: profile.categorias.includes(c) ? "rgba(121,80,242,0.15)" : "transparent", color: profile.categorias.includes(c) ? D.purpleLight : D.text2, fontSize: 12, fontWeight: 500, cursor: "pointer", transition: "all 0.2s" }}>
-                  {c}
-                </button>
-              ))}
-            </div>
-          </div>
-        </Section>
+        {/* Step content */}
+        <div style={{ maxWidth: 760, margin: "0 auto", padding: "32px 24px 0" }}>
 
-        {/* === SECTION 4: Personalidad de marca === */}
-        <Section title="Personalidad de marca" badge="Opcional pero recomendado" badgeColor="purple" defaultOpen={false}>
-          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-            <div>
-              <label style={labelStyle}>¿Cómo habla tu marca? ¿Qué evita?</label>
-              <textarea className="input-focus" style={{ ...getInpStyle(profile.personalidad), minHeight: 90, resize: "none" }} placeholder="Ej: Hablo directo, uso humor, evito ser formal, digo 'reina' y 'amiga'..." value={profile.personalidad} onChange={e => setProfile(p => ({ ...p, personalidad: e.target.value }))} />
-            </div>
-            <div>
-              <label style={labelStyle}>¿Cómo se ve tu marca visualmente?</label>
-              <textarea className="input-focus" style={{ ...getInpStyle(profile.estiloVisual), minHeight: 70, resize: "none" }} placeholder="Ej: Minimalista con toques de color, lifestyle, editorial, colorido y vibrante..." value={profile.estiloVisual} onChange={e => setProfile(p => ({ ...p, estiloVisual: e.target.value }))} />
-            </div>
-            <div>
-              <label style={labelStyle}>Colores de marca</label>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
-                {presetColors.map(c => {
-                  const selected = profile.coloresMarca.includes(c);
-                  return (
-                    <button key={c} onClick={() => setProfile(p => ({ ...p, coloresMarca: selected ? p.coloresMarca.filter(x => x !== c) : [...p.coloresMarca, c] }))}
-                      style={{ width: 32, height: 32, borderRadius: "50%", background: c, border: selected ? "3px solid #fff" : "2px solid rgba(255,255,255,0.15)", cursor: "pointer", position: "relative", boxShadow: selected ? "0 0 0 2px " + D.purple : "none", transition: "all 0.2s" }}>
-                      {selected && <span style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: c === "#F8F9FA" || c === "#FFD93D" ? "#000" : "#fff", fontWeight: 700 }}>✓</span>}
-                    </button>
-                  );
-                })}
+          {/* ═══ STEP 1: Conexión y Análisis IA ═══ */}
+          {step === 1 && (
+            <div style={{ animation: "fadeIn 0.4s ease" }}>
+              {/* Hero Card — AI Analyze */}
+              <div style={{ ...card, background: D.bg2, border: "2px solid " + D.purple, padding: "36px 32px", textAlign: "center", marginBottom: 24, position: "relative", overflow: "hidden" }}>
+                <div style={{ position: "absolute", top: 0, right: 0, width: 200, height: 200, background: "radial-gradient(circle, rgba(121,80,242,0.15) 0%, transparent 70%)", pointerEvents: "none" }} />
+                <div style={{ position: "relative", zIndex: 1 }}>
+                  <div style={{ width: 56, height: 56, borderRadius: 16, background: "rgba(121,80,242,0.15)", border: "1px solid rgba(121,80,242,0.3)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={D.purpleLight} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a4 4 0 0 1 4 4c0 1.5-.8 2.8-2 3.4V11h3a3 3 0 0 1 3 3v1a2 2 0 0 1-2 2h-1v3a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-3H6a2 2 0 0 1-2-2v-1a3 3 0 0 1 3-3h3V9.4C8.8 8.8 8 7.5 8 6a4 4 0 0 1 4-4z"/></svg>
+                  </div>
+                  <h2 style={{ fontSize: 22, fontWeight: 800, color: D.text, marginBottom: 8, letterSpacing: "-0.03em" }}>Deja que Claude construya tu ADN en segundos</h2>
+                  <p style={{ fontSize: 14, color: D.text2, marginBottom: 24, maxWidth: 440, margin: "0 auto 24px", lineHeight: 1.6, letterSpacing: "-0.02em" }}>
+                    Conecta tus canales abajo y Claude analiza tu contenido para extraer tu tono, audiencia y personalidad automáticamente.
+                  </p>
+                </div>
               </div>
-              {/* Custom color input */}
-              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                <input className="input-focus" style={{ ...getInpStyle(customColorInput), width: 120, padding: "8px 12px", fontSize: 13, fontFamily: "monospace" }} placeholder="#hex" value={customColorInput} onChange={e => setCustomColorInput(e.target.value)} />
-                <button onClick={() => { if (/^#[0-9A-Fa-f]{6}$/.test(customColorInput) && !profile.coloresMarca.includes(customColorInput)) { setProfile(p => ({ ...p, coloresMarca: [...p.coloresMarca, customColorInput] })); setCustomColorInput(""); } }}
-                  style={{ padding: "8px 14px", borderRadius: 8, border: "1px dashed " + D.border, background: "transparent", color: D.text3, fontSize: 12, cursor: "pointer" }}>+ Agregar</button>
-              </div>
-              {/* Selected colors display */}
-              {profile.coloresMarca.length > 0 && (
-                <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 10 }}>
-                  {profile.coloresMarca.map((c, i) => (
-                    <div key={i} style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 10px 4px 6px", background: "rgba(255,255,255,0.06)", borderRadius: 20, border: "1px solid " + D.border }}>
-                      <div style={{ width: 14, height: 14, borderRadius: "50%", background: c, flexShrink: 0 }} />
-                      <span style={{ fontSize: 11, color: D.text3, fontFamily: "monospace" }}>{c}</span>
-                      <button onClick={() => setProfile(p => ({ ...p, coloresMarca: p.coloresMarca.filter((_, j) => j !== i) }))} style={{ background: "none", border: "none", color: D.text3, fontSize: 12, cursor: "pointer", padding: 0 }}>×</button>
+
+              {/* Channels card */}
+              <div style={{ ...card, marginBottom: 24 }}>
+                <div style={{ fontSize: 15, fontWeight: 700, color: D.text, marginBottom: 4, letterSpacing: "-0.02em" }}>Tus canales</div>
+                <div style={{ fontSize: 12, color: D.text3, marginBottom: 16 }}>Agrega al menos uno para el análisis con IA</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {[
+                    { icon: "📸", placeholder: "instagram.com/tucuenta", key: "instagramUrl", name: "Instagram" },
+                    { icon: "🎵", placeholder: "tiktok.com/@tucuenta", key: "tiktokUrl", name: "TikTok" },
+                    { icon: "🌐", placeholder: "tuweb.com", key: "webUrl", name: "Web" },
+                    { icon: "🎨", placeholder: "canva.com/tucuenta", key: "canvaUrl", name: "Canva" },
+                  ].map(ch => (
+                    <div key={ch.key} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      <span style={{ fontSize: 16, width: 28, textAlign: "center" }}>{ch.icon}</span>
+                      <input className="input-focus" style={{ ...inp(profile[ch.key]), flex: 1 }} placeholder={ch.placeholder} value={profile[ch.key]} onChange={e => setProfile(p => ({ ...p, [ch.key]: e.target.value }))} />
                     </div>
                   ))}
                 </div>
+              </div>
+
+              {/* Analyze sources */}
+              <div style={{ ...card, marginBottom: 24 }}>
+                <div style={{ fontSize: 15, fontWeight: 700, color: D.text, marginBottom: 4, letterSpacing: "-0.02em" }}>Selecciona fuentes para analizar</div>
+                <div style={{ fontSize: 12, color: D.text3, marginBottom: 16 }}>Claude lee tus redes y construye tu ADN automáticamente</div>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
+                  {[
+                    { key: "screenshots", lbl: "Screenshots de posts", icon: "🖼", ok: true, hint: "La fuente más poderosa" },
+                    { key: "web", lbl: "Página web", icon: "🌐", ok: !!profile.webUrl, hint: profile.webUrl || "Agrega URL arriba" },
+                    { key: "instagram", lbl: "Instagram", icon: "📸", ok: !!profile.instagramUrl, hint: profile.instagramUrl || "Agrega URL arriba" },
+                    { key: "tiktok", lbl: "TikTok", icon: "🎵", ok: !!profile.tiktokUrl, hint: profile.tiktokUrl || "Agrega URL arriba" },
+                  ].map(src => (
+                    <div key={src.key}
+                      onClick={() => { if (!src.ok) return; setSources(prev => prev.includes(src.key) ? prev.filter(s => s !== src.key) : [...prev, src.key]); }}
+                      style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 14px", borderRadius: 10, background: sources.includes(src.key) ? "rgba(121,80,242,0.1)" : D.bg3, border: "1px solid " + (sources.includes(src.key) ? "rgba(121,80,242,0.3)" : D.border), opacity: src.ok ? 1 : 0.35, cursor: src.ok ? "pointer" : "not-allowed", transition: "all 0.3s ease" }}>
+                      <div style={{ width: 20, height: 20, borderRadius: 6, border: "2px solid " + (sources.includes(src.key) ? D.purple : "rgba(255,255,255,0.15)"), background: sources.includes(src.key) ? D.purple : "transparent", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, color: "#fff", flexShrink: 0, transition: "all 0.3s ease" }}>
+                        {sources.includes(src.key) ? "✓" : ""}
+                      </div>
+                      <span style={{ fontSize: 15 }}>{src.icon}</span>
+                      <div>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: D.text, letterSpacing: "-0.02em" }}>{src.lbl}</div>
+                        <div style={{ fontSize: 11, color: D.text3 }}>{src.hint}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Screenshots upload */}
+                {sources.includes("screenshots") && (
+                  <div style={{ marginBottom: 16 }}>
+                    <input type="file" accept="image/*" multiple id="screenshots" style={{ display: "none" }} onChange={e => { const arr = Array.from(e.target.files).slice(0, 6).map(f => ({ file: f, url: URL.createObjectURL(f) })); setScreenshots(prev => [...prev, ...arr].slice(0, 6)); }} />
+                    {screenshots.length > 0 ? (
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(6,1fr)", gap: 6 }}>
+                        {screenshots.map((s, i) => (
+                          <div key={i} style={{ position: "relative" }}>
+                            <img src={s.url} alt="" style={{ width: "100%", aspectRatio: "1", objectFit: "cover", borderRadius: 8, display: "block" }} />
+                            <button onClick={() => setScreenshots(prev => prev.filter((_, j) => j !== i))} style={{ position: "absolute", top: 2, right: 2, width: 16, height: 16, borderRadius: "50%", background: "#DC2626", border: "none", color: "#fff", fontSize: 9, cursor: "pointer" }}>x</button>
+                          </div>
+                        ))}
+                        {screenshots.length < 6 && <label htmlFor="screenshots" style={{ aspectRatio: "1", border: "2px dashed rgba(121,80,242,0.3)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 20, color: D.text3 }}>+</label>}
+                      </div>
+                    ) : (
+                      <label htmlFor="screenshots" style={{ display: "block", border: "2px dashed rgba(121,80,242,0.3)", borderRadius: 12, padding: 20, textAlign: "center", cursor: "pointer" }}>
+                        <div style={{ fontSize: 13, color: D.text2, fontWeight: 500 }}>Sube screenshots de tus posts · Hasta 6</div>
+                      </label>
+                    )}
+                  </div>
+                )}
+
+                {/* Analyze progress */}
+                {analyzing && (
+                  <div style={{ marginBottom: 12 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
+                      <span style={{ fontSize: 11, color: D.purpleLight }}>{analyzeMsg}</span>
+                      <span style={{ fontSize: 11, color: D.purpleLight }}>{Math.round(Math.min(analyzeProgress, 95))}%</span>
+                    </div>
+                    <div style={{ height: 4, background: "rgba(255,255,255,0.06)", borderRadius: 4, overflow: "hidden" }}>
+                      <div style={{ height: "100%", width: Math.min(analyzeProgress, 95) + "%", background: "linear-gradient(90deg,#7950F2,#A78BFA)", borderRadius: 4, transition: "width 0.5s" }} />
+                    </div>
+                  </div>
+                )}
+                {analyzeError && <div style={{ background: "rgba(220,38,38,0.1)", borderRadius: 8, padding: 10, fontSize: 11, color: "#FCA5A5", marginBottom: 12 }}>{analyzeError}</div>}
+
+                <button onClick={analyzeInstagram} disabled={analyzing || sources.length === 0}
+                  style={{ width: "100%", padding: 13, background: analyzing || sources.length === 0 ? "rgba(121,80,242,0.2)" : "linear-gradient(135deg,#7950F2,#4C1D95)", color: "#fff", border: "none", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: analyzing || sources.length === 0 ? "not-allowed" : "pointer", transition: "all 0.3s ease", boxShadow: sources.length > 0 ? "0 8px 24px rgba(121,80,242,0.3)" : "none", letterSpacing: "-0.02em" }}>
+                  {analyzing ? "Analizando con Claude..." : "Analizar " + sources.length + " fuente" + (sources.length !== 1 ? "s" : "") + " →"}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* ═══ STEP 2: Voz y Comunicación ═══ */}
+          {step === 2 && (
+            <div style={{ animation: "fadeIn 0.4s ease" }}>
+              {/* Marca info */}
+              <div style={{ ...card, marginBottom: 24 }}>
+                <div style={{ fontSize: 15, fontWeight: 700, color: D.text, marginBottom: 16, letterSpacing: "-0.02em" }}>Tu marca</div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+                  <div>
+                    <label style={label}>Nombre / cuenta</label>
+                    <input className="input-focus" style={inp(profile.nombre)} placeholder="@tumarca" value={profile.nombre} onChange={e => setProfile(p => ({ ...p, nombre: e.target.value }))} />
+                  </div>
+                  <div>
+                    <label style={label}>A quién le hablas</label>
+                    <input className="input-focus" style={inp(profile.audiencia)} placeholder="Mujeres latinas 28-42 en EE.UU." value={profile.audiencia} onChange={e => setProfile(p => ({ ...p, audiencia: e.target.value }))} />
+                  </div>
+                </div>
+                <div style={{ marginTop: 14 }}>
+                  <label style={label}>Qué haces (biografía)</label>
+                  <textarea className="input-focus" style={{ ...inp(profile.descripcion), minHeight: 80, resize: "none" }} placeholder="Soy coach de negocios para mujeres latinas..." value={profile.descripcion} onChange={e => setProfile(p => ({ ...p, descripcion: e.target.value }))} />
+                </div>
+                <div style={{ marginTop: 14 }}>
+                  <label style={label}>Propuesta de valor</label>
+                  <textarea className="input-focus" style={{ ...inp(profile.propuestaValor), minHeight: 60, resize: "none" }} placeholder="Tu ventaja única — qué te hace diferente de todos los demás" value={profile.propuestaValor} onChange={e => setProfile(p => ({ ...p, propuestaValor: e.target.value }))} />
+                </div>
+              </div>
+
+              {/* Comunicación */}
+              <div style={{ ...card, marginBottom: 24 }}>
+                <div style={{ fontSize: 15, fontWeight: 700, color: D.text, marginBottom: 16, letterSpacing: "-0.02em" }}>Comunicación</div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 20 }}>
+                  <div>
+                    <label style={label}>Idioma</label>
+                    <div style={{ display: "flex", gap: 8 }}>
+                      {idiomas.map(i => (
+                        <button key={i} onClick={() => setProfile(p => ({ ...p, idioma: i }))} style={chip(profile.idioma === i)}>{i}</button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <label style={label}>Tono de voz</label>
+                    <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                      {tonos.map(t => (
+                        <button key={t} onClick={() => setProfile(p => ({ ...p, tono: t }))} style={chip(profile.tono === t)}>{t}</button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <label style={label}>Categorías de contenido</label>
+                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                    {cats.map(c => (
+                      <button key={c} onClick={() => setProfile(p => ({ ...p, categorias: p.categorias.includes(c) ? p.categorias.filter(x => x !== c) : [...p.categorias, c] }))} style={chip(profile.categorias.includes(c))}>{c}</button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ═══ STEP 3: Estilo Visual y Referencias ═══ */}
+          {step === 3 && (
+            <div style={{ animation: "fadeIn 0.4s ease" }}>
+              {/* Personalidad */}
+              <div style={{ ...card, marginBottom: 24 }}>
+                <div style={{ fontSize: 15, fontWeight: 700, color: D.text, marginBottom: 16, letterSpacing: "-0.02em" }}>Personalidad de marca</div>
+                <div style={{ marginBottom: 14 }}>
+                  <label style={label}>¿Cómo habla tu marca? ¿Qué evita?</label>
+                  <textarea className="input-focus" style={{ ...inp(profile.personalidad), minHeight: 90, resize: "none" }} placeholder="Ej: Hablo directo, uso humor, evito ser formal, digo 'reina' y 'amiga'..." value={profile.personalidad} onChange={e => setProfile(p => ({ ...p, personalidad: e.target.value }))} />
+                </div>
+                <div>
+                  <label style={label}>¿Cómo se ve tu marca visualmente?</label>
+                  <textarea className="input-focus" style={{ ...inp(profile.estiloVisual), minHeight: 70, resize: "none" }} placeholder="Ej: Minimalista con toques de color, lifestyle, editorial..." value={profile.estiloVisual} onChange={e => setProfile(p => ({ ...p, estiloVisual: e.target.value }))} />
+                </div>
+              </div>
+
+              {/* Colors */}
+              <div style={{ ...card, marginBottom: 24 }}>
+                <div style={{ fontSize: 15, fontWeight: 700, color: D.text, marginBottom: 16, letterSpacing: "-0.02em" }}>Colores de marca</div>
+                <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 14 }}>
+                  {presetColors.map(c => {
+                    const sel = profile.coloresMarca.includes(c);
+                    return (
+                      <button key={c} onClick={() => setProfile(p => ({ ...p, coloresMarca: sel ? p.coloresMarca.filter(x => x !== c) : [...p.coloresMarca, c] }))}
+                        style={{ width: 36, height: 36, borderRadius: "50%", background: c, border: sel ? "3px solid #fff" : "2px solid rgba(255,255,255,0.12)", cursor: "pointer", position: "relative", boxShadow: sel ? "0 0 0 2px " + D.purple : "none", transition: "all 0.3s ease" }}>
+                        {sel && <span style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, color: c === "#F8F9FA" || c === "#FFD93D" ? "#000" : "#fff", fontWeight: 700 }}>✓</span>}
+                      </button>
+                    );
+                  })}
+                </div>
+                <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                  <input className="input-focus" style={{ ...inp(customColorInput), width: 130, padding: "8px 12px", fontSize: 13, fontFamily: "monospace" }} placeholder="#hex" value={customColorInput} onChange={e => setCustomColorInput(e.target.value)} />
+                  <button onClick={() => { if (/^#[0-9A-Fa-f]{6}$/.test(customColorInput) && !profile.coloresMarca.includes(customColorInput)) { setProfile(p => ({ ...p, coloresMarca: [...p.coloresMarca, customColorInput] })); setCustomColorInput(""); } }}
+                    style={{ padding: "8px 16px", borderRadius: 8, border: "1px dashed " + D.border, background: "transparent", color: D.text3, fontSize: 12, cursor: "pointer", transition: "all 0.3s ease" }}>+ Agregar</button>
+                </div>
+                {profile.coloresMarca.length > 0 && (
+                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 12 }}>
+                    {profile.coloresMarca.map((c, i) => (
+                      <div key={i} style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 10px 4px 6px", background: "rgba(255,255,255,0.06)", borderRadius: 20, border: "1px solid " + D.border }}>
+                        <div style={{ width: 14, height: 14, borderRadius: "50%", background: c, flexShrink: 0 }} />
+                        <span style={{ fontSize: 11, color: D.text3, fontFamily: "monospace" }}>{c}</span>
+                        <button onClick={() => setProfile(p => ({ ...p, coloresMarca: p.coloresMarca.filter((_, j) => j !== i) }))} style={{ background: "none", border: "none", color: D.text3, fontSize: 12, cursor: "pointer", padding: 0 }}>×</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Copy examples */}
+              <div style={{ ...card, marginBottom: 24 }}>
+                <div style={{ fontSize: 15, fontWeight: 700, color: D.text, marginBottom: 4, letterSpacing: "-0.02em" }}>Ejemplos de copy ideal</div>
+                <div style={{ fontSize: 12, color: D.text3, marginBottom: 16 }}>La IA aprende tu estilo exacto de estos ejemplos</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {profile.ejemplosCopy.map((ej, i) => (
+                    <div key={i}>
+                      <label style={{ ...label, fontSize: 11 }}>Ejemplo {i + 1}</label>
+                      <textarea className="input-focus" style={{ ...inp(ej), minHeight: 60, resize: "none" }} placeholder="Pega un caption de Instagram que ames..." value={ej}
+                        onChange={e => { const arr = [...profile.ejemplosCopy]; arr[i] = e.target.value; setProfile(p => ({ ...p, ejemplosCopy: arr })); }} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Competitors */}
+              <div style={{ ...card, marginBottom: 24 }}>
+                <div style={{ fontSize: 15, fontWeight: 700, color: D.text, marginBottom: 4, letterSpacing: "-0.02em" }}>Marcas de referencia</div>
+                <div style={{ fontSize: 12, color: D.text3, marginBottom: 16 }}>Marcas que admiras o inspiran tu contenido (opcional)</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {profile.competidores.map((comp, i) => (
+                    <input key={i} className="input-focus" style={inp(comp)} placeholder={"@cuenta o URL " + (i + 1)} value={comp}
+                      onChange={e => { const arr = [...profile.competidores]; arr[i] = e.target.value; setProfile(p => ({ ...p, competidores: arr })); }} />
+                  ))}
+                </div>
+              </div>
+
+              {/* Final CTA */}
+              {pct === 100 ? (
+                <button onClick={() => router.push("/crear")} className="glow-btn"
+                  style={{ width: "100%", padding: 18, background: "linear-gradient(135deg,#40C057,#2B8A3E)", color: "#fff", border: "none", borderRadius: 14, fontSize: 17, fontWeight: 800, cursor: "pointer", letterSpacing: "-0.02em", boxShadow: "0 8px 30px rgba(64,192,87,0.4), 0 0 60px rgba(64,192,87,0.15)", transition: "all 0.3s ease" }}>
+                  ADN Completo! Crear mi primera pieza →
+                </button>
+              ) : (
+                <div style={{ ...card, textAlign: "center", padding: "32px" }}>
+                  <div style={{ fontSize: 18, fontWeight: 700, color: D.text, marginBottom: 8, letterSpacing: "-0.02em" }}>Tu ADN está guardado</div>
+                  <div style={{ fontSize: 14, color: D.text2, marginBottom: 20 }}>Puedes seguir completando o empezar a crear</div>
+                  <button onClick={() => router.push("/crear")}
+                    style={{ padding: "14px 36px", background: "linear-gradient(135deg,#7950F2,#A78BFA)", color: "#fff", border: "none", borderRadius: 100, fontSize: 15, fontWeight: 700, cursor: "pointer", boxShadow: "0 8px 24px rgba(121,80,242,0.3)", transition: "all 0.3s ease", letterSpacing: "-0.02em" }}>
+                    Ir a crear →
+                  </button>
+                </div>
               )}
             </div>
-          </div>
-        </Section>
-
-        {/* === SECTION 5: Ejemplos de copy === */}
-        <Section title="Ejemplos de copy ideal" badge="Muy recomendado" badgeColor="purple" defaultOpen={false}>
-          <div style={{ fontSize: 13, color: D.text2, marginBottom: 14, lineHeight: 1.5 }}>
-            La IA aprende tu estilo exacto de estos ejemplos — pega captions de Instagram que consideras perfectos
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {profile.ejemplosCopy.map((ej, i) => (
-              <div key={i}>
-                <label style={{ ...labelStyle, fontSize: 11 }}>Ejemplo {i + 1}</label>
-                <textarea className="input-focus" style={{ ...getInpStyle(ej), minHeight: 60, resize: "none" }} placeholder={"Pega un caption de Instagram que ames..."} value={ej}
-                  onChange={e => { const arr = [...profile.ejemplosCopy]; arr[i] = e.target.value; setProfile(p => ({ ...p, ejemplosCopy: arr })); }} />
-              </div>
-            ))}
-          </div>
-          {/* Competitors */}
-          <div style={{ marginTop: 20 }}>
-            <div style={{ fontSize: 13, color: D.text2, marginBottom: 10, fontWeight: 500 }}>Marcas de referencia (opcional)</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {profile.competidores.map((comp, i) => (
-                <input key={i} className="input-focus" style={getInpStyle(comp)} placeholder={"@cuenta o URL " + (i + 1)} value={comp}
-                  onChange={e => { const arr = [...profile.competidores]; arr[i] = e.target.value; setProfile(p => ({ ...p, competidores: arr })); }} />
-              ))}
-            </div>
-          </div>
-        </Section>
-
-        {/* Bottom CTA */}
-        <div style={{ background: "linear-gradient(135deg, rgba(121,80,242,0.12), rgba(167,139,250,0.08))", border: "1px solid rgba(121,80,242,0.2)", borderRadius: 20, padding: "36px 28px", textAlign: "center", marginTop: 8 }}>
-          <div style={{ fontSize: 20, fontWeight: 700, color: D.text, marginBottom: 8 }}>
-            {pct >= 90 ? "🎉 Tu ADN está completo — ya puedes crear contenido!" : "Tu ADN está guardado — ya puedes crear contenido!"}
-          </div>
-          <div style={{ fontSize: 14, color: D.text2, marginBottom: 24 }}>
-            {pct >= 90 ? "La IA tiene todo lo que necesita para sonar como tú" : "Puedes seguir completando tu perfil después"}
-          </div>
-          <button onClick={() => router.push("/crear")}
-            style={{ padding: "16px 40px", background: "linear-gradient(135deg,#7950F2,#A78BFA)", color: "#fff", border: "none", borderRadius: 100, fontSize: 16, fontWeight: 700, cursor: "pointer", boxShadow: "0 8px 30px rgba(121,80,242,0.4)" }}>
-            Ir a crear →
-          </button>
+          )}
         </div>
       </div>
 
-      {/* Global styles */}
+      {/* ═══ STICKY FOOTER ═══ */}
+      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 50, background: "rgba(10,10,26,0.95)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderTop: "1px solid " + D.border }}>
+        <div style={{ maxWidth: 760, margin: "0 auto", padding: "14px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ fontSize: 12, color: D.text3, letterSpacing: "-0.02em", minWidth: 160 }}>
+            {saveStatus === "saving" && <span style={{ color: D.purpleLight }}>💾 Guardando cambios...</span>}
+            {saveStatus === "saved" && <span style={{ color: "#40C057" }}>✓ Cambios guardados</span>}
+            {saveStatus === "idle" && <span>Paso {step} de 3</span>}
+          </div>
+          <div style={{ display: "flex", gap: 10 }}>
+            {step > 1 && (
+              <button onClick={goPrev} style={{ padding: "10px 24px", background: "rgba(255,255,255,0.06)", border: "1px solid " + D.border, borderRadius: 10, color: D.text2, fontSize: 13, fontWeight: 600, cursor: "pointer", transition: "all 0.3s ease", letterSpacing: "-0.02em" }}>
+                ← Anterior
+              </button>
+            )}
+            {step < 3 ? (
+              <button onClick={goNext} style={{ padding: "10px 28px", background: D.purple, border: "none", borderRadius: 10, color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer", boxShadow: "0 4px 14px rgba(121,80,242,0.4)", transition: "all 0.3s ease", letterSpacing: "-0.02em" }}>
+                Siguiente →
+              </button>
+            ) : (
+              <button onClick={() => { handleSave(); router.push("/crear"); }}
+                style={{ padding: "10px 28px", background: pct === 100 ? "linear-gradient(135deg,#40C057,#2B8A3E)" : D.purple, border: "none", borderRadius: 10, color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer", boxShadow: pct === 100 ? "0 4px 14px rgba(64,192,87,0.4)" : "0 4px 14px rgba(121,80,242,0.4)", transition: "all 0.3s ease", letterSpacing: "-0.02em" }}>
+                {pct === 100 ? "ADN Completo! Crear →" : "Listo — Crear →"}
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Styles */}
       <style>{`
         @keyframes orbFloat1 { 0% { transform: translate(0, 0); } 33% { transform: translate(30px, -20px); } 66% { transform: translate(-20px, 15px); } 100% { transform: translate(0, 0); } }
         @keyframes orbFloat2 { 0% { transform: translate(0, 0); } 33% { transform: translate(-25px, 20px); } 66% { transform: translate(15px, -25px); } 100% { transform: translate(0, 0); } }
@@ -534,15 +582,15 @@ function ADNContent() {
         .orb-3 { animation: orbFloat3 12s ease-in-out infinite; }
         @keyframes scanMove { 0% { top: 0; } 100% { top: 100%; } }
         .scan-line { animation: scanMove 4s linear infinite; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
         .input-focus:focus { border-color: #7950F2 !important; box-shadow: 0 0 0 2px rgba(121,80,242,0.15); }
+        .glow-btn:hover { transform: scale(1.02); box-shadow: 0 12px 40px rgba(64,192,87,0.5), 0 0 80px rgba(64,192,87,0.2) !important; }
       `}</style>
     </AppLayout>
   );
 }
 
-const labelStyle = { fontSize: 13, color: D.text2, display: "block", marginBottom: 6, fontWeight: 500 };
-
-// --- Confetti Effect (CSS only) ---
+// --- Confetti ---
 const ConfettiEffect = () => (
   <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 9999, overflow: "hidden" }}>
     <style>{`
@@ -550,21 +598,14 @@ const ConfettiEffect = () => (
         0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
         100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
       }
-      .confetti-piece {
-        position: absolute;
-        width: 10px;
-        height: 10px;
-        top: -10px;
-        animation: confettiFall 3s ease-in forwards;
-      }
+      .confetti-piece { position: absolute; top: -10px; animation: confettiFall 3s ease-in forwards; }
     `}</style>
     {Array.from({ length: 40 }).map((_, i) => (
       <div key={i} className="confetti-piece" style={{
         left: Math.random() * 100 + "%",
         background: ["#7950F2", "#A78BFA", "#E64980", "#40C057", "#FFD93D", "#FF6B35"][i % 6],
-        borderRadius: i % 3 === 0 ? "50%" : i % 3 === 1 ? "2px" : "0",
-        width: 6 + Math.random() * 8,
-        height: 6 + Math.random() * 8,
+        borderRadius: i % 3 === 0 ? "50%" : "2px",
+        width: 6 + Math.random() * 8, height: 6 + Math.random() * 8,
         animationDelay: Math.random() * 2 + "s",
         animationDuration: 2 + Math.random() * 2 + "s",
       }} />
