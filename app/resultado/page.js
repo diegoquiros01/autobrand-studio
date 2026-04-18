@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { supabase } from "../../lib/supabase";
 
 export default function Resultado() {
   const router = useRouter();
@@ -11,6 +12,9 @@ export default function Resultado() {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) { router.push("/login"); return; }
+    });
     const bp = localStorage.getItem("brandProfile");
     const prop = localStorage.getItem("selectedPropuesta");
     if (bp) setBrandProfile(JSON.parse(bp));

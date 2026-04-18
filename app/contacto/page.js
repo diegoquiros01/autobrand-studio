@@ -82,8 +82,14 @@ export default function Contacto() {
 
   const handleSubmit = async () => {
     if (!form.name || !form.email || !form.message) return;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) { alert(lang === "es" ? "Email inválido" : "Invalid email"); return; }
     setSending(true);
-    await new Promise(r => setTimeout(r, 1500));
+    try {
+      await fetch("/api/contact", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+    } catch (e) { /* fallback — still show success */ }
     setSent(true);
     setSending(false);
   };

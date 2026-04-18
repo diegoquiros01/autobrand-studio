@@ -46,11 +46,7 @@ export async function POST(request) {
     // Fetch web page content if selected
     let webContent = null;
     if (sources && sources.includes("web") && webUrl) {
-      console.log("Fetching web content from:", webUrl);
       webContent = await fetchWebContent(webUrl);
-      if (webContent) {
-        console.log("Web content fetched:", webContent.substring(0, 100) + "...");
-      }
     }
 
     // Build analysis context

@@ -136,14 +136,13 @@ function CrearContent() {
       const refB = referencias.length > 0 ? await Promise.all(referencias.map(async r => ({ data: await toBase64(r.file), mimeType: "image/jpeg" }))) : [];
       const talB = talentos.length > 0 ? await Promise.all(talentos.map(async t => ({ data: await toBase64(t.file), mimeType: "image/jpeg" }))) : [];
       const promptFinal = feedbackText ? prompt + ". Feedback del usuario: " + feedbackText : prompt;
-      console.log("Generating image with:", { prompt: promptFinal, refs: refB.length, talents: talB.length, brandProfile: brandProfile?.nombre });
       const res = await fetch("/api/generate-image", {
         method:"POST", headers:{"Content-Type":"application/json"},
         body: JSON.stringify({ prompt: promptFinal, brandProfile, referencias: refB, talentos: talB, editedCopy: prompt, userId: user?.id || "", idiomapieza: idiomapieza === "ADN" ? (brandProfile?.idioma || "") : idiomapieza, formato }),
       });
       const data = await res.json();
       if (data.error === "limit_reached") {
-        setError("LIMIT_REACHED");
+        setError("Alcanzaste tu límite de " + (data.limit || 20) + " generaciones este mes. Actualiza tu plan en Pricing.");
       } else if (data.image) {
         const newVersion = { image: data.image, mimeType: data.mimeType, feedback: feedbackText, timestamp: new Date().toLocaleTimeString() };
         setVersiones(prev => { const updated = [...prev, newVersion]; setVersionActiva(updated.length - 1); return updated; });
@@ -162,7 +161,7 @@ function CrearContent() {
       });
       const data = await res.json();
       if (data.error === "limit_reached") {
-        setError("LIMIT_REACHED");
+        setError("Alcanzaste tu límite de " + (data.limit || 20) + " generaciones este mes. Actualiza tu plan en Pricing.");
       } else {
         setCopies((data.propuestas || []).slice(0, 3));
       }

@@ -43,9 +43,14 @@ export default function Biblioteca() {
 
   const deleteGeneracion = async (id) => {
     if (!confirm("¿Eliminar esta pieza?")) return;
-    await supabase.from("generaciones").delete().eq("id", id);
-    setGeneraciones(prev => prev.filter(g => g.id !== id));
-    if (selected?.id === id) setSelected(null);
+    try {
+      const { error } = await supabase.from("generaciones").delete().eq("id", id);
+      if (error) throw error;
+      setGeneraciones(prev => prev.filter(g => g.id !== id));
+      if (selected?.id === id) setSelected(null);
+    } catch (e) {
+      alert("Error al eliminar: " + (e.message || "intenta de nuevo"));
+    }
   };
 
   const formatDate = (d) => new Date(d).toLocaleDateString("es-ES", { day:"numeric", month:"short", year:"numeric" });

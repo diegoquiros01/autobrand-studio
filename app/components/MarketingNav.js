@@ -62,7 +62,7 @@ const logoText = { fontSize:15, fontWeight:700, letterSpacing:"-0.03em", color:"
 
 const linkDefault = {
   padding:"7px 16px", borderRadius:8, fontSize:14, fontWeight:500,
-  color:"rgba(255,255,255,0.6)", cursor:"pointer", background:"none",
+  color:"rgba(255,255,255,0.75)", cursor:"pointer", background:"none",
   border:"none", transition:"all 0.2s",
 };
 

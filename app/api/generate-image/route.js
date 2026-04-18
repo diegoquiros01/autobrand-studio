@@ -157,7 +157,6 @@ async function generateImageFromBrief(brief, styleNotes, referencias, talentos, 
     console.error("Gemini error" + (retryWithoutRefs ? " (retry)" : "") + ":", err.message);
     // If first attempt with refs failed, retry without refs
     if (!retryWithoutRefs && referencias && referencias.length > 0) {
-      console.log("Retrying Gemini without reference images...");
       return generateImageFromBrief(brief, styleNotes, null, talentos, true);
     }
     return null;
@@ -234,10 +233,6 @@ function buildLegacyPrompt(prompt, brandProfile, referencias, talentos, editedCo
 // ─── Main handler ───
 export async function POST(request) {
   const { prompt, brandProfile, referencias, talentos, editedCopy, userId, idiomapieza, formato } = await request.json();
-  console.log("=== ART DIRECTOR PIPELINE ===");
-  console.log("Prompt:", prompt?.substring(0, 100));
-  console.log("Brand:", brandProfile?.nombre);
-  console.log("Refs:", referencias?.length || 0, "| Talent:", talentos?.length || 0);
 
   // ─── Rate limiting (unchanged) ───
   if (userId) {
@@ -260,18 +255,13 @@ export async function POST(request) {
   let briefResult = null;
   let usedLegacy = false;
   try {
-    console.log("STEP 1: Generating visual brief with Claude...");
-    const t1 = Date.now();
     briefResult = await generateVisualBrief(prompt, brandProfile, referencias, talentos, editedCopy, idiomapieza, null, formato);
-    console.log("STEP 1 done (" + (Date.now() - t1) + "ms). Brief:", briefResult.brief?.substring(0, 150));
   } catch (err) {
     console.error("STEP 1 failed, using legacy prompt:", err.message);
     usedLegacy = true;
   }
 
   // ─── STEP 2: Generate image with Gemini ───
-  console.log("STEP 2: Generating image with Gemini...");
-  const t2 = Date.now();
   let imageResult;
 
   if (usedLegacy) {
@@ -282,8 +272,6 @@ export async function POST(request) {
     imageResult = await generateImageFromBrief(briefResult.brief, briefResult.style_notes, referencias, talentos, false);
   }
 
-  console.log("STEP 2 done (" + (Date.now() - t2) + "ms). Got image:", !!imageResult);
-
   if (!imageResult) {
     return Response.json({ error: "No image generated" }, { status: 500 });
   }
@@ -291,25 +279,18 @@ export async function POST(request) {
   // ─── STEP 3: Validate image with Claude ───
   if (!usedLegacy) {
     try {
-      console.log("STEP 3: Validating image with Claude...");
-      const t3 = Date.now();
       const validation = await validateImage(imageResult.image, imageResult.mimeType, briefResult.brief, brandProfile);
-      console.log("STEP 3 done (" + (Date.now() - t3) + "ms). Score:", validation.score, "Approved:", validation.approved);
 
       if (!validation.approved || validation.score < 6) {
-        console.log("Image rejected. Issues:", validation.issues);
-        console.log("RETRY: Generating adjusted brief...");
         try {
           const adjustedBrief = await generateVisualBrief(
             prompt, brandProfile, referencias, talentos, editedCopy, idiomapieza,
             "Previous attempt issues: " + validation.issues + ". Adjustments needed: " + validation.suggested_adjustments,
             formato
           );
-          console.log("RETRY: Regenerating image...");
           const retryResult = await generateImageFromBrief(adjustedBrief.brief, adjustedBrief.style_notes, referencias, talentos, false);
           if (retryResult) {
             imageResult = retryResult;
-            console.log("RETRY: Success, using new image");
           }
         } catch (retryErr) {
           console.error("RETRY failed, using original image:", retryErr.message);
