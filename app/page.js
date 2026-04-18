@@ -115,6 +115,43 @@ export default function Landing() {
         </div>
       </RevealSection>
 
+      {/* ═══ PROMPT BOX + 3 STEPS ═══ */}
+      <RevealSection>
+        {/* Chat-like prompt input */}
+        <div style={{ maxWidth:700, margin:"0 auto 56px", background:"#16162d", borderRadius:16, border:"1px solid rgba(255,255,255,0.08)", overflow:"hidden", boxShadow:"0 20px 60px rgba(0,0,0,0.3)" }}>
+          <div style={{ padding:"20px 24px 12px", fontSize:15, color:"rgba(255,255,255,0.35)", textAlign:"left", lineHeight:1.6 }}>
+            {en ? "Ask AiStudioBrand to create a Post for my Instagram account..." : "Pedile a AiStudioBrand que cree un Post para mi cuenta de Instagram..."}
+          </div>
+          <div style={{ padding:"8px 16px 12px", display:"flex", alignItems:"center", justifyContent:"space-between", borderTop:"1px solid rgba(255,255,255,0.04)" }}>
+            <div style={{ width:28, height:28, borderRadius:8, border:"1px solid rgba(255,255,255,0.1)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, color:"rgba(255,255,255,0.3)", cursor:"pointer" }}>+</div>
+            <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+              <span style={{ fontSize:13, color:"rgba(255,255,255,0.35)" }}>{en ? "Create" : "Crear"} <span style={{ fontSize:10 }}>▾</span></span>
+              <div style={{ width:28, height:28, borderRadius:"50%", background:"#7950F2", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer" }}>
+                <span style={{ fontSize:12, color:"#fff" }}>↑</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 3 Simple Steps */}
+        <div style={{ display:"flex", justifyContent:"center", gap:56, maxWidth:800, margin:"0 auto" }}>
+          {(en ? [
+            { n:"1", t:"Define your brand DNA and upload your visual references." },
+            { n:"2", t:"AiStudioBrand generates image + copy aligned to your voice." },
+            { n:"3", t:"Review, edit, and publish your Instagram post in seconds." },
+          ] : [
+            { n:"1", t:"Define tu ADN de marca y sube tus referencias visuales." },
+            { n:"2", t:"AiStudioBrand genera imagen + copy alineado a tu voz." },
+            { n:"3", t:"Revisa, edita y publica tu post de Instagram en segundos." },
+          ]).map((step, i) => (
+            <div key={i} style={{ textAlign:"center", maxWidth:200 }}>
+              <div style={{ width:36, height:36, borderRadius:10, border:"1px solid rgba(255,255,255,0.15)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, fontWeight:700, color:"rgba(255,255,255,0.6)", margin:"0 auto 14px" }}>{step.n}</div>
+              <div style={{ fontSize:14, color:"rgba(255,255,255,0.5)", lineHeight:1.55 }}>{step.t}</div>
+            </div>
+          ))}
+        </div>
+      </RevealSection>
+
       {/* ═══ SOCIAL PROOF STRIP ═══ */}
       <RevealSection style={{ padding:"40px 20px" }}>
         <div style={s.proofStrip}>
