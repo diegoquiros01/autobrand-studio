@@ -545,26 +545,26 @@ function ADNContent() {
       </div>
 
       {/* ═══ STICKY FOOTER (respects sidebar) ═══ */}
-      <div className="adn-footer" style={{ position: "fixed", bottom: 0, left: 260, right: 0, zIndex: 45, background: "rgba(10,10,26,0.95)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderTop: "1px solid " + D.border }}>
-        <div style={{ maxWidth: 760, margin: "0 auto", padding: "12px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{ fontSize: 12, color: D.text3, letterSpacing: "-0.02em", minWidth: 160 }}>
-            {saveStatus === "saving" && <span style={{ color: D.purpleLight }}>💾 Guardando cambios...</span>}
-            {saveStatus === "saved" && <span style={{ color: "#40C057" }}>✓ Cambios guardados</span>}
-            {saveStatus === "idle" && <span>Paso {step} de 3</span>}
+      <div className="adn-footer" style={{ position: "fixed", bottom: 0, left: 260, right: 0, zIndex: 45, background: "rgba(14,14,30,0.95)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderTop: "1px solid rgba(255,255,255,0.1)" }}>
+        <div style={{ maxWidth: 760, margin: "0 auto", padding: "16px 28px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ fontSize: 14, color: D.text2, letterSpacing: "-0.02em", minWidth: 160 }}>
+            {saveStatus === "saving" && <span style={{ color: D.purpleLight, fontWeight: 600 }}>💾 Guardando cambios...</span>}
+            {saveStatus === "saved" && <span style={{ color: "#40C057", fontWeight: 600 }}>✓ Cambios guardados</span>}
+            {saveStatus === "idle" && <span style={{ color: D.text3 }}>Paso {step} de 3</span>}
           </div>
           <div style={{ display: "flex", gap: 10 }}>
             {step > 1 && (
-              <button onClick={goPrev} style={{ padding: "10px 24px", background: "rgba(255,255,255,0.06)", border: "1px solid " + D.border, borderRadius: 10, color: D.text2, fontSize: 13, fontWeight: 600, cursor: "pointer", transition: "all 0.3s ease", letterSpacing: "-0.02em" }}>
+              <button onClick={goPrev} style={{ padding: "11px 24px", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 10, color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer", transition: "all 0.3s ease", letterSpacing: "-0.02em" }}>
                 ← Anterior
               </button>
             )}
             {step < 3 ? (
-              <button onClick={goNext} style={{ padding: "10px 28px", background: D.purple, border: "none", borderRadius: 10, color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer", boxShadow: "0 4px 14px rgba(121,80,242,0.4)", transition: "all 0.3s ease", letterSpacing: "-0.02em" }}>
+              <button onClick={goNext} style={{ padding: "11px 28px", background: D.purple, border: "none", borderRadius: 10, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer", boxShadow: "0 4px 14px rgba(121,80,242,0.4)", transition: "all 0.3s ease", letterSpacing: "-0.02em" }}>
                 Siguiente →
               </button>
             ) : (
               <button onClick={() => { handleSave(); router.push("/crear"); }}
-                style={{ padding: "10px 28px", background: pct === 100 ? "linear-gradient(135deg,#40C057,#2B8A3E)" : D.purple, border: "none", borderRadius: 10, color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer", boxShadow: pct === 100 ? "0 4px 14px rgba(64,192,87,0.4)" : "0 4px 14px rgba(121,80,242,0.4)", transition: "all 0.3s ease", letterSpacing: "-0.02em" }}>
+                style={{ padding: "11px 28px", background: pct === 100 ? "linear-gradient(135deg,#40C057,#2B8A3E)" : D.purple, border: "none", borderRadius: 10, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer", boxShadow: pct === 100 ? "0 4px 14px rgba(64,192,87,0.4)" : "0 4px 14px rgba(121,80,242,0.4)", transition: "all 0.3s ease", letterSpacing: "-0.02em" }}>
                 {pct === 100 ? "ADN Completo! Crear →" : "Listo — Crear →"}
               </button>
             )}
