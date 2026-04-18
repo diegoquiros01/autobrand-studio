@@ -47,7 +47,7 @@ function ADNContent() {
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState({
     nombre: "", descripcion: "", audiencia: "", tono: "",
-    idioma: "Español", categorias: [], propuestaValor: "",
+    idioma: "", categorias: [], propuestaValor: "",
     instagramUrl: "", tiktokUrl: "", webUrl: "", canvaUrl: "",
     personalidad: "", coloresMarca: [], estiloVisual: "",
     ejemplosCopy: ["", "", ""], competidores: ["", "", ""],
@@ -280,90 +280,6 @@ function ADNContent() {
           </div>
         </div>
 
-        {/* AI Analyze Banner */}
-        <div style={{ background: "linear-gradient(135deg,#7950F2 0%,#4C1D95 100%)", borderRadius: 16, padding: "24px 22px", marginBottom: 24, boxShadow: "0 12px 32px rgba(121,80,242,0.25)" }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: showAnalyze ? 16 : 0 }}>
-            <div>
-              <div style={{ fontSize: 16, fontWeight: 700, color: "#fff", marginBottom: 4 }}>Analiza tu marca con IA</div>
-              <div style={{ fontSize: 13, color: "rgba(255,255,255,0.7)" }}>Claude lee tus redes y web para construir tu ADN automáticamente</div>
-            </div>
-            <button onClick={() => setShowAnalyze(!showAnalyze)}
-              style={{ padding: "9px 18px", background: showAnalyze ? "rgba(255,255,255,0.15)" : "#fff", color: showAnalyze ? "#fff" : "#7950F2", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", flexShrink: 0 }}>
-              {showAnalyze ? "Ocultar" : "Analizar con IA"}
-            </button>
-          </div>
-
-          {showAnalyze && (
-            <div>
-              {!profile.instagramUrl && !profile.webUrl && !profile.tiktokUrl && !profile.canvaUrl && (
-                <div style={{ fontSize: 12, color: "rgba(255,200,100,0.9)", marginBottom: 12, padding: "8px 12px", background: "rgba(255,200,100,0.1)", borderRadius: 8 }}>
-                  Agrega al menos una URL en &ldquo;Tus canales&rdquo; para poder analizar
-                </div>
-              )}
-              <div style={{ fontSize: 12, color: "rgba(255,255,255,0.7)", marginBottom: 10 }}>Selecciona fuentes para el análisis:</div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
-                {[
-                  { key: "screenshots", label: "Screenshots de posts", icon: "🖼", available: true, hint: "Claude analiza tus imágenes directamente" },
-                  { key: "web", label: "Página web", icon: "🌐", available: !!profile.webUrl, hint: profile.webUrl || "Agrega URL primero" },
-                  { key: "instagram", label: "Instagram", icon: "📸", available: !!profile.instagramUrl, hint: profile.instagramUrl || "Agrega URL primero" },
-                  { key: "tiktok", label: "TikTok", icon: "🎵", available: !!profile.tiktokUrl, hint: profile.tiktokUrl || "Agrega URL primero" },
-                ].map(source => (
-                  <div key={source.key}
-                    style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 9, background: sources.includes(source.key) ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.05)", border: "1px solid " + (sources.includes(source.key) ? "rgba(255,255,255,0.25)" : "rgba(255,255,255,0.08)"), opacity: source.available ? 1 : 0.4, cursor: source.available ? "pointer" : "not-allowed" }}
-                    onClick={() => { if (!source.available) return; setSources(prev => prev.includes(source.key) ? prev.filter(s => s !== source.key) : [...prev, source.key]); }}>
-                    <div style={{ width: 18, height: 18, borderRadius: 5, border: "1.5px solid " + (sources.includes(source.key) ? "#fff" : "rgba(255,255,255,0.3)"), background: sources.includes(source.key) ? "#fff" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, color: "#7950F2", flexShrink: 0 }}>
-                      {sources.includes(source.key) ? "✓" : ""}
-                    </div>
-                    <span style={{ fontSize: 14 }}>{source.icon}</span>
-                    <div>
-                      <div style={{ fontSize: 12, fontWeight: 600, color: "#fff" }}>{source.label}</div>
-                      <div style={{ fontSize: 10, color: "rgba(255,255,255,0.5)" }}>{source.hint}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {sources.includes("screenshots") && (
-                <div style={{ marginBottom: 12 }}>
-                  <input type="file" accept="image/*" multiple id="screenshots" style={{ display: "none" }} onChange={e => { const arr = Array.from(e.target.files).slice(0, 6).map(f => ({ file: f, url: URL.createObjectURL(f) })); setScreenshots(prev => [...prev, ...arr].slice(0, 6)); }} />
-                  {screenshots.length > 0 ? (
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(6,1fr)", gap: 6, marginBottom: 8 }}>
-                      {screenshots.map((s, i) => (
-                        <div key={i} style={{ position: "relative" }}>
-                          <img src={s.url} alt="" style={{ width: "100%", aspectRatio: "1", objectFit: "cover", borderRadius: 8, display: "block" }} />
-                          <button onClick={() => setScreenshots(prev => prev.filter((_, j) => j !== i))} style={{ position: "absolute", top: 2, right: 2, width: 16, height: 16, borderRadius: "50%", background: "#DC2626", border: "none", color: "#fff", fontSize: 9, cursor: "pointer" }}>x</button>
-                        </div>
-                      ))}
-                      {screenshots.length < 6 && <label htmlFor="screenshots" style={{ aspectRatio: "1", border: "2px dashed rgba(255,255,255,0.2)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 20, color: "rgba(255,255,255,0.4)" }}>+</label>}
-                    </div>
-                  ) : (
-                    <label htmlFor="screenshots" style={{ display: "block", border: "2px dashed rgba(255,255,255,0.2)", borderRadius: 10, padding: 16, textAlign: "center", cursor: "pointer" }}>
-                      <div style={{ fontSize: 13, color: "rgba(255,255,255,0.7)", fontWeight: 500 }}>Sube screenshots de tus posts · Hasta 6</div>
-                    </label>
-                  )}
-                </div>
-              )}
-
-              {analyzing && (
-                <div style={{ marginBottom: 10 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
-                    <span style={{ fontSize: 11, color: "rgba(255,255,255,0.8)" }}>{analyzeMsg}</span>
-                    <span style={{ fontSize: 11, color: "rgba(255,255,255,0.8)" }}>{Math.round(Math.min(analyzeProgress, 95))}%</span>
-                  </div>
-                  <div style={{ height: 4, background: "rgba(255,255,255,0.1)", borderRadius: 4, overflow: "hidden" }}>
-                    <div style={{ height: "100%", width: Math.min(analyzeProgress, 95) + "%", background: "#fff", borderRadius: 4, transition: "width 0.5s" }} />
-                  </div>
-                </div>
-              )}
-              {analyzeError && <div style={{ background: "rgba(220,38,38,0.15)", borderRadius: 8, padding: 10, fontSize: 11, color: "#FCA5A5", marginBottom: 10 }}>{analyzeError}</div>}
-              <button onClick={analyzeInstagram} disabled={analyzing || sources.length === 0}
-                style={{ width: "100%", padding: 11, background: analyzing || sources.length === 0 ? "rgba(255,255,255,0.15)" : "#fff", color: analyzing || sources.length === 0 ? "rgba(255,255,255,0.5)" : "#7950F2", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: analyzing || sources.length === 0 ? "not-allowed" : "pointer" }}>
-                {analyzing ? "Analizando con Claude..." : "Analizar " + sources.length + " fuente" + (sources.length !== 1 ? "s" : "") + " →"}
-              </button>
-            </div>
-          )}
-        </div>
-
         {/* === SECTION 1: Tu marca === */}
         <Section title="Tu marca" badge={marcaCount + "/4 campos"} badgeColor={marcaCount === 4 ? "green" : "default"} defaultOpen={true}>
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
@@ -402,6 +318,87 @@ function ADNContent() {
             ))}
           </div>
         </Section>
+
+        {/* AI Analyze Banner — after channels */}
+        <div style={{ background: "linear-gradient(135deg,#7950F2 0%,#4C1D95 100%)", borderRadius: 16, padding: "24px 22px", marginBottom: 16, boxShadow: "0 12px 32px rgba(121,80,242,0.25)" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: showAnalyze ? 16 : 0 }}>
+            <div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: "#fff", marginBottom: 4 }}>Analiza tu marca con IA</div>
+              <div style={{ fontSize: 13, color: "rgba(255,255,255,0.7)" }}>Claude lee tus redes y web para construir tu ADN automáticamente</div>
+            </div>
+            <button onClick={() => setShowAnalyze(!showAnalyze)}
+              style={{ padding: "9px 18px", background: showAnalyze ? "rgba(255,255,255,0.15)" : "#fff", color: showAnalyze ? "#fff" : "#7950F2", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", flexShrink: 0 }}>
+              {showAnalyze ? "Ocultar" : "Analizar con IA"}
+            </button>
+          </div>
+          {showAnalyze && (
+            <div>
+              {!profile.instagramUrl && !profile.webUrl && !profile.tiktokUrl && !profile.canvaUrl && (
+                <div style={{ fontSize: 12, color: "rgba(255,200,100,0.9)", marginBottom: 12, padding: "8px 12px", background: "rgba(255,200,100,0.1)", borderRadius: 8 }}>
+                  Agrega al menos una URL en &ldquo;Tus canales&rdquo; arriba para poder analizar
+                </div>
+              )}
+              <div style={{ fontSize: 12, color: "rgba(255,255,255,0.7)", marginBottom: 10 }}>Selecciona fuentes para el análisis:</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
+                {[
+                  { key: "screenshots", label: "Screenshots de posts", icon: "🖼", available: true, hint: "Claude analiza tus imágenes directamente" },
+                  { key: "web", label: "Página web", icon: "🌐", available: !!profile.webUrl, hint: profile.webUrl || "Agrega URL primero" },
+                  { key: "instagram", label: "Instagram", icon: "📸", available: !!profile.instagramUrl, hint: profile.instagramUrl || "Agrega URL primero" },
+                  { key: "tiktok", label: "TikTok", icon: "🎵", available: !!profile.tiktokUrl, hint: profile.tiktokUrl || "Agrega URL primero" },
+                ].map(source => (
+                  <div key={source.key}
+                    style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 9, background: sources.includes(source.key) ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.05)", border: "1px solid " + (sources.includes(source.key) ? "rgba(255,255,255,0.25)" : "rgba(255,255,255,0.08)"), opacity: source.available ? 1 : 0.4, cursor: source.available ? "pointer" : "not-allowed" }}
+                    onClick={() => { if (!source.available) return; setSources(prev => prev.includes(source.key) ? prev.filter(s => s !== source.key) : [...prev, source.key]); }}>
+                    <div style={{ width: 18, height: 18, borderRadius: 5, border: "1.5px solid " + (sources.includes(source.key) ? "#fff" : "rgba(255,255,255,0.3)"), background: sources.includes(source.key) ? "#fff" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, color: "#7950F2", flexShrink: 0 }}>
+                      {sources.includes(source.key) ? "✓" : ""}
+                    </div>
+                    <span style={{ fontSize: 14 }}>{source.icon}</span>
+                    <div>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: "#fff" }}>{source.label}</div>
+                      <div style={{ fontSize: 10, color: "rgba(255,255,255,0.5)" }}>{source.hint}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {sources.includes("screenshots") && (
+                <div style={{ marginBottom: 12 }}>
+                  <input type="file" accept="image/*" multiple id="screenshots" style={{ display: "none" }} onChange={e => { const arr = Array.from(e.target.files).slice(0, 6).map(f => ({ file: f, url: URL.createObjectURL(f) })); setScreenshots(prev => [...prev, ...arr].slice(0, 6)); }} />
+                  {screenshots.length > 0 ? (
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(6,1fr)", gap: 6, marginBottom: 8 }}>
+                      {screenshots.map((s, i) => (
+                        <div key={i} style={{ position: "relative" }}>
+                          <img src={s.url} alt="" style={{ width: "100%", aspectRatio: "1", objectFit: "cover", borderRadius: 8, display: "block" }} />
+                          <button onClick={() => setScreenshots(prev => prev.filter((_, j) => j !== i))} style={{ position: "absolute", top: 2, right: 2, width: 16, height: 16, borderRadius: "50%", background: "#DC2626", border: "none", color: "#fff", fontSize: 9, cursor: "pointer" }}>x</button>
+                        </div>
+                      ))}
+                      {screenshots.length < 6 && <label htmlFor="screenshots" style={{ aspectRatio: "1", border: "2px dashed rgba(255,255,255,0.2)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 20, color: "rgba(255,255,255,0.4)" }}>+</label>}
+                    </div>
+                  ) : (
+                    <label htmlFor="screenshots" style={{ display: "block", border: "2px dashed rgba(255,255,255,0.2)", borderRadius: 10, padding: 16, textAlign: "center", cursor: "pointer" }}>
+                      <div style={{ fontSize: 13, color: "rgba(255,255,255,0.7)", fontWeight: 500 }}>Sube screenshots de tus posts · Hasta 6</div>
+                    </label>
+                  )}
+                </div>
+              )}
+              {analyzing && (
+                <div style={{ marginBottom: 10 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
+                    <span style={{ fontSize: 11, color: "rgba(255,255,255,0.8)" }}>{analyzeMsg}</span>
+                    <span style={{ fontSize: 11, color: "rgba(255,255,255,0.8)" }}>{Math.round(Math.min(analyzeProgress, 95))}%</span>
+                  </div>
+                  <div style={{ height: 4, background: "rgba(255,255,255,0.1)", borderRadius: 4, overflow: "hidden" }}>
+                    <div style={{ height: "100%", width: Math.min(analyzeProgress, 95) + "%", background: "#fff", borderRadius: 4, transition: "width 0.5s" }} />
+                  </div>
+                </div>
+              )}
+              {analyzeError && <div style={{ background: "rgba(220,38,38,0.15)", borderRadius: 8, padding: 10, fontSize: 11, color: "#FCA5A5", marginBottom: 10 }}>{analyzeError}</div>}
+              <button onClick={analyzeInstagram} disabled={analyzing || sources.length === 0}
+                style={{ width: "100%", padding: 11, background: analyzing || sources.length === 0 ? "rgba(255,255,255,0.15)" : "#fff", color: analyzing || sources.length === 0 ? "rgba(255,255,255,0.5)" : "#7950F2", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: analyzing || sources.length === 0 ? "not-allowed" : "pointer" }}>
+                {analyzing ? "Analizando con Claude..." : "Analizar " + sources.length + " fuente" + (sources.length !== 1 ? "s" : "") + " →"}
+              </button>
+            </div>
+          )}
+        </div>
 
         {/* === SECTION 3: Comunicación === */}
         <Section title="Comunicación" badge={comComplete ? "Completo ✓" : "Pendiente"} badgeColor={comComplete ? "green" : "default"} defaultOpen={true}>
