@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../lib/supabase";
+import MarketingNav from "../components/MarketingNav";
 
 const content = {
   es: {
@@ -94,7 +95,7 @@ export default function Pricing() {
   };
   const t = content[lang];
 
-  const nav = { display:"flex", alignItems:"center", padding:"0 32px", height:62, borderBottom:"1px solid rgba(255,255,255,0.1)", background:"#111122", position:"sticky", top:0, zIndex:100 };
+  const setLanguage = (l) => { setLang(l); localStorage.setItem("lang", l); };
   const priceCard = { background:"#16162d", border:"1px solid rgba(255,255,255,0.1)", borderRadius:24, padding:24, position:"relative" };
   const priceCardFeat = { backgroundImage:"linear-gradient(#16162d, #16162d), linear-gradient(135deg, #7950F2 0%, #A78BFA 100%)", backgroundOrigin:"border-box", backgroundClip:"padding-box, border-box", boxShadow:"0 20px 40px rgba(0,0,0,0.4), 0 0 20px rgba(121,80,242,0.1)", transform:"scale(1.05)", zIndex:2, border:"1px solid transparent", borderRadius:24, padding:24, position:"relative" };
   const priceFeat = { fontSize:13, color:"rgba(255,255,255,0.7)", padding:"5px 0", display:"flex", alignItems:"flex-start", gap:8 };
@@ -103,24 +104,7 @@ export default function Pricing() {
 
   return (
     <div style={{ minHeight:"100vh", background:"#0D0D1F" }}>
-      <nav style={nav}>
-        <div style={{ display:"flex", alignItems:"center", gap:9, cursor:"pointer" }} onClick={() => router.push("/")}>
-          <div style={{ width:30, height:30, background:"#7950F2", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:12, fontWeight:500 }}>Ai</div>
-          <span style={{ fontSize:15, fontWeight:500, color:"#fff" }}>Ai<span style={{ color:"#7950F2" }}>Studio</span>Brand</span>
-        </div>
-        <div style={{ display:"flex", gap:4, marginLeft:"auto", alignItems:"center" }}>
-          <button onClick={() => router.push("/")} style={{ padding:"6px 13px", borderRadius:8, fontSize:13, color:"rgba(255,255,255,0.7)", cursor:"pointer", background:"none", border:"none" }}>{lang === "en" ? "Home" : "Inicio"}</button>
-          <button onClick={() => router.push("/pricing")} style={{ padding:"6px 13px", borderRadius:8, fontSize:13, color:"#7950F2", cursor:"pointer", background:"#F3F0FF", border:"none", fontWeight:500 }}>{lang === "en" ? "Pricing" : "Precios"}</button>
-          <button onClick={() => router.push("/contacto")} style={{ padding:"6px 13px", borderRadius:8, fontSize:13, color:"rgba(255,255,255,0.7)", cursor:"pointer", background:"none", border:"none" }}>{lang === "en" ? "Contact" : "Contacto"}</button>
-          <div style={{ display:"flex", background:"rgba(255,255,255,0.06)", borderRadius:8, padding:3, gap:2, marginLeft:8 }}>
-            <button onClick={() => { setLang("es"); localStorage.setItem("lang", "es"); }} style={{ padding:"5px 10px", borderRadius:6, fontSize:12, fontWeight:500, cursor:"pointer", background: lang==="es" ? "#fff" : "transparent", border:"none", color: lang==="es" ? "#0A0A0A" : "#888" }}>ES</button>
-            <button onClick={() => { setLang("en"); localStorage.setItem("lang", "en"); }} style={{ padding:"5px 10px", borderRadius:6, fontSize:12, fontWeight:500, cursor:"pointer", background: lang==="en" ? "#fff" : "transparent", border:"none", color: lang==="en" ? "#0A0A0A" : "#888" }}>EN</button>
-          </div>
-          <button onClick={() => router.push("/login")} style={{ padding:"8px 18px", background:"#7950F2", color:"#fff", border:"none", borderRadius:8, fontSize:13, fontWeight:500, cursor:"pointer", marginLeft:4 }}>
-            {lang === "es" ? "Empieza gratis" : "Start free"}
-          </button>
-        </div>
-      </nav>
+      <MarketingNav lang={lang} setLang={setLanguage} activePage="pricing" />
 
       <div style={{ padding:"64px 32px", textAlign:"center" }}>
         <div style={{ display:"inline-block", background:"rgba(121,80,242,0.15)", color:"#A78BFA", fontSize:11, fontWeight:500, padding:"4px 12px", borderRadius:20, marginBottom:12 }}>{t.badge}</div>

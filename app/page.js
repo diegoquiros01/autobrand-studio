@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../lib/supabase";
+import MarketingNav from "./components/MarketingNav";
 
 // --- SCROLL REVEAL HOOK ---
 const useScrollReveal = () => {
@@ -79,27 +80,7 @@ export default function Landing() {
     <div style={s.container}>
       <GlobalAnimations />
 
-      {/* ═══ NAV ═══ */}
-      <nav style={s.nav}>
-        <div style={{ display:"flex", alignItems:"center", gap:10, cursor:"pointer" }} onClick={() => router.push("/")}>
-          <div style={s.logoIcon}>Ai</div>
-          <span style={s.logoText}>Ai<span style={{ color:"#A78BFA" }}>Studio</span>Brand</span>
-        </div>
-        <div style={{ display:"flex", alignItems:"center", gap:32 }}>
-          <a href="#how-it-works" style={s.navLinkUpper}>{en ? "HOW IT WORKS" : "CÓMO FUNCIONA"}</a>
-          <a href="#features" style={s.navLinkUpper}>{en ? "FEATURES" : "FUNCIONES"}</a>
-          <button onClick={() => router.push("/pricing")} style={s.navLinkUpper}>{en ? "PRICING" : "PRECIOS"}</button>
-          <button onClick={() => router.push("/contacto")} style={s.navLinkUpper}>{en ? "CONTACT" : "CONTACTO"}</button>
-        </div>
-        <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-          <div style={s.langToggle}>
-            <button onClick={() => setLanguage("en")} style={{ ...s.langBtn, ...(en ? s.langActive : {}) }}>EN</button>
-            <button onClick={() => setLanguage("es")} style={{ ...s.langBtn, ...(!en ? s.langActive : {}) }}>ES</button>
-          </div>
-          <button onClick={() => router.push("/login")} style={s.navSignin}>{en ? "Log in" : "Entrar"}</button>
-          <button className="pulse-glow" onClick={() => router.push("/login?tab=register")} style={s.navCta}>{en ? "Start free" : "Empieza gratis"}</button>
-        </div>
-      </nav>
+      <MarketingNav lang={lang} setLang={setLanguage} activePage="home" />
 
       {/* ═══ HERO — FULL VIEWPORT ═══ */}
       <section style={s.heroSection}>
@@ -359,17 +340,6 @@ const GlobalAnimations = () => (
 const s = {
   container: { backgroundColor:"#0A0A1A", color:"#fff", overflowX:"hidden" },
   section: { padding:"100px 20px", maxWidth:1100, margin:"0 auto", textAlign:"center" },
-
-  // Nav
-  nav: { display:"flex", alignItems:"center", justifyContent:"space-between", padding:"0 32px", height:64, position:"sticky", top:0, zIndex:100, background:"rgba(10,10,26,0.8)", backdropFilter:"blur(20px)", WebkitBackdropFilter:"blur(20px)", borderBottom:"1px solid rgba(255,255,255,0.05)" },
-  logoIcon: { width:30, height:30, background:"linear-gradient(135deg,#7950F2,#A78BFA)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:800, color:"#fff" },
-  logoText: { fontSize:15, fontWeight:700, letterSpacing:"-0.03em" },
-  navLinkUpper: { padding:0, background:"none", border:"none", color:"rgba(255,255,255,0.45)", fontSize:11, fontWeight:600, letterSpacing:"0.12em", cursor:"pointer", transition:"color 0.2s", textDecoration:"none" },
-  langToggle: { display:"flex", background:"rgba(255,255,255,0.06)", borderRadius:7, padding:2, gap:1, marginLeft:8 },
-  langBtn: { padding:"4px 9px", borderRadius:5, fontSize:11, fontWeight:600, cursor:"pointer", background:"transparent", border:"none", color:"rgba(255,255,255,0.35)" },
-  langActive: { background:"#fff", color:"#0A0A0A" },
-  navSignin: { padding:"7px 16px", background:"none", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, color:"rgba(255,255,255,0.6)", fontSize:13, fontWeight:500, cursor:"pointer", marginLeft:4 },
-  navCta: { padding:"8px 18px", background:"#7950F2", border:"none", borderRadius:8, color:"#fff", fontSize:13, fontWeight:600, cursor:"pointer", boxShadow:"0 2px 12px rgba(121,80,242,0.4)" },
 
   // Hero
   heroSection: { minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", position:"relative", textAlign:"center", padding:"0 24px" },
