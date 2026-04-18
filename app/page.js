@@ -28,6 +28,37 @@ const RevealSection = ({ children, style }) => {
   );
 };
 
+// --- TYPING EFFECT COMPONENT ---
+const TypingPrompt = ({ text }) => {
+  const [displayed, setDisplayed] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [charIndex, setCharIndex] = useState(0);
+
+  useEffect(() => {
+    const typeSpeed = isDeleting ? 30 : 60;
+    const pauseDelay = isDeleting ? 500 : 2000;
+
+    if (!isDeleting && charIndex === text.length) {
+      const t = setTimeout(() => setIsDeleting(true), pauseDelay);
+      return () => clearTimeout(t);
+    }
+    if (isDeleting && charIndex === 0) {
+      const t = setTimeout(() => setIsDeleting(false), pauseDelay);
+      return () => clearTimeout(t);
+    }
+
+    const t = setTimeout(() => {
+      setCharIndex(prev => prev + (isDeleting ? -1 : 1));
+      setDisplayed(text.slice(0, charIndex + (isDeleting ? -1 : 1)));
+    }, typeSpeed);
+    return () => clearTimeout(t);
+  }, [charIndex, isDeleting, text]);
+
+  return (
+    <span>{displayed}<span className="typing-cursor">|</span></span>
+  );
+};
+
 export default function Landing() {
   const router = useRouter();
   const [lang, setLang] = useState("es");
@@ -92,14 +123,32 @@ export default function Landing() {
             {en ? "AI content in 30 seconds." : "Contenido IA en 30 segundos."}
           </h1>
 
-          <p className="animate-hero" style={{ ...s.heroSub, animationDelay:"0.2s" }}>
+          {/* Prompt box with typing effect */}
+          <div className="animate-hero" style={{ animationDelay:"0.2s", maxWidth:720, margin:"0 auto 48px" }}>
+            <div style={{ background:"rgba(255,255,255,0.04)", borderRadius:16, border:"1px solid rgba(255,255,255,0.1)", overflow:"hidden", boxShadow:"0 20px 60px rgba(0,0,0,0.3)" }}>
+              <div style={{ padding:"22px 26px 40px", fontSize:16, color:"rgba(255,255,255,0.35)", textAlign:"left", lineHeight:1.6, minHeight:80 }}>
+                <TypingPrompt text={en ? "Ask AiStudioBrand to create a Post for my Instagram account..." : "Pedile a AiStudioBrand que cree un Post para mi cuenta de Instagram..."} />
+              </div>
+              <div style={{ padding:"10px 16px 14px", display:"flex", alignItems:"center", justifyContent:"space-between", borderTop:"1px solid rgba(255,255,255,0.04)" }}>
+                <div style={{ width:30, height:30, borderRadius:8, border:"1px solid rgba(255,255,255,0.1)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:16, color:"rgba(255,255,255,0.3)", cursor:"pointer" }}>+</div>
+                <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+                  <span style={{ fontSize:13, color:"rgba(255,255,255,0.35)", fontWeight:500 }}>{en ? "Create" : "Crear"} <span style={{ fontSize:10 }}>▾</span></span>
+                  <div style={{ width:30, height:30, borderRadius:"50%", background:"#7950F2", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer" }}>
+                    <span style={{ fontSize:13, color:"#fff" }}>↑</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p className="animate-hero" style={{ ...s.heroSub, animationDelay:"0.3s" }}>
             {en
               ? "The first bicultural AI that learns your brand DNA to create Instagram posts that sound exactly like you. "
               : "La primera IA bicultural que aprende tu ADN de marca para crear posts de Instagram que suenan exactamente como tú. "}
             <span style={{ color:"#fff" }}>Spanglish included.</span>
           </p>
 
-          <div className="animate-hero" style={{ ...s.ctaWrapper, animationDelay:"0.35s" }}>
+          <div className="animate-hero" style={{ ...s.ctaWrapper, animationDelay:"0.4s" }}>
             <button className="magnetic-btn" onClick={() => router.push("/login?tab=register")} style={s.mainCta}>
               {en ? "Try 20 Free Generations" : "Prueba 20 Generaciones Gratis"}
             </button>
@@ -112,60 +161,6 @@ export default function Landing() {
       <RevealSection style={{ paddingTop:0 }}>
         <div style={{ maxWidth:900, margin:"0 auto", borderRadius:20, border:"1px solid rgba(255,255,255,0.08)", overflow:"hidden", boxShadow:"0 40px 120px rgba(0,0,0,0.6), 0 0 60px rgba(121,80,242,0.06)" }}>
           <video autoPlay loop muted playsInline style={{ width:"100%", display:"block" }} src="/assets/hero-video.mp4" />
-        </div>
-      </RevealSection>
-
-      {/* ═══ PROMPT BOX + 3 STEPS ═══ */}
-      <RevealSection>
-        {/* Chat-like prompt input */}
-        <div style={{ maxWidth:700, margin:"0 auto 56px", background:"#16162d", borderRadius:16, border:"1px solid rgba(255,255,255,0.08)", overflow:"hidden", boxShadow:"0 20px 60px rgba(0,0,0,0.3)" }}>
-          <div style={{ padding:"20px 24px 12px", fontSize:15, color:"rgba(255,255,255,0.35)", textAlign:"left", lineHeight:1.6 }}>
-            {en ? "Ask AiStudioBrand to create a Post for my Instagram account..." : "Pedile a AiStudioBrand que cree un Post para mi cuenta de Instagram..."}
-          </div>
-          <div style={{ padding:"8px 16px 12px", display:"flex", alignItems:"center", justifyContent:"space-between", borderTop:"1px solid rgba(255,255,255,0.04)" }}>
-            <div style={{ width:28, height:28, borderRadius:8, border:"1px solid rgba(255,255,255,0.1)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, color:"rgba(255,255,255,0.3)", cursor:"pointer" }}>+</div>
-            <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-              <span style={{ fontSize:13, color:"rgba(255,255,255,0.35)" }}>{en ? "Create" : "Crear"} <span style={{ fontSize:10 }}>▾</span></span>
-              <div style={{ width:28, height:28, borderRadius:"50%", background:"#7950F2", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer" }}>
-                <span style={{ fontSize:12, color:"#fff" }}>↑</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* 3 Simple Steps */}
-        <div style={{ display:"flex", justifyContent:"center", gap:56, maxWidth:800, margin:"0 auto" }}>
-          {(en ? [
-            { n:"1", t:"Define your brand DNA and upload your visual references." },
-            { n:"2", t:"AiStudioBrand generates image + copy aligned to your voice." },
-            { n:"3", t:"Review, edit, and publish your Instagram post in seconds." },
-          ] : [
-            { n:"1", t:"Define tu ADN de marca y sube tus referencias visuales." },
-            { n:"2", t:"AiStudioBrand genera imagen + copy alineado a tu voz." },
-            { n:"3", t:"Revisa, edita y publica tu post de Instagram en segundos." },
-          ]).map((step, i) => (
-            <div key={i} style={{ textAlign:"center", maxWidth:200 }}>
-              <div style={{ width:36, height:36, borderRadius:10, border:"1px solid rgba(255,255,255,0.15)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, fontWeight:700, color:"rgba(255,255,255,0.6)", margin:"0 auto 14px" }}>{step.n}</div>
-              <div style={{ fontSize:14, color:"rgba(255,255,255,0.5)", lineHeight:1.55 }}>{step.t}</div>
-            </div>
-          ))}
-        </div>
-      </RevealSection>
-
-      {/* ═══ SOCIAL PROOF STRIP ═══ */}
-      <RevealSection style={{ padding:"40px 20px" }}>
-        <div style={s.proofStrip}>
-          {[
-            { n:"30s", l: en ? "to generate" : "para generar" },
-            { n:"3", l: en ? "steps" : "pasos" },
-            { n:"ES+EN", l: "bicultural" },
-            { n:"20", l: en ? "free gens" : "gratis" },
-          ].map((item, i) => (
-            <div key={i} style={{ textAlign:"center" }}>
-              <div style={s.proofNum}>{item.n}</div>
-              <div style={s.proofLabel}>{item.l}</div>
-            </div>
-          ))}
         </div>
       </RevealSection>
 
@@ -322,6 +317,7 @@ const GlobalAnimations = () => (
     @keyframes reveal { from { clip-path: inset(100% 0 0 0); opacity: 0; } to { clip-path: inset(0 0 0 0); opacity: 1; } }
     @keyframes blink { from, to { border-color: transparent } 50% { border-color: #7950F2 } }
     .reveal-animation { animation: reveal 1.5s cubic-bezier(0.19,1,0.22,1) forwards; }
+    .typing-cursor { animation: blink 0.8s step-end infinite; font-weight: 100; color: rgba(255,255,255,0.5); }
     .pulse-text { animation: pulse-glow-text 2s infinite; }
     @keyframes pulse-glow-text { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     .typing-effect { animation: typing 3s steps(40, end), blink 0.75s step-end infinite; }
