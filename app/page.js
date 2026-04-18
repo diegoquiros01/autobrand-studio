@@ -19,10 +19,10 @@ const useScrollReveal = () => {
   return [ref, isVisible];
 };
 
-const RevealSection = ({ children, style }) => {
+const RevealSection = ({ children, style, id }) => {
   const [ref, isVisible] = useScrollReveal();
   return (
-    <section ref={ref} className={isVisible ? "visible" : "hidden"} style={{ ...s.section, ...style }}>
+    <section ref={ref} id={id} className={isVisible ? "visible" : "hidden"} style={{ ...s.section, ...style }}>
       {children}
     </section>
   );
@@ -85,9 +85,13 @@ export default function Landing() {
           <div style={s.logoIcon}>Ai</div>
           <span style={s.logoText}>Ai<span style={{ color:"#A78BFA" }}>Studio</span>Brand</span>
         </div>
-        <div style={{ display:"flex", alignItems:"center", gap:6 }}>
-          <button onClick={() => router.push("/pricing")} style={s.navLink}>{en ? "Pricing" : "Precios"}</button>
-          <button onClick={() => router.push("/contacto")} style={s.navLink}>{en ? "Contact" : "Contacto"}</button>
+        <div style={{ display:"flex", alignItems:"center", gap:32 }}>
+          <a href="#how-it-works" style={s.navLinkUpper}>{en ? "HOW IT WORKS" : "CÓMO FUNCIONA"}</a>
+          <a href="#features" style={s.navLinkUpper}>{en ? "FEATURES" : "FUNCIONES"}</a>
+          <button onClick={() => router.push("/pricing")} style={s.navLinkUpper}>{en ? "PRICING" : "PRECIOS"}</button>
+          <button onClick={() => router.push("/contacto")} style={s.navLinkUpper}>{en ? "CONTACT" : "CONTACTO"}</button>
+        </div>
+        <div style={{ display:"flex", alignItems:"center", gap:8 }}>
           <div style={s.langToggle}>
             <button onClick={() => setLanguage("en")} style={{ ...s.langBtn, ...(en ? s.langActive : {}) }}>EN</button>
             <button onClick={() => setLanguage("es")} style={{ ...s.langBtn, ...(!en ? s.langActive : {}) }}>ES</button>
@@ -172,7 +176,7 @@ export default function Landing() {
       </RevealSection>
 
       {/* ═══ HOW IT WORKS ═══ */}
-      <RevealSection>
+      <RevealSection style={{ scrollMarginTop:80 }} id="how-it-works">
         <div style={s.sectionBadge}>{en ? "How it works" : "Cómo funciona"}</div>
         <h2 style={s.sectionTitle}>{en ? "From idea to post in three steps" : "De la idea al post en tres pasos"}</h2>
         <div style={s.stepsGrid}>
@@ -196,7 +200,7 @@ export default function Landing() {
       </RevealSection>
 
       {/* ═══ BENTO FEATURES ═══ */}
-      <RevealSection>
+      <RevealSection style={{ scrollMarginTop:80 }} id="features">
         <div style={s.sectionBadge}>{en ? "Features" : "Funcionalidades"}</div>
         <h2 style={s.sectionTitle}>{en ? "Built for creators who mean business" : "Hecho para creadoras que van en serio"}</h2>
         <div style={{ display:"grid", gridTemplateColumns:"repeat(2, 1fr)", gap:16, textAlign:"left" }}>
@@ -344,6 +348,8 @@ const GlobalAnimations = () => (
     @keyframes pulse-glow-text { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     .typing-effect { animation: typing 3s steps(40, end), blink 0.75s step-end infinite; }
     .progress-fill { width:0%; height:100%; background:linear-gradient(90deg,#7950F2,#A78BFA); border-radius:4px; animation: typing 3s ease-in-out forwards; }
+    html { scroll-behavior: smooth; }
+    nav a:hover, nav button.nav-upper:hover { color: rgba(255,255,255,0.9) !important; }
     .card-hover { transition: all 0.3s cubic-bezier(0.4,0,0.2,1); cursor: pointer; }
     .card-hover:hover { transform: translateY(-6px); border-color: rgba(121,80,242,0.4) !important; box-shadow: 0 20px 50px rgba(0,0,0,0.4); }
   `}</style>
@@ -358,7 +364,7 @@ const s = {
   nav: { display:"flex", alignItems:"center", justifyContent:"space-between", padding:"0 32px", height:64, position:"sticky", top:0, zIndex:100, background:"rgba(10,10,26,0.8)", backdropFilter:"blur(20px)", WebkitBackdropFilter:"blur(20px)", borderBottom:"1px solid rgba(255,255,255,0.05)" },
   logoIcon: { width:30, height:30, background:"linear-gradient(135deg,#7950F2,#A78BFA)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:800, color:"#fff" },
   logoText: { fontSize:15, fontWeight:700, letterSpacing:"-0.03em" },
-  navLink: { padding:"8px 16px", background:"none", border:"none", color:"rgba(255,255,255,0.7)", fontSize:14, fontWeight:500, letterSpacing:"0.02em", cursor:"pointer", borderRadius:8, transition:"all 0.2s" },
+  navLinkUpper: { padding:0, background:"none", border:"none", color:"rgba(255,255,255,0.45)", fontSize:11, fontWeight:600, letterSpacing:"0.12em", cursor:"pointer", transition:"color 0.2s", textDecoration:"none" },
   langToggle: { display:"flex", background:"rgba(255,255,255,0.06)", borderRadius:7, padding:2, gap:1, marginLeft:8 },
   langBtn: { padding:"4px 9px", borderRadius:5, fontSize:11, fontWeight:600, cursor:"pointer", background:"transparent", border:"none", color:"rgba(255,255,255,0.35)" },
   langActive: { background:"#fff", color:"#0A0A0A" },
