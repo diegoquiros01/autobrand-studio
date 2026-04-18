@@ -220,7 +220,7 @@ function ADNContent() {
 
       <div style={{ background: D.bg, minHeight: "calc(100vh - 64px)", paddingBottom: 100 }}>
         {/* Header with stepper */}
-        <div style={{ position: "relative", overflow: "hidden", background: "linear-gradient(180deg, #1a0a2e 0%, " + D.bg + " 100%)", padding: "36px 24px 40px" }}>
+        <div style={{ position: "relative", overflow: "hidden", background: "linear-gradient(180deg, #1a0a2e 0%, " + D.bg + " 100%)", padding: "44px 24px 40px" }}>
           {/* Orbs */}
           <div className="orb-1" style={{ position: "absolute", top: "-20%", left: "15%", width: 280, height: 280, borderRadius: "50%", background: "radial-gradient(circle, rgba(121,80,242,0.4) 0%, transparent 70%)", filter: "blur(60px)", pointerEvents: "none" }} />
           <div className="orb-2" style={{ position: "absolute", top: "0%", right: "5%", width: 220, height: 220, borderRadius: "50%", background: "radial-gradient(circle, rgba(230,73,128,0.2) 0%, transparent 70%)", filter: "blur(60px)", pointerEvents: "none" }} />
@@ -544,9 +544,9 @@ function ADNContent() {
         </div>
       </div>
 
-      {/* ═══ STICKY FOOTER ═══ */}
-      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 50, background: "rgba(10,10,26,0.95)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderTop: "1px solid " + D.border }}>
-        <div style={{ maxWidth: 760, margin: "0 auto", padding: "14px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      {/* ═══ STICKY FOOTER (respects sidebar) ═══ */}
+      <div className="adn-footer" style={{ position: "fixed", bottom: 0, left: 260, right: 0, zIndex: 45, background: "rgba(10,10,26,0.95)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderTop: "1px solid " + D.border }}>
+        <div style={{ maxWidth: 760, margin: "0 auto", padding: "12px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ fontSize: 12, color: D.text3, letterSpacing: "-0.02em", minWidth: 160 }}>
             {saveStatus === "saving" && <span style={{ color: D.purpleLight }}>💾 Guardando cambios...</span>}
             {saveStatus === "saved" && <span style={{ color: "#40C057" }}>✓ Cambios guardados</span>}
@@ -585,6 +585,9 @@ function ADNContent() {
         @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
         .input-focus:focus { border-color: #7950F2 !important; box-shadow: 0 0 0 2px rgba(121,80,242,0.15); }
         .glow-btn:hover { transform: scale(1.02); box-shadow: 0 12px 40px rgba(64,192,87,0.5), 0 0 80px rgba(64,192,87,0.2) !important; }
+        @media (max-width: 768px) {
+          .adn-footer { left: 0 !important; }
+        }
       `}</style>
     </AppLayout>
   );
