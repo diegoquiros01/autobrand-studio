@@ -99,16 +99,23 @@ export default function Landing() {
 
       {/* ═══ HERO — FULL VIEWPORT ═══ */}
       <section style={s.heroSection}>
-        {/* Animated gradient background */}
-        <div style={{ position:"absolute", inset:0, background:"radial-gradient(ellipse 80% 50% at 50% -20%, rgba(121,80,242,0.25) 0%, transparent 50%), radial-gradient(ellipse 60% 40% at 80% 60%, rgba(230,73,128,0.08) 0%, transparent 50%), radial-gradient(ellipse 50% 30% at 10% 80%, rgba(167,139,250,0.06) 0%, transparent 50%)", zIndex:0 }} />
-        {/* Slow moving orbs */}
-        <div className="orb-1" style={{ position:"absolute", top:"15%", left:"20%", width:300, height:300, borderRadius:"50%", background:"rgba(121,80,242,0.08)", filter:"blur(80px)", pointerEvents:"none", zIndex:0 }} />
-        <div className="orb-2" style={{ position:"absolute", bottom:"10%", right:"15%", width:250, height:250, borderRadius:"50%", background:"rgba(230,73,128,0.06)", filter:"blur(70px)", pointerEvents:"none", zIndex:0 }} />
-        <div className="orb-3" style={{ position:"absolute", top:"60%", left:"60%", width:200, height:200, borderRadius:"50%", background:"rgba(167,139,250,0.05)", filter:"blur(60px)", pointerEvents:"none", zIndex:0 }} />
-        {/* Grid overlay */}
-        <div style={{ position:"absolute", inset:0, backgroundImage:"linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px)", backgroundSize:"40px 40px", maskImage:"radial-gradient(ellipse 70% 50% at 50% 40%, black, transparent)", WebkitMaskImage:"radial-gradient(ellipse 70% 50% at 50% 40%, black, transparent)", pointerEvents:"none", zIndex:0 }} />
-        {/* Horizon line glow */}
-        <div style={{ position:"absolute", top:"50%", left:0, right:0, height:1, background:"linear-gradient(90deg, transparent 5%, rgba(121,80,242,0.15) 30%, rgba(167,139,250,0.2) 50%, rgba(121,80,242,0.15) 70%, transparent 95%)", zIndex:0 }} />
+        {/* Vibrant gradient mesh background (Lovable-style) */}
+        <div style={{ position:"absolute", inset:0, zIndex:0, overflow:"hidden" }}>
+          {/* Base warm gradient */}
+          <div style={{ position:"absolute", inset:0, background:"linear-gradient(180deg, #1a0a2e 0%, #0A0A1A 100%)" }} />
+          {/* Large purple blob — center top */}
+          <div className="orb-1" style={{ position:"absolute", top:"-10%", left:"30%", width:"60%", height:"60%", borderRadius:"50%", background:"radial-gradient(circle, rgba(121,80,242,0.7) 0%, rgba(121,80,242,0) 70%)", filter:"blur(60px)", pointerEvents:"none" }} />
+          {/* Pink/magenta blob — right */}
+          <div className="orb-2" style={{ position:"absolute", top:"20%", right:"-5%", width:"50%", height:"50%", borderRadius:"50%", background:"radial-gradient(circle, rgba(230,73,128,0.5) 0%, rgba(230,73,128,0) 70%)", filter:"blur(80px)", pointerEvents:"none" }} />
+          {/* Violet blob — left */}
+          <div className="orb-3" style={{ position:"absolute", top:"30%", left:"-10%", width:"45%", height:"50%", borderRadius:"50%", background:"radial-gradient(circle, rgba(167,139,250,0.45) 0%, rgba(167,139,250,0) 70%)", filter:"blur(70px)", pointerEvents:"none" }} />
+          {/* Deep purple blob — bottom center */}
+          <div style={{ position:"absolute", bottom:"-5%", left:"20%", width:"60%", height:"40%", borderRadius:"50%", background:"radial-gradient(circle, rgba(88,40,200,0.5) 0%, rgba(88,40,200,0) 70%)", filter:"blur(80px)", pointerEvents:"none" }} />
+          {/* Warm accent — bottom right */}
+          <div style={{ position:"absolute", bottom:"5%", right:"10%", width:"35%", height:"35%", borderRadius:"50%", background:"radial-gradient(circle, rgba(245,101,101,0.25) 0%, rgba(245,101,101,0) 70%)", filter:"blur(60px)", pointerEvents:"none" }} />
+          {/* Light wash — top center for readability */}
+          <div style={{ position:"absolute", top:"15%", left:"25%", width:"50%", height:"30%", borderRadius:"50%", background:"radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 70%)", filter:"blur(40px)", pointerEvents:"none" }} />
+        </div>
         <div style={s.contentWrapper}>
           <div className="animate-hero" style={{ ...s.heroBadge, backdropFilter:"blur(10px)", WebkitBackdropFilter:"blur(10px)" }}>
             <span style={{ fontSize:16 }}>🧠</span>
