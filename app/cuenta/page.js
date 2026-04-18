@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../lib/supabase";
+import AppLayout from "../components/AppLayout";
 
 export default function Cuenta() {
   const router = useRouter();
@@ -23,11 +24,15 @@ export default function Cuenta() {
 
   useEffect(() => {
     const init = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { router.push("/login"); return; }
-      setUser(user);
-      const { data } = await supabase.from("profiles").select("*").eq("id", user.id).single();
-      setProfile(data);
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) { router.push("/login"); return; }
+        setUser(user);
+        const { data } = await supabase.from("profiles").select("*").eq("id", user.id).single();
+        setProfile(data);
+      } catch (e) {
+        router.push("/login");
+      }
       setLoading(false);
     };
     init();
@@ -52,19 +57,7 @@ export default function Cuenta() {
   const genPct = Math.min((genUsed / planInfo.limit) * 100, 100);
 
   return (
-    <div style={{ minHeight:"100vh", background:D.bg }}>
-      <nav style={{ display:"flex", alignItems:"center", padding:"0 28px", height:60, borderBottom:"1px solid " + D.border, background:D.bg2 }}>
-        <div style={{ display:"flex", alignItems:"center", gap:10, cursor:"pointer" }} onClick={() => router.push("/")}>
-          <div style={{ width:32, height:32, background:D.purple, borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:500, fontSize:13 }}>Ai</div>
-          <span style={{ fontSize:16, fontWeight:500, color:D.text }}>Ai<span style={{ color:D.purpleLight }}>Studio</span>Brand</span>
-        </div>
-        <div style={{ display:"flex", gap:8, marginLeft:"auto", alignItems:"center" }}>
-          <button onClick={() => router.push("/crear")} style={{ padding:"7px 14px", borderRadius:8, fontSize:13, color:D.text2, cursor:"pointer", background:"none", border:"none" }}>Generador</button>
-          <button onClick={() => router.push("/biblioteca")} style={{ padding:"7px 14px", borderRadius:8, fontSize:13, color:D.text2, cursor:"pointer", background:"none", border:"none" }}>Biblioteca</button>
-          <button onClick={handleLogout} style={{ padding:"7px 14px", borderRadius:8, fontSize:12, color:"rgba(255,255,255,0.3)", cursor:"pointer", background:"none", border:"1px solid rgba(255,255,255,0.08)" }}>Salir</button>
-        </div>
-      </nav>
-
+    <AppLayout>
       <div style={{ maxWidth:600, margin:"0 auto", padding:"40px 24px" }}>
         <h1 style={{ fontSize:26, fontWeight:500, color:D.text, marginBottom:6, letterSpacing:"-0.02em" }}>Mi cuenta</h1>
         <p style={{ fontSize:14, color:D.text2, marginBottom:32 }}>Gestiona tu suscripción y uso</p>
@@ -133,6 +126,6 @@ export default function Cuenta() {
           Cerrar sesión
         </button>
       </div>
-    </div>
+    </AppLayout>
   );
 }

@@ -330,8 +330,11 @@ function CrearContent() {
     <AppLayout>
       <style>{`
         @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+        @media (max-width: 768px) {
+          .crear-grid { grid-template-columns: 1fr !important; height: auto !important; }
+        }
       `}</style>
-      <div style={{ display:"grid", gridTemplateColumns:"minmax(400px, 480px) 1fr", height:"calc(100vh - 56px)" }}>
+      <div className="crear-grid" style={{ display:"grid", gridTemplateColumns:"minmax(340px, 480px) 1fr", height:"calc(100vh - 56px)" }}>
         {/* ═══ LEFT: EDITOR PANEL ═══ */}
         <div style={{ padding:"28px 24px", borderRight:"1px solid rgba(255,255,255,0.06)", overflowY:"auto", background:"#0D0D1F" }}>
           <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:16 }}>

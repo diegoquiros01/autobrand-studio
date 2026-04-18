@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../lib/supabase";
+import AppLayout from "../components/AppLayout";
 
 export default function Resultado() {
   const router = useRouter();
@@ -41,35 +42,22 @@ export default function Resultado() {
     setLoadingImg(false);
   };
 
-  const navStyle = { display:"flex", alignItems:"center", padding:"0 28px", height:60, borderBottom:"1px solid #F0F0F0", background:"#fff", gap:8, position:"sticky", top:0, zIndex:100 };
-  const logoIcon = { width:32, height:32, background:"linear-gradient(135deg,#7950F2,#4C6EF5)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:500, fontSize:13 };
-
   return (
-    <div style={{ minHeight:"100vh", background:"#fff" }}>
-      <nav style={navStyle}>
-        <div style={{ display:"flex", alignItems:"center", gap:10, cursor:"pointer" }} onClick={() => router.push("/")}>
-          <div style={logoIcon}>Ai</div>
-          <span style={{ fontSize:16, fontWeight:500, color:"#0A0A0A" }}>Ai<span style={{ color:"#7950F2" }}>Studio</span>Brand</span>
-        </div>
-        <button onClick={() => router.push("/")} style={{ marginLeft:"auto", padding:"7px 16px", background:"#fff", color:"#0A0A0A", border:"1.5px solid #E0E0E0", borderRadius:8, fontSize:13.5, fontWeight:500, cursor:"pointer" }}>
-          Volver
-        </button>
-      </nav>
-
-      <div style={{ maxWidth:860, margin:"0 auto", padding:"40px 28px" }}>
-        <h1 style={{ fontSize:26, fontWeight:500, color:"#0A0A0A", marginBottom:6, letterSpacing:"-0.02em" }}>Resultado generado</h1>
-        <p style={{ fontSize:14, color:"#888", marginBottom:32 }}>
+    <AppLayout>
+      <div style={{ padding: "32px 28px", maxWidth: 900, margin: "0 auto" }}>
+        <h1 style={{ fontSize: 24, fontWeight: 700, color: "#fff", marginBottom: 6, letterSpacing: "-0.02em" }}>Resultado generado</h1>
+        <p style={{ fontSize: 14, color: "rgba(255,255,255,0.5)", marginBottom: 32 }}>
           {brandProfile ? brandProfile.nombre + " · " + brandProfile.tono : "AiStudioBrand"}
         </p>
 
-        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:28, alignItems:"start" }}>
+        <div className="resultado-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 28, alignItems: "start" }}>
           <div>
             {imagen ? (
               <div>
                 <img
                   src={"data:" + imagen.mimeType + ";base64," + imagen.image}
                   alt="Imagen generada"
-                  style={{ width:"100%", borderRadius:16, display:"block", border:"1.5px solid #EAEAEA" }}
+                  style={{ width: "100%", borderRadius: 16, display: "block", border: "1px solid rgba(255,255,255,0.1)" }}
                 />
                 <button
                   onClick={() => {
@@ -78,30 +66,30 @@ export default function Resultado() {
                     a.download = "aistudiobrand.png";
                     a.click();
                   }}
-                  style={{ display:"block", width:"100%", marginTop:10, padding:"11px", background:"#F5F5F5", color:"#333", border:"1.5px solid #E0E0E0", borderRadius:9, textAlign:"center", fontSize:13.5, fontWeight:500, cursor:"pointer" }}
+                  style={{ display: "block", width: "100%", marginTop: 10, padding: 12, background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.7)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, textAlign: "center", fontSize: 13, fontWeight: 600, cursor: "pointer" }}
                 >
                   Descargar imagen
                 </button>
               </div>
             ) : (
               <div>
-                <div style={{ background:"linear-gradient(135deg,#F3F0FF,#EBF4FF)", borderRadius:16, aspectRatio:"1", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", border:"1.5px solid #E8E8E8" }}>
-                  <div style={{ fontSize:40, marginBottom:10, opacity:0.3 }}>◉</div>
-                  <div style={{ fontSize:14, color:"#888" }}>
+                <div style={{ background: "linear-gradient(135deg,rgba(121,80,242,0.12),rgba(230,73,128,0.08))", borderRadius: 16, aspectRatio: "1", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", border: "1px solid rgba(255,255,255,0.08)" }}>
+                  <div style={{ fontSize: 40, marginBottom: 10, opacity: 0.2, color: "#A78BFA" }}>◉</div>
+                  <div style={{ fontSize: 14, color: "rgba(255,255,255,0.4)" }}>
                     {loadingImg ? "Generando con Gemini..." : "La imagen aparecerá aquí"}
                   </div>
                 </div>
                 <button
                   onClick={generarImagen}
                   disabled={loadingImg}
-                  style={{ width:"100%", marginTop:10, padding:14, background:loadingImg ? "#C5B8FB" : "linear-gradient(135deg,#E64980,#7950F2)", color:"#fff", border:"none", borderRadius:10, fontSize:14, fontWeight:500, cursor:loadingImg ? "not-allowed" : "pointer" }}
+                  style={{ width: "100%", marginTop: 10, padding: 14, background: loadingImg ? "rgba(121,80,242,0.4)" : "linear-gradient(135deg,#7950F2,#A78BFA)", color: "#fff", border: "none", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: loadingImg ? "not-allowed" : "pointer", boxShadow: "0 4px 14px rgba(121,80,242,0.3)" }}
                 >
                   {loadingImg ? "Generando con Gemini..." : "Generar imagen con IA"}
                 </button>
               </div>
             )}
             {error && (
-              <div style={{ marginTop:10, padding:12, background:"#FEF2F2", border:"1px solid #FCA5A5", borderRadius:9, color:"#DC2626", fontSize:13 }}>
+              <div style={{ marginTop: 10, padding: 12, background: "rgba(220,38,38,0.1)", border: "1px solid rgba(220,38,38,0.3)", borderRadius: 10, color: "#FCA5A5", fontSize: 13 }}>
                 {error}
               </div>
             )}
@@ -109,32 +97,32 @@ export default function Resultado() {
 
           <div>
             {propuesta ? (
-              <div style={{ background:"#fff", border:"1.5px solid #EAEAEA", borderRadius:14, padding:24, boxShadow:"0 2px 8px rgba(0,0,0,0.04)" }}>
-                <div style={{ marginBottom:18, paddingBottom:18, borderBottom:"1px solid #F0F0F0" }}>
-                  <div style={{ fontSize:11, fontWeight:500, color:"#9775FA", textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:7 }}>Hook</div>
-                  <div style={{ fontSize:16, fontWeight:500, color:"#0A0A0A", lineHeight:1.5 }}>{propuesta.hook}</div>
+              <div style={{ background: "#16162D", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 16, padding: 24 }}>
+                <div style={{ marginBottom: 18, paddingBottom: 18, borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: "#A78BFA", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 7 }}>Hook</div>
+                  <div style={{ fontSize: 16, fontWeight: 600, color: "#fff", lineHeight: 1.5 }}>{propuesta.hook}</div>
                 </div>
-                <div style={{ marginBottom:18, paddingBottom:18, borderBottom:"1px solid #F0F0F0" }}>
-                  <div style={{ fontSize:11, fontWeight:500, color:"#9775FA", textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:7 }}>Copy</div>
-                  <div style={{ fontSize:13.5, color:"#555", lineHeight:1.7 }}>{propuesta.copy}</div>
+                <div style={{ marginBottom: 18, paddingBottom: 18, borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: "#A78BFA", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 7 }}>Copy</div>
+                  <div style={{ fontSize: 14, color: "rgba(255,255,255,0.6)", lineHeight: 1.7 }}>{propuesta.copy}</div>
                 </div>
                 <div>
-                  <div style={{ fontSize:11, fontWeight:500, color:"#9775FA", textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:7 }}>CTA</div>
-                  <div style={{ fontSize:14, color:"#7950F2", fontWeight:500 }}>{propuesta.cta}</div>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: "#A78BFA", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 7 }}>CTA</div>
+                  <div style={{ fontSize: 14, color: "#7950F2", fontWeight: 600 }}>{propuesta.cta}</div>
                 </div>
-                <div style={{ display:"flex", gap:8, marginTop:20 }}>
-                  <button onClick={() => router.push("/")} style={{ flex:1, padding:10, border:"1.5px solid #E0E0E0", borderRadius:8, fontSize:13, fontWeight:500, cursor:"pointer", background:"#fff", color:"#333" }}>
+                <div style={{ display: "flex", gap: 8, marginTop: 20 }}>
+                  <button onClick={() => router.push("/crear")} style={{ flex: 1, padding: 11, border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: "pointer", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.6)" }}>
                     Nueva propuesta
                   </button>
-                  <button style={{ flex:1, padding:10, border:"none", borderRadius:8, fontSize:13, fontWeight:500, cursor:"pointer", background:"#7950F2", color:"#fff" }}>
+                  <button style={{ flex: 1, padding: 11, border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", background: "#7950F2", color: "#fff" }}>
                     Publicar
                   </button>
                 </div>
               </div>
             ) : (
-              <div style={{ background:"#F9F9F9", border:"1.5px solid #EAEAEA", borderRadius:14, padding:24, textAlign:"center", color:"#888" }}>
-                <p style={{ marginBottom:12 }}>No hay propuesta seleccionada.</p>
-                <button onClick={() => router.push("/")} style={{ padding:"10px 20px", background:"#7950F2", color:"#fff", border:"none", borderRadius:8, cursor:"pointer", fontSize:13, fontWeight:500 }}>
+              <div style={{ background: "#16162D", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 16, padding: 24, textAlign: "center" }}>
+                <p style={{ marginBottom: 12, color: "rgba(255,255,255,0.4)" }}>No hay propuesta seleccionada.</p>
+                <button onClick={() => router.push("/crear")} style={{ padding: "11px 24px", background: "#7950F2", color: "#fff", border: "none", borderRadius: 10, cursor: "pointer", fontSize: 13, fontWeight: 700 }}>
                   Ir al generador
                 </button>
               </div>
@@ -142,6 +130,11 @@ export default function Resultado() {
           </div>
         </div>
       </div>
-    </div>
+      <style>{`
+        @media (max-width: 768px) {
+          .resultado-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
+    </AppLayout>
   );
 }
