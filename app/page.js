@@ -64,6 +64,8 @@ export default function Landing() {
   const router = useRouter();
   const [lang, setLang] = useState("es");
   const [email, setEmail] = useState("");
+  const [videoMuted, setVideoMuted] = useState(true);
+  const videoRef = useRef(null);
 
   useEffect(() => {
     const saved = localStorage.getItem("lang");
@@ -151,8 +153,22 @@ export default function Landing() {
 
       {/* ═══ VIDEO DEMO ═══ */}
       <RevealSection style={{ paddingTop:0 }}>
-        <div style={{ maxWidth:900, margin:"0 auto", borderRadius:20, border:"1px solid rgba(255,255,255,0.08)", overflow:"hidden", boxShadow:"0 40px 120px rgba(0,0,0,0.6), 0 0 60px rgba(121,80,242,0.06)" }}>
-          <video autoPlay loop muted playsInline style={{ width:"100%", display:"block" }} src="/assets/hero-video.mp4" />
+        <div style={{ maxWidth:900, margin:"0 auto", borderRadius:20, border:"1px solid rgba(255,255,255,0.08)", overflow:"hidden", boxShadow:"0 40px 120px rgba(0,0,0,0.6), 0 0 60px rgba(121,80,242,0.06)", position:"relative" }}>
+          <video ref={videoRef} autoPlay loop muted={videoMuted} playsInline style={{ width:"100%", display:"block" }} src="/assets/hero-video.mp4" />
+          <button
+            onClick={() => {
+              const next = !videoMuted;
+              setVideoMuted(next);
+              if (videoRef.current) videoRef.current.muted = next;
+            }}
+            style={{ position:"absolute", bottom:16, right:16, width:40, height:40, borderRadius:"50%", background:"rgba(0,0,0,0.6)", backdropFilter:"blur(8px)", WebkitBackdropFilter:"blur(8px)", border:"1px solid rgba(255,255,255,0.15)", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", transition:"all 0.2s", zIndex:2 }}
+          >
+            {videoMuted ? (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+            ) : (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+            )}
+          </button>
         </div>
       </RevealSection>
 
