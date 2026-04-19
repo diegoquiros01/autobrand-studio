@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@supabase/supabase-js";
+import { checkRateLimit } from "../../../lib/rateLimit";
 
 const client = new Anthropic();
 const supabase = createClient(
@@ -10,6 +11,8 @@ const supabase = createClient(
 const LIMITS = { free: 20, professional: 200, enterprise: 1000 };
 
 export async function POST(request) {
+  const { allowed } = checkRateLimit(request, 20);
+  if (!allowed) return Response.json({ error: "Demasiadas solicitudes. Espera un momento." }, { status: 429 });
   try {
     const { prompt, tipo, brandProfile, userId, idiomapieza } = await request.json();
 

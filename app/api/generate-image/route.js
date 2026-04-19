@@ -1,6 +1,7 @@
 import { GoogleGenAI } from "@google/genai";
 import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@supabase/supabase-js";
+import { checkRateLimit } from "../../../lib/rateLimit";
 
 export const maxDuration = 120;
 
@@ -232,6 +233,9 @@ function buildLegacyPrompt(prompt, brandProfile, referencias, talentos, editedCo
 
 // ─── Main handler ───
 export async function POST(request) {
+  const { allowed } = checkRateLimit(request, 10);
+  if (!allowed) return Response.json({ error: "Demasiadas solicitudes. Espera un momento." }, { status: 429 });
+
   const { prompt, brandProfile, referencias, talentos, editedCopy, userId, idiomapieza, formato } = await request.json();
 
   // ─── Rate limiting (unchanged) ───

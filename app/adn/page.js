@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef, useCallback, Suspense } from "react";
+import { useState, useEffect, useRef, useCallback, memo, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "../../lib/supabase";
 import AppLayout from "../components/AppLayout";
@@ -17,6 +17,22 @@ const tonos = ["Empoderador","Cercano","Profesional","Divertido","Inspiracional"
 const idiomas = ["Español","Inglés","Spanglish"];
 const cats = ["Coaching","Lifestyle","Moda","Belleza","Negocio","Motivación","Educación","Fitness","Recetas","Familia"];
 const presetColors = ["#FF6B35","#7950F2","#E64980","#FFD93D","#40C057","#1971C2","#F8F9FA","#0A0A0A"];
+
+// Memoized input to prevent full-page re-renders on each keystroke
+const MemoInput = memo(function MemoInput({ value, onChange, placeholder, style, type = "input", minHeight }) {
+  const inpStyle = {
+    width: "100%",
+    backgroundColor: value && value.toString().trim() ? "rgba(121,80,242,0.06)" : D.bg3,
+    border: "1px solid " + (value && value.toString().trim() ? "rgba(121,80,242,0.3)" : D.border),
+    borderRadius: 10, padding: "12px 16px", fontSize: 14, color: D.text,
+    outline: "none", transition: "all 0.3s ease", fontFamily: "Inter, sans-serif",
+    letterSpacing: "-0.02em", ...(style || {}),
+  };
+  if (type === "textarea") {
+    return <textarea className="input-focus" style={{ ...inpStyle, minHeight: minHeight || 80, resize: "none" }} placeholder={placeholder} value={value} onChange={e => onChange(e.target.value)} />;
+  }
+  return <input className="input-focus" style={inpStyle} placeholder={placeholder} value={value} onChange={e => onChange(e.target.value)} />;
+});
 
 const STEPS = [
   { n: 1, title: "Conexión y Análisis IA", sub: "Conecta tus canales y deja que Claude construya tu ADN" },

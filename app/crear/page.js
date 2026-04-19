@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "../../lib/supabase";
+import { saveImage } from "../../lib/imageStore";
 import AppLayout from "../components/AppLayout";
 
 const TIPOS = ["Comercial","Branding","Educativo","Storytelling","Promocional","Posicionamiento"];
@@ -147,6 +148,8 @@ function CrearContent() {
         const newVersion = { image: data.image, mimeType: data.mimeType, feedback: feedbackText, timestamp: new Date().toLocaleTimeString() };
         setVersiones(prev => { const updated = [...prev, newVersion]; setVersionActiva(updated.length - 1); return updated; });
         setFeedback("");
+        // Store in IndexedDB to avoid localStorage overflow
+        saveImage("latest-" + Date.now(), { image: data.image, mimeType: data.mimeType }).catch(() => {});
       } else setError("No se pudo generar la imagen. Intenta de nuevo.");
     } catch(e) { setError("Error generando imagen: " + e.message); }
     clearInterval(iv); setGenProgress(100); setGeneratingImg(false); setGenMsg("");
