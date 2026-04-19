@@ -98,15 +98,23 @@ export default function Contacto() {
   const inp = { width:"100%", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, padding:"11px 13px", fontSize:14, background:"#0A0A18", color:"#fff", outline:"none" };
 
   return (
-    <div style={{ minHeight:"100vh", background:"#0D0D1F" }}>
+    <div style={{ minHeight:"100vh", background:"#0A0A1A" }}>
       <MarketingNav lang={lang} setLang={setLanguage} activePage="contact" />
 
-      <div style={{ maxWidth:960, margin:"0 auto", padding:"64px 32px" }}>
-        <div style={{ textAlign:"center", marginBottom:52 }}>
-          <div style={{ display:"inline-block", background:"rgba(121,80,242,0.15)", color:"#A78BFA", fontSize:11, fontWeight:500, padding:"4px 12px", borderRadius:20, marginBottom:12 }}>{t.badge}</div>
-          <h1 style={{ fontSize:38, fontWeight:500, color:"#fff", letterSpacing:"-0.03em", marginBottom:10 }}>{t.title}</h1>
-          <p style={{ fontSize:15, color:"rgba(255,255,255,0.5)", maxWidth:480, margin:"0 auto" }}>{t.sub}</p>
+      {/* Hero with gradient mesh */}
+      <div style={{ position:"relative", overflow:"hidden", padding:"80px 32px 60px", textAlign:"center" }}>
+        <div style={{ position:"absolute", inset:0, background:"linear-gradient(180deg, #1a0a2e 0%, #0A0A1A 100%)" }} />
+        <div style={{ position:"absolute", top:"-10%", left:"30%", width:"50%", height:"60%", borderRadius:"50%", background:"radial-gradient(circle, rgba(121,80,242,0.5) 0%, transparent 70%)", filter:"blur(60px)", pointerEvents:"none" }} />
+        <div style={{ position:"absolute", top:"20%", right:"5%", width:"40%", height:"50%", borderRadius:"50%", background:"radial-gradient(circle, rgba(230,73,128,0.3) 0%, transparent 70%)", filter:"blur(70px)", pointerEvents:"none" }} />
+        <div style={{ position:"absolute", bottom:"0%", left:"10%", width:"35%", height:"40%", borderRadius:"50%", background:"radial-gradient(circle, rgba(167,139,250,0.25) 0%, transparent 70%)", filter:"blur(60px)", pointerEvents:"none" }} />
+        <div style={{ position:"relative", zIndex:1 }}>
+          <div style={{ display:"inline-block", background:"rgba(121,80,242,0.15)", border:"1px solid rgba(121,80,242,0.2)", color:"#A78BFA", fontSize:11, fontWeight:600, padding:"5px 14px", borderRadius:20, marginBottom:16 }}>{t.badge}</div>
+          <h1 style={{ fontSize:42, fontWeight:800, color:"#fff", letterSpacing:"-0.04em", marginBottom:10 }}>{t.title}</h1>
+          <p style={{ fontSize:16, color:"rgba(255,255,255,0.5)", maxWidth:480, margin:"0 auto" }}>{t.sub}</p>
         </div>
+      </div>
+
+      <div style={{ maxWidth:960, margin:"0 auto", padding:"0 32px 64px" }}>
 
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:40, alignItems:"start" }}>
           <div>
@@ -155,7 +163,7 @@ export default function Contacto() {
               <h3 style={{ fontSize:16, fontWeight:500, color:"#fff", marginBottom:20 }}>{t.infoTitle}</h3>
               {t.infoItems.map((item, i) => (
                 <div key={i} style={{ display:"flex", alignItems:"center", gap:14, marginBottom:18 }}>
-                  <div style={{ width:38, height:38, background:"#F3F0FF", borderRadius:9, display:"flex", alignItems:"center", justifyContent:"center", color:"#7950F2", fontSize:16, flexShrink:0 }}>{item.icon}</div>
+                  <div style={{ width:38, height:38, background:"rgba(121,80,242,0.15)", border:"1px solid rgba(121,80,242,0.2)", borderRadius:9, display:"flex", alignItems:"center", justifyContent:"center", color:"#A78BFA", fontSize:16, flexShrink:0 }}>{item.icon}</div>
                   <div>
                     <div style={{ fontSize:11, fontWeight:500, color:"rgba(255,255,255,0.4)", textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:2 }}>{item.label}</div>
                     <div style={{ fontSize:13.5, color:"#fff", fontWeight:500 }}>{item.value}</div>
@@ -167,7 +175,7 @@ export default function Contacto() {
             <div style={{ background:"#16162d", border:"1px solid rgba(255,255,255,0.1)", borderRadius:16, padding:28 }}>
               <h3 style={{ fontSize:16, fontWeight:500, color:"#fff", marginBottom:16 }}>{t.faqTitle}</h3>
               {t.faqs.map((faq, i) => (
-                <div key={i} style={{ borderBottom: i < t.faqs.length - 1 ? "0.5px solid #F0F0F0" : "none" }}>
+                <div key={i} style={{ borderBottom: i < t.faqs.length - 1 ? "1px solid rgba(255,255,255,0.06)" : "none" }}>
                   <button onClick={() => setOpenFaq(openFaq === i ? null : i)} style={{ width:"100%", padding:"13px 0", display:"flex", alignItems:"center", justifyContent:"space-between", background:"none", border:"none", cursor:"pointer", textAlign:"left" }}>
                     <span style={{ fontSize:13.5, fontWeight:500, color:"#fff" }}>{faq.q}</span>
                     <span style={{ fontSize:16, color:"rgba(255,255,255,0.4)", transform: openFaq === i ? "rotate(45deg)" : "none", transition:"transform 0.15s", flexShrink:0 }}>+</span>
@@ -182,13 +190,13 @@ export default function Contacto() {
         </div>
       </div>
 
-      <div style={{ padding:32, borderTop:"0.5px solid #F0F0F0", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+      <footer style={{ padding:"24px 32px", borderTop:"1px solid rgba(255,255,255,0.06)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
         <div style={{ display:"flex", alignItems:"center", gap:9 }}>
-          <div style={{ width:26, height:26, background:"#7950F2", borderRadius:7, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:11, fontWeight:500 }}>Ai</div>
-          <span style={{ fontSize:13, fontWeight:500, color:"#fff" }}>Ai<span style={{ color:"#7950F2" }}>Studio</span>Brand</span>
+          <div style={{ width:24, height:24, background:"#7950F2", borderRadius:6, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:9, fontWeight:800 }}>Ai</div>
+          <span style={{ fontSize:12, color:"rgba(255,255,255,0.25)" }}>AiStudioBrand</span>
         </div>
-        <div style={{ fontSize:12, color:"rgba(255,255,255,0.25)" }}>2025 AiStudioBrand.</div>
-      </div>
+        <div style={{ fontSize:12, color:"rgba(255,255,255,0.2)" }}>© 2025 AiStudioBrand.</div>
+      </footer>
     </div>
   );
 }

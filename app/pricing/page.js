@@ -103,13 +103,19 @@ export default function Pricing() {
   const priceBtnP = { width:"100%", padding:11, borderRadius:9, fontSize:13.5, fontWeight:500, cursor:"pointer", marginTop:16, border:"none", background:"#7950F2", color:"#fff", boxShadow:"0 4px 14px rgba(121,80,242,0.4)" };
 
   return (
-    <div style={{ minHeight:"100vh", background:"#0D0D1F" }}>
+    <div style={{ minHeight:"100vh", background:"#0A0A1A" }}>
       <MarketingNav lang={lang} setLang={setLanguage} activePage="pricing" />
 
-      <div style={{ padding:"64px 32px", textAlign:"center" }}>
-        <div style={{ display:"inline-block", background:"rgba(121,80,242,0.15)", color:"#A78BFA", fontSize:11, fontWeight:500, padding:"4px 12px", borderRadius:20, marginBottom:12 }}>{t.badge}</div>
-        <h1 style={{ fontSize:38, fontWeight:500, color:"#fff", letterSpacing:"-0.03em", marginBottom:10 }}>{t.title}</h1>
-        <p style={{ fontSize:15, color:"rgba(255,255,255,0.5)", marginBottom:40 }}>{t.sub}</p>
+      {/* Hero with gradient mesh */}
+      <div style={{ position:"relative", overflow:"hidden", padding:"80px 32px 60px", textAlign:"center" }}>
+        <div style={{ position:"absolute", inset:0, background:"linear-gradient(180deg, #1a0a2e 0%, #0A0A1A 100%)" }} />
+        <div style={{ position:"absolute", top:"-15%", left:"25%", width:"55%", height:"55%", borderRadius:"50%", background:"radial-gradient(circle, rgba(121,80,242,0.5) 0%, transparent 70%)", filter:"blur(60px)", pointerEvents:"none" }} />
+        <div style={{ position:"absolute", top:"15%", right:"0%", width:"45%", height:"50%", borderRadius:"50%", background:"radial-gradient(circle, rgba(230,73,128,0.3) 0%, transparent 70%)", filter:"blur(70px)", pointerEvents:"none" }} />
+        <div style={{ position:"absolute", bottom:"-10%", left:"5%", width:"40%", height:"40%", borderRadius:"50%", background:"radial-gradient(circle, rgba(167,139,250,0.25) 0%, transparent 70%)", filter:"blur(60px)", pointerEvents:"none" }} />
+        <div style={{ position:"relative", zIndex:1 }}>
+          <div style={{ display:"inline-block", background:"rgba(121,80,242,0.15)", border:"1px solid rgba(121,80,242,0.2)", color:"#A78BFA", fontSize:11, fontWeight:600, padding:"5px 14px", borderRadius:20, marginBottom:16 }}>{t.badge}</div>
+          <h1 style={{ fontSize:42, fontWeight:800, color:"#fff", letterSpacing:"-0.04em", marginBottom:10 }}>{t.title}</h1>
+          <p style={{ fontSize:16, color:"rgba(255,255,255,0.5)", marginBottom:40 }}>{t.sub}</p>
 
         <div style={{ display:"grid", gridTemplateColumns:"repeat(3, minmax(0,1fr))", gap:14, maxWidth:900, margin:"0 auto" }}>
           {t.plans.map((p, i) => (
@@ -119,7 +125,7 @@ export default function Pricing() {
               <div style={{ fontSize:34, fontWeight:500, color:"#fff", letterSpacing:"-0.04em", marginBottom:4 }}>{p.price}</div>
               <div style={{ fontSize:13, color:"rgba(255,255,255,0.4)", marginBottom:10 }}>{p.period}</div>
               <div style={{ display:"inline-block", background:"rgba(121,80,242,0.15)", color:"#A78BFA", fontSize:11, fontWeight:500, padding:"3px 10px", borderRadius:20, marginBottom:16 }}>{p.gens} {t.gens}</div>
-              <div style={{ height:"0.5px", background:"#F0F0F0", margin:"14px 0" }}></div>
+              <div style={{ height:"1px", background:"rgba(255,255,255,0.06)", margin:"14px 0" }}></div>
               {p.feats.map((f, j) => (
                 <div key={j} style={priceFeat}><span style={{ color:"#40C057", fontSize:13 }}>✓</span> {f}</div>
               ))}
@@ -130,9 +136,10 @@ export default function Pricing() {
           ))}
         </div>
         <div style={{ fontSize:12, color:"rgba(255,255,255,0.4)", marginTop:20 }}>{t.note}</div>
+        </div>
       </div>
 
-      <div style={{ padding:"64px 32px", background:"#0A0A18" }}>
+      <div style={{ padding:"64px 32px" }}>
         <div style={{ maxWidth:640, margin:"0 auto" }}>
           <h2 style={{ fontSize:26, fontWeight:500, color:"#fff", letterSpacing:"-0.02em", marginBottom:28, textAlign:"center" }}>{t.faqTitle}</h2>
           {t.faqs.map((faq, i) => (
@@ -149,25 +156,25 @@ export default function Pricing() {
         </div>
       </div>
 
-      <div style={{ padding:"64px 32px", background:"#7950F2", textAlign:"center" }}>
-        <h2 style={{ fontSize:28, fontWeight:500, color:"#fff", letterSpacing:"-0.02em", marginBottom:12 }}>
+      <div style={{ padding:"64px 32px", background:"linear-gradient(135deg, rgba(121,80,242,0.12), rgba(167,139,250,0.06))", textAlign:"center", margin:"0 32px", borderRadius:24, border:"1px solid rgba(121,80,242,0.15)" }}>
+        <h2 style={{ fontSize:28, fontWeight:800, color:"#fff", letterSpacing:"-0.03em", marginBottom:12 }}>
           {lang === "es" ? "Lista para empezar?" : "Ready to get started?"}
         </h2>
-        <p style={{ fontSize:15, color:"rgba(255,255,255,0.75)", marginBottom:28 }}>
+        <p style={{ fontSize:15, color:"rgba(255,255,255,0.5)", marginBottom:28 }}>
           {lang === "es" ? "Únete a las primeras creadoras que están usando AiStudioBrand." : "Join the first creators using AiStudioBrand."}
         </p>
-        <button onClick={() => router.push("/login")} style={{ padding:"14px 32px", background:"#111122", color:"#7950F2", border:"none", borderRadius:10, fontSize:15, fontWeight:500, cursor:"pointer" }}>
+        <button onClick={() => router.push("/login?tab=register")} style={{ padding:"16px 36px", background:"linear-gradient(135deg,#7950F2,#A78BFA)", color:"#fff", border:"none", borderRadius:100, fontSize:16, fontWeight:700, cursor:"pointer", boxShadow:"0 8px 30px rgba(121,80,242,0.4)" }}>
           {lang === "es" ? "Crear cuenta gratis" : "Create free account"}
         </button>
       </div>
 
-      <div style={{ padding:32, borderTop:"0.5px solid #F0F0F0", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+      <footer style={{ padding:"24px 32px", marginTop:40, borderTop:"1px solid rgba(255,255,255,0.06)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
         <div style={{ display:"flex", alignItems:"center", gap:9 }}>
-          <div style={{ width:26, height:26, background:"#7950F2", borderRadius:7, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:11, fontWeight:500 }}>Ai</div>
-          <span style={{ fontSize:13, fontWeight:500, color:"#fff" }}>Ai<span style={{ color:"#7950F2" }}>Studio</span>Brand</span>
+          <div style={{ width:24, height:24, background:"#7950F2", borderRadius:6, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:9, fontWeight:800 }}>Ai</div>
+          <span style={{ fontSize:12, color:"rgba(255,255,255,0.25)" }}>AiStudioBrand</span>
         </div>
-        <div style={{ fontSize:12, color:"rgba(255,255,255,0.25)" }}>© 2025 AiStudioBrand.</div>
-      </div>
+        <div style={{ fontSize:12, color:"rgba(255,255,255,0.2)" }}>© 2025 AiStudioBrand.</div>
+      </footer>
     </div>
   );
 }
