@@ -198,12 +198,30 @@ export default function Contacto() {
         }
       `}</style>
 
-      <footer style={{ padding:"24px 32px", borderTop:"1px solid rgba(255,255,255,0.06)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-        <div style={{ display:"flex", alignItems:"center", gap:9 }}>
-          <div style={{ width:24, height:24, background:"#7950F2", borderRadius:6, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:9, fontWeight:800 }}>Ai</div>
-          <span style={{ fontSize:12, color:"rgba(255,255,255,0.25)" }}>AiStudioBrand</span>
+      {/* CTA */}
+      <div style={{ maxWidth:900, margin:"0 auto", padding:"0 32px 48px" }}>
+        <div style={{ background:"linear-gradient(135deg, rgba(121,80,242,0.12), rgba(167,139,250,0.06))", border:"1px solid rgba(121,80,242,0.15)", borderRadius:20, padding:"40px 28px", textAlign:"center" }}>
+          <h2 style={{ fontSize:22, fontWeight:800, color:"#fff", marginBottom:8, letterSpacing:"-0.03em" }}>
+            {lang === "es" ? "Prefiere probar directamente?" : "Prefer to try it yourself?"}
+          </h2>
+          <p style={{ fontSize:14, color:"rgba(255,255,255,0.5)", marginBottom:24 }}>
+            {lang === "es" ? "20 generaciones gratis, sin tarjeta de crédito" : "20 free generations, no credit card required"}
+          </p>
+          <button onClick={() => router.push("/login?tab=register")} style={{ padding:"14px 36px", background:"linear-gradient(135deg,#7950F2,#A78BFA)", color:"#fff", border:"none", borderRadius:100, fontSize:15, fontWeight:700, cursor:"pointer", boxShadow:"0 8px 24px rgba(121,80,242,0.3)" }}>
+            {lang === "es" ? "Empieza gratis →" : "Start free →"}
+          </button>
         </div>
-        <div style={{ fontSize:12, color:"rgba(255,255,255,0.2)" }}>© 2025 AiStudioBrand.</div>
+      </div>
+
+      <footer style={{ padding:"24px 32px", borderTop:"1px solid rgba(255,255,255,0.06)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+        <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+          <div style={{ width:22, height:22, background:"#7950F2", borderRadius:6, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:9, fontWeight:800 }}>Ai</div>
+          <span style={{ fontSize:12, color:"rgba(255,255,255,0.25)" }}>AiStudioBrand · {lang === "es" ? "Contenido que suena como tú" : "Content that sounds like you"}</span>
+        </div>
+        <div style={{ display:"flex", gap:16 }}>
+          <button onClick={() => router.push("/terminos")} style={{ fontSize:11, color:"rgba(255,255,255,0.2)", background:"none", border:"none", cursor:"pointer" }}>{lang === "es" ? "Términos" : "Terms"}</button>
+          <button onClick={() => router.push("/privacidad")} style={{ fontSize:11, color:"rgba(255,255,255,0.2)", background:"none", border:"none", cursor:"pointer" }}>{lang === "es" ? "Privacidad" : "Privacy"}</button>
+        </div>
       </footer>
     </div>
   );
