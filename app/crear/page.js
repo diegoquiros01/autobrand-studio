@@ -498,80 +498,88 @@ function CrearContent() {
               {skipRefs && <span style={{ fontSize:10, padding:"3px 10px", borderRadius:12, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", color:D.text3 }}>Sin referencias</span>}
               {skipTalent && <span style={{ fontSize:10, padding:"3px 10px", borderRadius:12, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", color:D.text3 }}>Sin talento</span>}
             </div>
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 260px", gap:16 }}>
-              <div>
-                <div style={{ background:"linear-gradient(135deg,rgba(121,80,242,0.1),rgba(230,73,128,0.08))", borderRadius:12, minHeight:300, display:"flex", alignItems:"center", justifyContent:"center", marginBottom:10, position:"relative", overflow:"hidden", border:"1px solid rgba(255,255,255,0.06)" }}>
-                  {generatingImg ? (
-                    <div style={{ textAlign:"center", padding:24 }}>
-                      <div style={{ fontSize:13, color:D.purpleLight, marginBottom:12, fontWeight:500 }}>{genMsg}</div>
-                      <div style={{ height:4, background:"rgba(255,255,255,0.06)", borderRadius:4, overflow:"hidden", width:220, margin:"0 auto" }}>
-                        <div style={{ height:"100%", width: Math.min(genProgress,95) + "%", background:"linear-gradient(90deg,#7950F2,#4C6EF5)", borderRadius:4, transition:"width 0.5s" }} />
-                      </div>
-                      <div style={{ fontSize:11, color:D.text3, marginTop:10 }}>Art Director + Gemini procesando · 30-45 segundos</div>
-                      <div style={{ fontSize:10, color:"rgba(121,80,242,0.5)", marginTop:6 }}>{Math.round(Math.min(genProgress,95))}%</div>
+            <div>
+              {/* Image area */}
+              <div style={{ background:"linear-gradient(135deg,rgba(121,80,242,0.1),rgba(230,73,128,0.08))", borderRadius:12, minHeight:260, display:"flex", alignItems:"center", justifyContent:"center", marginBottom:12, position:"relative", overflow:"hidden", border:"1px solid rgba(255,255,255,0.06)" }}>
+                {generatingImg ? (
+                  <div style={{ textAlign:"center", padding:24 }}>
+                    <div style={{ fontSize:13, color:D.purpleLight, marginBottom:12, fontWeight:500 }}>{genMsg}</div>
+                    <div style={{ height:4, background:"rgba(255,255,255,0.06)", borderRadius:4, overflow:"hidden", width:200, margin:"0 auto" }}>
+                      <div style={{ height:"100%", width: Math.min(genProgress,95) + "%", background:"linear-gradient(90deg,#7950F2,#4C6EF5)", borderRadius:4, transition:"width 0.5s" }} />
                     </div>
-                  ) : versiones.length > 0 ? (
-                    <img src={"data:" + versiones[versionActiva].mimeType + ";base64," + versiones[versionActiva].image} alt="" style={{ width:"100%", display:"block", borderRadius:12 }} />
-                  ) : (
-                    <div style={{ textAlign:"center", opacity:0.2 }}>
-                      <div style={{ fontSize:48, marginBottom:8 }}>◉</div>
-                      <div style={{ fontSize:12, color:D.text }}>La imagen aparecerá aquí</div>
-                    </div>
-                  )}
-                </div>
-                {versiones.length > 1 && (
-                  <div>
-                    <div style={{ fontSize:11, color:D.text3, marginBottom:6 }}>Versiones generadas:</div>
-                    <div style={{ display:"flex", gap:6 }}>
-                      {versiones.map((v,i) => (
-                        <div key={i} onClick={() => setVersionActiva(i)}
-                          style={{ position:"relative", width:44, height:44, borderRadius:8, overflow:"hidden", cursor:"pointer", border: versionActiva === i ? "2px solid " + D.purple : "1px solid rgba(255,255,255,0.1)", flexShrink:0 }}>
-                          <img src={"data:" + v.mimeType + ";base64," + v.image} alt="" style={{ width:"100%", height:"100%", objectFit:"cover" }} />
-                          <div style={{ position:"absolute", bottom:1, right:2, fontSize:9, color:"rgba(255,255,255,0.6)" }}>v{i+1}</div>
-                        </div>
-                      ))}
-                    </div>
+                    <div style={{ fontSize:11, color:D.text3, marginTop:8 }}>Art Director + Gemini · 30-45s</div>
+                    <div style={{ fontSize:10, color:"rgba(121,80,242,0.5)", marginTop:4 }}>{Math.round(Math.min(genProgress,95))}%</div>
+                  </div>
+                ) : versiones.length > 0 ? (
+                  <img src={"data:" + versiones[versionActiva].mimeType + ";base64," + versiones[versionActiva].image} alt="" style={{ width:"100%", display:"block", borderRadius:12 }} />
+                ) : (
+                  <div style={{ textAlign:"center", opacity:0.2 }}>
+                    <div style={{ fontSize:40, marginBottom:6 }}>◉</div>
+                    <div style={{ fontSize:11, color:D.text }}>La imagen aparecerá aquí</div>
                   </div>
                 )}
               </div>
 
-              <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
-                <div style={{ background:D.bg3, border:"1px solid " + D.border, borderRadius:10, padding:14 }}>
-                  <div style={{ fontSize:12, fontWeight:500, color:D.text, marginBottom:6 }}>¿Qué quieres cambiar?</div>
-                  <div style={{ fontSize:11, color:D.text3, marginBottom:8, lineHeight:1.5 }}>Describe qué ajustar y regenera una nueva versión</div>
-                  <textarea className="input-focus" value={feedback} onChange={e => setFeedback(e.target.value)} rows={4}
-                    placeholder="Ej: Hazla más colorida. Agrega texto con el precio. Cambia el fondo por algo más cálido..."
-                    style={{ width:"100%", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, padding:"8px 10px", fontSize:12, color:D.text, outline:"none", resize:"none", marginBottom:8 }} />
+              {/* Version thumbnails */}
+              {versiones.length > 1 && (
+                <div style={{ marginBottom:12 }}>
+                  <div style={{ fontSize:10, color:D.text3, marginBottom:6 }}>Versiones:</div>
+                  <div style={{ display:"flex", gap:6 }}>
+                    {versiones.map((v,i) => (
+                      <div key={i} onClick={() => setVersionActiva(i)}
+                        style={{ position:"relative", width:40, height:40, borderRadius:6, overflow:"hidden", cursor:"pointer", border: versionActiva === i ? "2px solid " + D.purple : "1px solid rgba(255,255,255,0.1)", flexShrink:0 }}>
+                        <img src={"data:" + v.mimeType + ";base64," + v.image} alt="" style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                        <div style={{ position:"absolute", bottom:1, right:2, fontSize:8, color:"rgba(255,255,255,0.6)" }}>v{i+1}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Feedback + actions — stacked below */}
+              <div style={{ background:D.bg3, border:"1px solid " + D.border, borderRadius:10, padding:14 }}>
+                <div style={{ fontSize:12, fontWeight:600, color:D.text, marginBottom:4 }}>¿Qué quieres cambiar?</div>
+                <div style={{ fontSize:11, color:D.text3, marginBottom:8 }}>Describe qué ajustar y regenera una nueva versión</div>
+                <textarea className="input-focus" value={feedback} onChange={e => setFeedback(e.target.value)} rows={2}
+                  placeholder="Ej: Hazla más colorida. Cambia el fondo..."
+                  style={{ width:"100%", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, padding:"8px 10px", fontSize:12, color:D.text, outline:"none", resize:"none", marginBottom:8 }} />
+                <div style={{ display:"flex", gap:8 }}>
                   <button onClick={() => { if (!generatingImg && feedback.trim()) generarImagen(feedback); }} disabled={generatingImg || !feedback.trim()}
-                    style={{ width:"100%", padding:9, background: generatingImg || !feedback.trim() ? "rgba(121,80,242,0.3)" : "linear-gradient(135deg,#7950F2,#4C6EF5)", color:"#fff", border:"none", borderRadius:8, fontSize:12, fontWeight:500, cursor: generatingImg || !feedback.trim() ? "not-allowed" : "pointer", marginBottom:8 }}>
-                    {generatingImg ? "Generando..." : "↺ Regenerar con feedback"}
+                    style={{ flex:1, padding:9, background: generatingImg || !feedback.trim() ? "rgba(121,80,242,0.3)" : "linear-gradient(135deg,#7950F2,#4C6EF5)", color:"#fff", border:"none", borderRadius:8, fontSize:12, fontWeight:600, cursor: generatingImg || !feedback.trim() ? "not-allowed" : "pointer" }}>
+                    {generatingImg ? "Generando..." : "↺ Regenerar"}
                   </button>
                   {versiones.length > 0 && !generatingImg && (
                     <button onClick={() => { setImgAprobada(true); generarCopies(); goToStep(5); }}
-                      style={{ width:"100%", padding:9, background:"rgba(64,192,87,0.12)", border:"1px solid rgba(64,192,87,0.3)", color:"#86EFAC", borderRadius:8, fontSize:12, fontWeight:500, cursor:"pointer" }}>
-                      ✓ Aprobar imagen → Generar copy
+                      style={{ flex:1, padding:9, background:"rgba(64,192,87,0.12)", border:"1px solid rgba(64,192,87,0.3)", color:"#86EFAC", borderRadius:8, fontSize:12, fontWeight:600, cursor:"pointer" }}>
+                      ✓ Aprobar → Copy
                     </button>
                   )}
                 </div>
-
-                {referencias.length > 0 && (
-                  <div style={{ background:D.bg3, border:"1px solid " + D.border, borderRadius:10, padding:12 }}>
-                    <div style={{ fontSize:10, color:D.text3, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:8 }}>Referencias usadas</div>
-                    <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:4 }}>
-                      {referencias.map((r,i) => <img key={i} src={r.url} alt="" style={{ width:"100%", aspectRatio:"1", objectFit:"cover", borderRadius:6, display:"block" }} />)}
-                    </div>
-                  </div>
-                )}
-                {talentos.length > 0 && (
-                  <div style={{ background:D.bg3, border:"1px solid " + D.border, borderRadius:10, padding:12 }}>
-                    <div style={{ fontSize:10, color:D.text3, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:8 }}>Talento incluido</div>
-                    <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:4 }}>
-                      {talentos.map((t,i) => <img key={i} src={t.url} alt="" style={{ width:"100%", aspectRatio:"1", objectFit:"cover", borderRadius:6, display:"block" }} />)}
-                    </div>
-                  </div>
-                )}
-                {error && <div style={{ background:"rgba(220,38,38,0.1)", border:"1px solid rgba(220,38,38,0.2)", borderRadius:8, padding:10, fontSize:11, color:"#FCA5A5" }}>{error}</div>}
               </div>
+
+              {/* References + talent thumbs */}
+              {(referencias.length > 0 || talentos.length > 0) && (
+                <div style={{ display:"flex", gap:10, marginTop:12 }}>
+                  {referencias.length > 0 && (
+                    <div style={{ flex:1, background:D.bg3, border:"1px solid " + D.border, borderRadius:10, padding:10 }}>
+                      <div style={{ fontSize:10, color:D.text3, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:6 }}>Referencias</div>
+                      <div style={{ display:"flex", gap:4 }}>
+                        {referencias.map((r,i) => <img key={i} src={r.url} alt="" style={{ width:36, height:36, objectFit:"cover", borderRadius:6, display:"block" }} />)}
+                      </div>
+                    </div>
+                  )}
+                  {talentos.length > 0 && (
+                    <div style={{ flex:1, background:D.bg3, border:"1px solid " + D.border, borderRadius:10, padding:10 }}>
+                      <div style={{ fontSize:10, color:D.text3, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:6 }}>Talento</div>
+                      <div style={{ display:"flex", gap:4 }}>
+                        {talentos.map((t,i) => <img key={i} src={t.url} alt="" style={{ width:36, height:36, objectFit:"cover", borderRadius:6, display:"block" }} />)}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {error && <div style={{ marginTop:10, background:"rgba(220,38,38,0.1)", border:"1px solid rgba(220,38,38,0.2)", borderRadius:8, padding:10, fontSize:11, color:"#FCA5A5" }}>{error}</div>}
             </div>
           </div>
         )}
