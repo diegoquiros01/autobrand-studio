@@ -174,9 +174,10 @@ function CrearContent() {
 
   const [savingFinal, setSavingFinal] = useState(false);
 
-  const guardarFinal = async () => {
-    const copy = copies.find(c => c.id === copySeleccionado);
-    if (!copy || versiones.length === 0) return;
+  const guardarFinal = async (withCopy = true) => {
+    const copy = withCopy ? copies.find(c => c.id === copySeleccionado) : null;
+    if (versiones.length === 0) return;
+    if (withCopy && !copy) return;
     setSavingFinal(true); setError("");
     try {
       const imgData = versiones[versionActiva];
@@ -189,7 +190,7 @@ function CrearContent() {
         body: JSON.stringify({
           userId: user.id,
           prompt, tipo,
-          copy,
+          copy: copy || { hook: "", copy: prompt, cta: "", hashtags: "" },
           imageBase64: imgData.image,
           mimeType: imgData.mimeType,
         }),
@@ -549,7 +550,7 @@ function CrearContent() {
                     {generatingImg ? "Generando..." : "↺ Regenerar"}
                   </button>
                   {versiones.length > 0 && !generatingImg && (
-                    <button onClick={() => { setImgAprobada(true); generarCopies(); goToStep(5); }}
+                    <button onClick={() => { setImgAprobada(true); guardarFinal(false); generarCopies(); goToStep(5); }}
                       style={{ flex:1, padding:9, background:"rgba(64,192,87,0.12)", border:"1px solid rgba(64,192,87,0.3)", color:"#86EFAC", borderRadius:8, fontSize:12, fontWeight:600, cursor:"pointer" }}>
                       ✓ Aprobar → Copy
                     </button>
