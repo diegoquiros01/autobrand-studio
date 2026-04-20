@@ -34,10 +34,10 @@ const MemoInput = memo(function MemoInput({ value, onChange, placeholder, style,
   return <input className="input-focus" style={inpStyle} placeholder={placeholder} value={value} onChange={e => onChange(e.target.value)} />;
 });
 
-const STEPS = [
-  { n: 1, title: "Conexión y Análisis IA", sub: "Conecta tus canales y deja que la IA construya tu ADN" },
-  { n: 2, title: "Voz y Comunicación", sub: "Define quién eres, a quién le hablas y cómo suenas" },
-  { n: 3, title: "Estilo Visual y Referencias", sub: "Tu personalidad visual, colores y ejemplos de copy ideal" },
+const getSteps = (en) => [
+  { n: 1, title: en ? "Connection & AI Analysis" : "Conexión y Análisis IA", sub: en ? "Connect your channels and let AI build your DNA" : "Conecta tus canales y deja que la IA construya tu ADN" },
+  { n: 2, title: en ? "Voice & Communication" : "Voz y Comunicación", sub: en ? "Define who you are, who you talk to and how you sound" : "Define quién eres, a quién le hablas y cómo suenas" },
+  { n: 3, title: en ? "Visual Style & References" : "Estilo Visual y Referencias", sub: en ? "Your visual personality, colors and ideal copy examples" : "Tu personalidad visual, colores y ejemplos de copy ideal" },
 ];
 
 const BLANK_PROFILE = {
@@ -67,6 +67,16 @@ function ADNContent() {
   const isOnboarding = searchParams.get("onboarding") === "true";
   const paramBrandId = searchParams.get("brand");
   const isNewBrand = searchParams.get("new") === "true";
+
+  const [lang, setLang] = useState("es");
+  useEffect(() => { const saved = localStorage.getItem("lang"); if (saved) setLang(saved); }, []);
+  useEffect(() => {
+    const handler = () => { const saved = localStorage.getItem("lang"); if (saved) setLang(saved); };
+    window.addEventListener("storage", handler);
+    return () => window.removeEventListener("storage", handler);
+  }, []);
+  const en = lang === "en";
+  const STEPS = getSteps(en);
 
   const [step, setStep] = useState(1);
   const [user, setUser] = useState(null);
@@ -257,7 +267,7 @@ function ADNContent() {
       } else if (data.error) {
         setAnalyzeError("Error: " + data.error);
       }
-    } catch (e) { setAnalyzeError("Error analizando tu marca. Intenta de nuevo."); }
+    } catch (e) { setAnalyzeError(en ? "Error analyzing your brand. Try again." : "Error analizando tu marca. Intenta de nuevo."); }
     clearInterval(iv); setAnalyzeProgress(100); setAnalyzing(false); setAnalyzeMsg("");
   };
 
@@ -307,7 +317,7 @@ function ADNContent() {
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 32 }}>
               <div>
                 <h1 style={{ fontSize: 26, fontWeight: 800, color: D.text, marginBottom: 4, letterSpacing: "-0.03em" }}>
-                  {isOnboarding ? "Entrena a tu clon digital" : "ADN de tu marca"}
+                  {isOnboarding ? (en ? "Train your digital clone" : "Entrena a tu clon digital") : (en ? "Your brand DNA" : "ADN de tu marca")}
                 </h1>
                 <p style={{ fontSize: 14, color: D.text2, letterSpacing: "-0.02em" }}>
                   {STEPS[step - 1].sub}
@@ -364,9 +374,9 @@ function ADNContent() {
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={D.purpleLight} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a4 4 0 0 1 4 4c0 1.5-.8 2.8-2 3.4V11h3a3 3 0 0 1 3 3v1a2 2 0 0 1-2 2h-1v3a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-3H6a2 2 0 0 1-2-2v-1a3 3 0 0 1 3-3h3V9.4C8.8 8.8 8 7.5 8 6a4 4 0 0 1 4-4z"/></svg>
                   </div>
                   <div style={{ textAlign: "left" }}>
-                    <h2 style={{ fontSize: 16, fontWeight: 700, color: D.text, marginBottom: 2, letterSpacing: "-0.02em" }}>AiStudioBrand construye tu ADN en segundos</h2>
+                    <h2 style={{ fontSize: 16, fontWeight: 700, color: D.text, marginBottom: 2, letterSpacing: "-0.02em" }}>{en ? "AiStudioBrand builds your DNA in seconds" : "AiStudioBrand construye tu ADN en segundos"}</h2>
                     <p style={{ fontSize: 13, color: D.text2, lineHeight: 1.5, letterSpacing: "-0.02em", margin: 0 }}>
-                      Conecta tus canales y analiza tu contenido para extraer tono, audiencia y personalidad.
+                      {en ? "Connect your channels and analyze your content to extract tone, audience and personality." : "Conecta tus canales y analiza tu contenido para extraer tono, audiencia y personalidad."}
                     </p>
                   </div>
                 </div>
@@ -374,8 +384,8 @@ function ADNContent() {
 
               {/* Channels card */}
               <div style={{ ...card, marginBottom: 24 }}>
-                <div style={{ fontSize: 15, fontWeight: 700, color: D.text, marginBottom: 4, letterSpacing: "-0.02em" }}>Tus canales</div>
-                <div style={{ fontSize: 12, color: D.text3, marginBottom: 16 }}>Agrega al menos uno para el análisis con IA</div>
+                <div style={{ fontSize: 15, fontWeight: 700, color: D.text, marginBottom: 4, letterSpacing: "-0.02em" }}>{en ? "Your channels" : "Tus canales"}</div>
+                <div style={{ fontSize: 12, color: D.text3, marginBottom: 16 }}>{en ? "Add at least one for AI analysis" : "Agrega al menos uno para el análisis con IA"}</div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   {[
                     { icon: "📸", placeholder: "instagram.com/tucuenta", key: "instagramUrl", name: "Instagram" },
@@ -393,15 +403,15 @@ function ADNContent() {
 
               {/* Analyze sources */}
               <div style={{ ...card, marginBottom: 24 }}>
-                <div style={{ fontSize: 15, fontWeight: 700, color: D.text, marginBottom: 4, letterSpacing: "-0.02em" }}>Selecciona fuentes para analizar</div>
-                <div style={{ fontSize: 12, color: D.text3, marginBottom: 16 }}>La IA lee tus redes y construye tu ADN automáticamente</div>
+                <div style={{ fontSize: 15, fontWeight: 700, color: D.text, marginBottom: 4, letterSpacing: "-0.02em" }}>{en ? "Select sources to analyze" : "Selecciona fuentes para analizar"}</div>
+                <div style={{ fontSize: 12, color: D.text3, marginBottom: 16 }}>{en ? "AI reads your social media and builds your DNA automatically" : "La IA lee tus redes y construye tu ADN automáticamente"}</div>
 
                 <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
                   {[
-                    { key: "screenshots", lbl: "Screenshots de posts", icon: "🖼", ok: true, hint: "La fuente más poderosa" },
-                    { key: "web", lbl: "Página web", icon: "🌐", ok: !!profile.webUrl, hint: profile.webUrl || "Agrega URL arriba" },
-                    { key: "instagram", lbl: "Instagram", icon: "📸", ok: !!profile.instagramUrl, hint: profile.instagramUrl || "Agrega URL arriba" },
-                    { key: "tiktok", lbl: "TikTok", icon: "🎵", ok: !!profile.tiktokUrl, hint: profile.tiktokUrl || "Agrega URL arriba" },
+                    { key: "screenshots", lbl: en ? "Post screenshots" : "Screenshots de posts", icon: "🖼", ok: true, hint: en ? "The most powerful source" : "La fuente más poderosa" },
+                    { key: "web", lbl: en ? "Website" : "Página web", icon: "🌐", ok: !!profile.webUrl, hint: profile.webUrl || (en ? "Add URL above" : "Agrega URL arriba") },
+                    { key: "instagram", lbl: "Instagram", icon: "📸", ok: !!profile.instagramUrl, hint: profile.instagramUrl || (en ? "Add URL above" : "Agrega URL arriba") },
+                    { key: "tiktok", lbl: "TikTok", icon: "🎵", ok: !!profile.tiktokUrl, hint: profile.tiktokUrl || (en ? "Add URL above" : "Agrega URL arriba") },
                   ].map(src => (
                     <div key={src.key}
                       onClick={() => { if (!src.ok) return; setSources(prev => prev.includes(src.key) ? prev.filter(s => s !== src.key) : [...prev, src.key]); }}
@@ -434,7 +444,7 @@ function ADNContent() {
                       </div>
                     ) : (
                       <label htmlFor="screenshots" style={{ display: "block", border: "2px dashed rgba(121,80,242,0.3)", borderRadius: 12, padding: 20, textAlign: "center", cursor: "pointer" }}>
-                        <div style={{ fontSize: 13, color: D.text2, fontWeight: 500 }}>Sube screenshots de tus posts · Hasta 6</div>
+                        <div style={{ fontSize: 13, color: D.text2, fontWeight: 500 }}>{en ? "Upload post screenshots · Up to 6" : "Sube screenshots de tus posts · Hasta 6"}</div>
                       </label>
                     )}
                   </div>
@@ -456,12 +466,12 @@ function ADNContent() {
 
                 {analyzeProgress === 100 && !analyzing ? (
                   <div style={{ width: "100%", padding: 13, background: "rgba(64,192,87,0.15)", border: "2px solid rgba(64,192,87,0.4)", borderRadius: 10, fontSize: 14, fontWeight: 700, color: "#40C057", textAlign: "center", letterSpacing: "-0.02em", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
-                    <span style={{ fontSize: 16 }}>✓</span> Análisis completado — ADN actualizado
+                    <span style={{ fontSize: 16 }}>✓</span> {en ? "Analysis complete — DNA updated" : "Análisis completado — ADN actualizado"}
                   </div>
                 ) : (
                   <button onClick={analyzeInstagram} disabled={analyzing || sources.length === 0}
                     style={{ width: "100%", padding: 13, background: analyzing || sources.length === 0 ? "rgba(121,80,242,0.2)" : "linear-gradient(135deg,#7950F2,#4C1D95)", color: "#fff", border: "none", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: analyzing || sources.length === 0 ? "not-allowed" : "pointer", transition: "all 0.3s ease", boxShadow: sources.length > 0 ? "0 8px 24px rgba(121,80,242,0.3)" : "none", letterSpacing: "-0.02em" }}>
-                    {analyzing ? "Analizando con IA..." : "Analizar " + sources.length + " fuente" + (sources.length !== 1 ? "s" : "") + " →"}
+                    {analyzing ? (en ? "Analyzing with AI..." : "Analizando con IA...") : (en ? "Analyze " + sources.length + " source" + (sources.length !== 1 ? "s" : "") + " →" : "Analizar " + sources.length + " fuente" + (sources.length !== 1 ? "s" : "") + " →")}
                   </button>
                 )}
               </div>
@@ -476,40 +486,40 @@ function ADNContent() {
                 <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 16px", borderRadius: 10, background: "rgba(121,80,242,0.08)", border: "1px solid rgba(121,80,242,0.2)", marginBottom: 16 }}>
                   <span style={{ fontSize: 16 }}>✨</span>
                   <div>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: D.purpleLight, letterSpacing: "-0.02em" }}>Generado por IA a partir de tus fuentes</div>
-                    <div style={{ fontSize: 12, color: D.text3 }}>Revisa y edita cada campo para que suene exactamente como tú</div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: D.purpleLight, letterSpacing: "-0.02em" }}>{en ? "Generated by AI from your sources" : "Generado por IA a partir de tus fuentes"}</div>
+                    <div style={{ fontSize: 12, color: D.text3 }}>{en ? "Review and edit each field to sound exactly like you" : "Revisa y edita cada campo para que suene exactamente como tú"}</div>
                   </div>
                 </div>
               )}
               {/* Marca info */}
               <div style={{ ...card, marginBottom: 24 }}>
-                <div style={{ fontSize: 15, fontWeight: 700, color: D.text, marginBottom: 16, letterSpacing: "-0.02em" }}>Tu marca</div>
+                <div style={{ fontSize: 15, fontWeight: 700, color: D.text, marginBottom: 16, letterSpacing: "-0.02em" }}>{en ? "Your brand" : "Tu marca"}</div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
                   <div>
-                    <label style={label}>Nombre / cuenta</label>
-                    <input className="input-focus" style={inp(profile.nombre)} placeholder="@tumarca" value={profile.nombre} onChange={e => setProfile(p => ({ ...p, nombre: e.target.value }))} />
+                    <label style={label}>{en ? "Name / account" : "Nombre / cuenta"}</label>
+                    <input className="input-focus" style={inp(profile.nombre)} placeholder={en ? "@yourbrand" : "@tumarca"} value={profile.nombre} onChange={e => setProfile(p => ({ ...p, nombre: e.target.value }))} />
                   </div>
                   <div>
-                    <label style={label}>A quién le hablas</label>
-                    <input className="input-focus" style={inp(profile.audiencia)} placeholder="Mujeres latinas 28-42 en EE.UU." value={profile.audiencia} onChange={e => setProfile(p => ({ ...p, audiencia: e.target.value }))} />
+                    <label style={label}>{en ? "Who you talk to" : "A quién le hablas"}</label>
+                    <input className="input-focus" style={inp(profile.audiencia)} placeholder={en ? "Latina women 28-42 in the US" : "Mujeres latinas 28-42 en EE.UU."} value={profile.audiencia} onChange={e => setProfile(p => ({ ...p, audiencia: e.target.value }))} />
                   </div>
                 </div>
                 <div style={{ marginTop: 14 }}>
-                  <label style={label}>Qué haces (biografía)</label>
-                  <textarea className="input-focus" style={{ ...inp(profile.descripcion), minHeight: 80, resize: "none" }} placeholder="Soy coach de negocios para mujeres latinas..." value={profile.descripcion} onChange={e => setProfile(p => ({ ...p, descripcion: e.target.value }))} />
+                  <label style={label}>{en ? "What you do (bio)" : "Qué haces (biografía)"}</label>
+                  <textarea className="input-focus" style={{ ...inp(profile.descripcion), minHeight: 80, resize: "none" }} placeholder={en ? "I'm a business coach for Latina women..." : "Soy coach de negocios para mujeres latinas..."} value={profile.descripcion} onChange={e => setProfile(p => ({ ...p, descripcion: e.target.value }))} />
                 </div>
                 <div style={{ marginTop: 14 }}>
-                  <label style={label}>Propuesta de valor</label>
-                  <textarea className="input-focus" style={{ ...inp(profile.propuestaValor), minHeight: 60, resize: "none" }} placeholder="Tu ventaja única — qué te hace diferente de todos los demás" value={profile.propuestaValor} onChange={e => setProfile(p => ({ ...p, propuestaValor: e.target.value }))} />
+                  <label style={label}>{en ? "Value proposition" : "Propuesta de valor"}</label>
+                  <textarea className="input-focus" style={{ ...inp(profile.propuestaValor), minHeight: 60, resize: "none" }} placeholder={en ? "Your unique advantage — what makes you different from everyone else" : "Tu ventaja única — qué te hace diferente de todos los demás"} value={profile.propuestaValor} onChange={e => setProfile(p => ({ ...p, propuestaValor: e.target.value }))} />
                 </div>
               </div>
 
               {/* Comunicación */}
               <div style={{ ...card, marginBottom: 24 }}>
-                <div style={{ fontSize: 15, fontWeight: 700, color: D.text, marginBottom: 16, letterSpacing: "-0.02em" }}>Comunicación</div>
+                <div style={{ fontSize: 15, fontWeight: 700, color: D.text, marginBottom: 16, letterSpacing: "-0.02em" }}>{en ? "Communication" : "Comunicación"}</div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 20 }}>
                   <div>
-                    <label style={label}>Idioma</label>
+                    <label style={label}>{en ? "Language" : "Idioma"}</label>
                     <div style={{ display: "flex", gap: 8 }}>
                       {idiomas.map(i => (
                         <button key={i} onClick={() => setProfile(p => ({ ...p, idioma: i }))} style={chip(profile.idioma === i)}>{i}</button>
@@ -517,7 +527,7 @@ function ADNContent() {
                     </div>
                   </div>
                   <div>
-                    <label style={label}>Tono de voz <span style={{ color: D.text3, fontWeight: 400 }}>(máx. 2)</span></label>
+                    <label style={label}>{en ? "Tone of voice" : "Tono de voz"} <span style={{ color: D.text3, fontWeight: 400 }}>{en ? "(max. 2)" : "(máx. 2)"}</span></label>
                     <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                       {tonos.map(t => (
                         <button key={t} onClick={() => setProfile(p => {
@@ -532,7 +542,7 @@ function ADNContent() {
                   </div>
                 </div>
                 <div>
-                  <label style={label}>Categorías de contenido</label>
+                  <label style={label}>{en ? "Content categories" : "Categorías de contenido"}</label>
                   <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                     {cats.map(c => (
                       <button key={c} onClick={() => setProfile(p => ({ ...p, categorias: p.categorias.includes(c) ? p.categorias.filter(x => x !== c) : [...p.categorias, c] }))} style={chip(profile.categorias.includes(c))}>{c}</button>
@@ -543,12 +553,12 @@ function ADNContent() {
                         <span onClick={() => setProfile(p => ({ ...p, categorias: p.categorias.filter(x => x !== c) }))} style={{ cursor: "pointer", fontSize: 14, lineHeight: 1 }}>×</span>
                       </div>
                     ))}
-                    <button onClick={() => setShowCustomCat(true)} style={chip(false)}>+ Otro</button>
+                    <button onClick={() => setShowCustomCat(true)} style={chip(false)}>{en ? "+ Other" : "+ Otro"}</button>
                   </div>
                   {showCustomCat && (
                     <div style={{ display: "flex", gap: 8, marginTop: 10, alignItems: "center" }}>
                       <input className="input-focus" style={{ ...inp(customCatInput), flex: 1, padding: "8px 12px", fontSize: 13 }} placeholder="Ej: Tecnología" value={customCatInput} onChange={e => setCustomCatInput(e.target.value)} onKeyDown={e => { if (e.key === "Enter" && customCatInput.trim()) { setProfile(p => ({ ...p, categorias: [...p.categorias, customCatInput.trim()] })); setCustomCatInput(""); setShowCustomCat(false); } }} />
-                      <button onClick={() => { if (customCatInput.trim()) { setProfile(p => ({ ...p, categorias: [...p.categorias, customCatInput.trim()] })); setCustomCatInput(""); setShowCustomCat(false); } }} style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: D.purple, color: "#fff", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>Agregar</button>
+                      <button onClick={() => { if (customCatInput.trim()) { setProfile(p => ({ ...p, categorias: [...p.categorias, customCatInput.trim()] })); setCustomCatInput(""); setShowCustomCat(false); } }} style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: D.purple, color: "#fff", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>{en ? "Add" : "Agregar"}</button>
                       <button onClick={() => { setShowCustomCat(false); setCustomCatInput(""); }} style={{ padding: "8px 10px", borderRadius: 8, border: "1px solid " + D.border, background: "transparent", color: D.text3, fontSize: 12, cursor: "pointer" }}>×</button>
                     </div>
                   )}
@@ -565,27 +575,27 @@ function ADNContent() {
                 <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 16px", borderRadius: 10, background: "rgba(121,80,242,0.08)", border: "1px solid rgba(121,80,242,0.2)", marginBottom: 16 }}>
                   <span style={{ fontSize: 16 }}>✨</span>
                   <div>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: D.purpleLight, letterSpacing: "-0.02em" }}>Generado por IA a partir de tus fuentes</div>
-                    <div style={{ fontSize: 12, color: D.text3 }}>Revisa y edita cada campo para que suene exactamente como tú</div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: D.purpleLight, letterSpacing: "-0.02em" }}>{en ? "Generated by AI from your sources" : "Generado por IA a partir de tus fuentes"}</div>
+                    <div style={{ fontSize: 12, color: D.text3 }}>{en ? "Review and edit each field to sound exactly like you" : "Revisa y edita cada campo para que suene exactamente como tú"}</div>
                   </div>
                 </div>
               )}
               {/* Personalidad */}
               <div style={{ ...card, marginBottom: 24 }}>
-                <div style={{ fontSize: 15, fontWeight: 700, color: D.text, marginBottom: 16, letterSpacing: "-0.02em" }}>Personalidad de marca</div>
+                <div style={{ fontSize: 15, fontWeight: 700, color: D.text, marginBottom: 16, letterSpacing: "-0.02em" }}>{en ? "Brand personality" : "Personalidad de marca"}</div>
                 <div style={{ marginBottom: 14 }}>
-                  <label style={label}>¿Cómo habla tu marca? ¿Qué evita?</label>
-                  <textarea className="input-focus" style={{ ...inp(profile.personalidad), minHeight: 90, resize: "none" }} placeholder="Ej: Hablo directo, uso humor, evito ser formal, digo 'reina' y 'amiga'..." value={profile.personalidad} onChange={e => setProfile(p => ({ ...p, personalidad: e.target.value }))} />
+                  <label style={label}>{en ? "How does your brand speak? What does it avoid?" : "¿Cómo habla tu marca? ¿Qué evita?"}</label>
+                  <textarea className="input-focus" style={{ ...inp(profile.personalidad), minHeight: 90, resize: "none" }} placeholder={en ? "E.g.: I speak directly, use humor, avoid being formal..." : "Ej: Hablo directo, uso humor, evito ser formal, digo 'reina' y 'amiga'..."} value={profile.personalidad} onChange={e => setProfile(p => ({ ...p, personalidad: e.target.value }))} />
                 </div>
                 <div>
-                  <label style={label}>¿Cómo se ve tu marca visualmente?</label>
-                  <textarea className="input-focus" style={{ ...inp(profile.estiloVisual), minHeight: 70, resize: "none" }} placeholder="Ej: Minimalista con toques de color, lifestyle, editorial..." value={profile.estiloVisual} onChange={e => setProfile(p => ({ ...p, estiloVisual: e.target.value }))} />
+                  <label style={label}>{en ? "How does your brand look visually?" : "¿Cómo se ve tu marca visualmente?"}</label>
+                  <textarea className="input-focus" style={{ ...inp(profile.estiloVisual), minHeight: 70, resize: "none" }} placeholder={en ? "E.g.: Minimalist with color touches, lifestyle, editorial..." : "Ej: Minimalista con toques de color, lifestyle, editorial..."} value={profile.estiloVisual} onChange={e => setProfile(p => ({ ...p, estiloVisual: e.target.value }))} />
                 </div>
               </div>
 
               {/* Colors */}
               <div style={{ ...card, marginBottom: 24 }}>
-                <div style={{ fontSize: 15, fontWeight: 700, color: D.text, marginBottom: 16, letterSpacing: "-0.02em" }}>Colores de marca</div>
+                <div style={{ fontSize: 15, fontWeight: 700, color: D.text, marginBottom: 16, letterSpacing: "-0.02em" }}>{en ? "Brand colors" : "Colores de marca"}</div>
                 <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 14 }}>
                   {presetColors.map(c => {
                     const sel = profile.coloresMarca.includes(c);
@@ -601,7 +611,7 @@ function ADNContent() {
                   <input type="color" value={customColorInput || "#7950F2"} onChange={e => setCustomColorInput(e.target.value)} style={{ width: 36, height: 36, padding: 0, border: "2px solid " + D.border, borderRadius: "50%", cursor: "pointer", background: "transparent", WebkitAppearance: "none", appearance: "none" }} />
                   <input className="input-focus" style={{ ...inp(customColorInput), width: 120, padding: "8px 12px", fontSize: 13, fontFamily: "monospace" }} placeholder="#hex" value={customColorInput} onChange={e => setCustomColorInput(e.target.value)} />
                   <button onClick={() => { if (/^#[0-9A-Fa-f]{3,6}$/.test(customColorInput) && !profile.coloresMarca.includes(customColorInput)) { setProfile(p => ({ ...p, coloresMarca: [...p.coloresMarca, customColorInput] })); setCustomColorInput(""); } }}
-                    style={{ padding: "8px 16px", borderRadius: 8, border: "1px dashed " + D.border, background: "transparent", color: D.text3, fontSize: 12, cursor: "pointer", transition: "all 0.3s ease" }}>+ Agregar</button>
+                    style={{ padding: "8px 16px", borderRadius: 8, border: "1px dashed " + D.border, background: "transparent", color: D.text3, fontSize: 12, cursor: "pointer", transition: "all 0.3s ease" }}>{en ? "+ Add" : "+ Agregar"}</button>
                 </div>
                 <style>{`
                   input[type="color"]::-webkit-color-swatch-wrapper { padding: 2px; }
@@ -623,13 +633,13 @@ function ADNContent() {
 
               {/* Copy examples */}
               <div style={{ ...card, marginBottom: 24 }}>
-                <div style={{ fontSize: 15, fontWeight: 700, color: D.text, marginBottom: 4, letterSpacing: "-0.02em" }}>Ejemplos de copy ideal</div>
-                <div style={{ fontSize: 12, color: D.text3, marginBottom: 16 }}>La IA aprende tu estilo exacto de estos ejemplos</div>
+                <div style={{ fontSize: 15, fontWeight: 700, color: D.text, marginBottom: 4, letterSpacing: "-0.02em" }}>{en ? "Ideal copy examples" : "Ejemplos de copy ideal"}</div>
+                <div style={{ fontSize: 12, color: D.text3, marginBottom: 16 }}>{en ? "AI learns your exact style from these examples" : "La IA aprende tu estilo exacto de estos ejemplos"}</div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   {profile.ejemplosCopy.map((ej, i) => (
                     <div key={i}>
-                      <label style={{ ...label, fontSize: 11 }}>Ejemplo {i + 1}</label>
-                      <textarea className="input-focus" style={{ ...inp(ej), minHeight: 60, resize: "none" }} placeholder="Pega un caption de Instagram que ames..." value={ej}
+                      <label style={{ ...label, fontSize: 11 }}>{en ? "Example" : "Ejemplo"} {i + 1}</label>
+                      <textarea className="input-focus" style={{ ...inp(ej), minHeight: 60, resize: "none" }} placeholder={en ? "Paste an Instagram caption you love..." : "Pega un caption de Instagram que ames..."} value={ej}
                         onChange={e => { const arr = [...profile.ejemplosCopy]; arr[i] = e.target.value; setProfile(p => ({ ...p, ejemplosCopy: arr })); }} />
                     </div>
                   ))}
@@ -638,11 +648,11 @@ function ADNContent() {
 
               {/* Competitors */}
               <div style={{ ...card, marginBottom: 24 }}>
-                <div style={{ fontSize: 15, fontWeight: 700, color: D.text, marginBottom: 4, letterSpacing: "-0.02em" }}>Marcas de referencia</div>
-                <div style={{ fontSize: 12, color: D.text3, marginBottom: 16 }}>Marcas que admiras o inspiran tu contenido (opcional)</div>
+                <div style={{ fontSize: 15, fontWeight: 700, color: D.text, marginBottom: 4, letterSpacing: "-0.02em" }}>{en ? "Reference brands" : "Marcas de referencia"}</div>
+                <div style={{ fontSize: 12, color: D.text3, marginBottom: 16 }}>{en ? "Brands you admire or inspire your content (optional)" : "Marcas que admiras o inspiran tu contenido (opcional)"}</div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {profile.competidores.map((comp, i) => (
-                    <input key={i} className="input-focus" style={inp(comp)} placeholder={"@cuenta o URL " + (i + 1)} value={comp}
+                    <input key={i} className="input-focus" style={inp(comp)} placeholder={(en ? "@account or URL " : "@cuenta o URL ") + (i + 1)} value={comp}
                       onChange={e => { const arr = [...profile.competidores]; arr[i] = e.target.value; setProfile(p => ({ ...p, competidores: arr })); }} />
                   ))}
                 </div>
@@ -652,15 +662,15 @@ function ADNContent() {
               {pct === 100 ? (
                 <button onClick={() => router.push("/crear")} className="glow-btn"
                   style={{ width: "100%", padding: 18, background: "linear-gradient(135deg,#40C057,#2B8A3E)", color: "#fff", border: "none", borderRadius: 14, fontSize: 17, fontWeight: 800, cursor: "pointer", letterSpacing: "-0.02em", boxShadow: "0 8px 30px rgba(64,192,87,0.4), 0 0 60px rgba(64,192,87,0.15)", transition: "all 0.3s ease" }}>
-                  ADN Completo! Crear mi primera pieza →
+                  {en ? "DNA Complete! Create my first piece →" : "ADN Completo! Crear mi primera pieza →"}
                 </button>
               ) : (
                 <div style={{ ...card, textAlign: "center", padding: "32px" }}>
-                  <div style={{ fontSize: 18, fontWeight: 700, color: D.text, marginBottom: 8, letterSpacing: "-0.02em" }}>Tu ADN está guardado</div>
-                  <div style={{ fontSize: 14, color: D.text2, marginBottom: 20 }}>Puedes seguir completando o empezar a crear</div>
+                  <div style={{ fontSize: 18, fontWeight: 700, color: D.text, marginBottom: 8, letterSpacing: "-0.02em" }}>{en ? "Your DNA is saved" : "Tu ADN está guardado"}</div>
+                  <div style={{ fontSize: 14, color: D.text2, marginBottom: 20 }}>{en ? "You can keep completing or start creating" : "Puedes seguir completando o empezar a crear"}</div>
                   <button onClick={() => router.push("/crear")}
                     style={{ padding: "14px 36px", background: "linear-gradient(135deg,#7950F2,#A78BFA)", color: "#fff", border: "none", borderRadius: 100, fontSize: 15, fontWeight: 700, cursor: "pointer", boxShadow: "0 8px 24px rgba(121,80,242,0.3)", transition: "all 0.3s ease", letterSpacing: "-0.02em" }}>
-                    Ir a crear →
+                    {en ? "Start creating →" : "Ir a crear →"}
                   </button>
                 </div>
               )}
@@ -673,24 +683,24 @@ function ADNContent() {
       <div className="adn-footer" style={{ position: "fixed", bottom: 0, left: 260, right: 0, zIndex: 45, background: "rgba(14,14,30,0.95)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderTop: "1px solid rgba(255,255,255,0.1)" }}>
         <div style={{ maxWidth: 760, margin: "0 auto", padding: "16px 28px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ fontSize: 14, color: D.text2, letterSpacing: "-0.02em", minWidth: 160 }}>
-            {saveStatus === "saving" && <span style={{ color: D.purpleLight, fontWeight: 600 }}>💾 Guardando cambios...</span>}
-            {saveStatus === "saved" && <span style={{ color: "#40C057", fontWeight: 600 }}>✓ Cambios guardados</span>}
-            {saveStatus === "idle" && <span style={{ color: D.text3 }}>Paso {step} de 3</span>}
+            {saveStatus === "saving" && <span style={{ color: D.purpleLight, fontWeight: 600 }}>{en ? "Saving changes..." : "💾 Guardando cambios..."}</span>}
+            {saveStatus === "saved" && <span style={{ color: "#40C057", fontWeight: 600 }}>{en ? "✓ Changes saved" : "✓ Cambios guardados"}</span>}
+            {saveStatus === "idle" && <span style={{ color: D.text3 }}>{en ? "Step" : "Paso"} {step} {en ? "of" : "de"} 3</span>}
           </div>
           <div style={{ display: "flex", gap: 10 }}>
             {step > 1 && (
               <button onClick={goPrev} style={{ padding: "11px 24px", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 10, color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer", transition: "all 0.3s ease", letterSpacing: "-0.02em" }}>
-                ← Anterior
+                {en ? "← Previous" : "← Anterior"}
               </button>
             )}
             {step < 3 ? (
               <button onClick={goNext} style={{ padding: "11px 28px", background: D.purple, border: "none", borderRadius: 10, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer", boxShadow: "0 4px 14px rgba(121,80,242,0.4)", transition: "all 0.3s ease", letterSpacing: "-0.02em" }}>
-                Siguiente →
+                {en ? "Next →" : "Siguiente →"}
               </button>
             ) : (
               <button onClick={() => { handleSave(); router.push("/crear"); }}
                 style={{ padding: "11px 28px", background: pct === 100 ? "linear-gradient(135deg,#40C057,#2B8A3E)" : D.purple, border: "none", borderRadius: 10, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer", boxShadow: pct === 100 ? "0 4px 14px rgba(64,192,87,0.4)" : "0 4px 14px rgba(121,80,242,0.4)", transition: "all 0.3s ease", letterSpacing: "-0.02em" }}>
-                {pct === 100 ? "ADN Completo! Crear →" : "Listo — Crear →"}
+                {pct === 100 ? (en ? "DNA Complete! Create →" : "ADN Completo! Crear →") : (en ? "Done — Create →" : "Listo — Crear →")}
               </button>
             )}
           </div>

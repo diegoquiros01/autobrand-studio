@@ -13,6 +13,13 @@ export default function Biblioteca() {
   const [page, setPage] = useState(1);
   const PER_PAGE = 20;
 
+  const [lang, setLang] = useState("es");
+  useEffect(() => {
+    const saved = localStorage.getItem("lang");
+    if (saved) setLang(saved);
+  }, []);
+  const en = lang === "en";
+
   const D = {
     bg3:"#16162d", border:"rgba(255,255,255,0.1)",
     text:"#fff", text2:"rgba(255,255,255,0.7)", text3:"rgba(255,255,255,0.4)",
@@ -42,18 +49,18 @@ export default function Biblioteca() {
   }, []);
 
   const deleteGeneracion = async (id) => {
-    if (!confirm("¿Eliminar esta pieza?")) return;
+    if (!confirm(en ? "Delete this piece?" : "¿Eliminar esta pieza?")) return;
     try {
       const { error } = await supabase.from("generaciones").delete().eq("id", id);
       if (error) throw error;
       setGeneraciones(prev => prev.filter(g => g.id !== id));
       if (selected?.id === id) setSelected(null);
     } catch (e) {
-      alert("Error al eliminar: " + (e.message || "intenta de nuevo"));
+      alert((en ? "Error deleting: " : "Error al eliminar: ") + (e.message || "intenta de nuevo"));
     }
   };
 
-  const formatDate = (d) => new Date(d).toLocaleDateString("es-ES", { day:"numeric", month:"short", year:"numeric" });
+  const formatDate = (d) => new Date(d).toLocaleDateString(en ? "en-US" : "es-ES", { day:"numeric", month:"short", year:"numeric" });
 
   const allFiltered = filter === "todas" ? generaciones : generaciones.filter(g => g.tipo === filter);
   const totalPages = Math.ceil(allFiltered.length / PER_PAGE);
@@ -64,12 +71,12 @@ export default function Biblioteca() {
       <div style={{ padding:"32px 28px" }}>
         <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:20 }}>
           <div>
-            <h1 style={{ fontSize:22, fontWeight:500, color:D.text, marginBottom:4, letterSpacing:"-0.02em" }}>Mi biblioteca</h1>
-            <p style={{ fontSize:13, color:D.text2 }}>Tus piezas guardadas — editables y reutilizables en cualquier momento</p>
+            <h1 style={{ fontSize:22, fontWeight:500, color:D.text, marginBottom:4, letterSpacing:"-0.02em" }}>{en ? "My library" : "Mi biblioteca"}</h1>
+            <p style={{ fontSize:13, color:D.text2 }}>{en ? "Your saved pieces — editable and reusable anytime" : "Tus piezas guardadas — editables y reutilizables en cualquier momento"}</p>
           </div>
           <button className="btn-primary" onClick={() => router.push("/crear")}
             style={{ padding:"9px 18px", background:D.purple, color:"#fff", border:"none", borderRadius:9, fontSize:13, fontWeight:500, cursor:"pointer" }}>
-            + Nueva pieza
+            {en ? "+ New piece" : "+ Nueva pieza"}
           </button>
         </div>
 
@@ -77,23 +84,23 @@ export default function Biblioteca() {
           {TIPOS.map(t => (
             <button key={t} onClick={() => { setFilter(t); setPage(1); }}
               style={{ padding:"5px 12px", borderRadius:20, fontSize:11.5, border: filter===t ? "1.5px solid " + D.purple : "1px solid rgba(255,255,255,0.1)", background: filter===t ? "rgba(121,80,242,0.12)" : "transparent", color: filter===t ? D.purpleLight : D.text3, fontWeight: filter===t ? 500 : 400, cursor:"pointer" }}>
-              {t === "todas" ? "Todas (" + generaciones.length + ")" : t}
+              {t === "todas" ? (en ? "All" : "Todas") + " (" + generaciones.length + ")" : t}
             </button>
           ))}
         </div>
 
         {loading ? (
-          <div style={{ textAlign:"center", padding:"60px 0", color:D.text3 }}>Cargando tu biblioteca...</div>
+          <div style={{ textAlign:"center", padding:"60px 0", color:D.text3 }}>{en ? "Loading your library..." : "Cargando tu biblioteca..."}</div>
         ) : filtered.length === 0 ? (
           <div style={{ background:D.bg3, border:"1px solid " + D.border, borderRadius:14, padding:"60px 24px", textAlign:"center" }}>
             <div style={{ fontSize:40, opacity:0.1, marginBottom:12 }}>◉</div>
             <div style={{ fontSize:15, color:D.text2, fontWeight:500, marginBottom:8 }}>
-              {filter === "todas" ? "No tienes piezas todavía" : "No tienes piezas de tipo " + filter}
+              {filter === "todas" ? (en ? "You don't have any pieces yet" : "No tienes piezas todavía") : (en ? "You don't have pieces of type " : "No tienes piezas de tipo ") + filter}
             </div>
-            <div style={{ fontSize:13, color:D.text3, marginBottom:20 }}>Genera tu primera pieza y aparecerá aquí</div>
+            <div style={{ fontSize:13, color:D.text3, marginBottom:20 }}>{en ? "Generate your first piece and it will appear here" : "Genera tu primera pieza y aparecerá aquí"}</div>
             <button onClick={() => router.push("/crear")}
               style={{ padding:"11px 24px", background:D.purple, color:"#fff", border:"none", borderRadius:9, fontSize:14, fontWeight:500, cursor:"pointer" }}>
-              Crear mi primera pieza →
+              {en ? "Create my first piece →" : "Crear mi primera pieza →"}
             </button>
           </div>
         ) : (
@@ -175,13 +182,13 @@ export default function Biblioteca() {
                       ⬇ Descargar imagen
                     </button>
                   )}
-                  <button onClick={() => { navigator.clipboard.writeText((selected.propuestas?.[0]?.hook || "") + "\n\n" + (selected.propuestas?.[0]?.copy || "") + "\n\n" + (selected.propuestas?.[0]?.cta || "") + "\n\n" + (selected.propuestas?.[0]?.hashtags || "")); alert("Copy copiado!"); }}
+                  <button onClick={() => { navigator.clipboard.writeText((selected.propuestas?.[0]?.hook || "") + "\n\n" + (selected.propuestas?.[0]?.copy || "") + "\n\n" + (selected.propuestas?.[0]?.cta || "") + "\n\n" + (selected.propuestas?.[0]?.hashtags || "")); alert(en ? "Text copied!" : "Copy copiado!"); }}
                     style={{ width:"100%", padding:10, background:"rgba(255,255,255,0.06)", color:D.text2, border:"1px solid " + D.border, borderRadius:8, fontSize:12, fontWeight:500, cursor:"pointer" }}>
                     ⎘ Copiar texto
                   </button>
                   <button className="btn-primary" onClick={() => router.push("/crear?prompt=" + encodeURIComponent(selected.prompt || "") + "&tipo=" + encodeURIComponent(selected.tipo || "Comercial"))}
                     style={{ width:"100%", padding:10, background:D.purple, color:"#fff", border:"none", borderRadius:8, fontSize:12, fontWeight:500, cursor:"pointer" }}>
-                    ✦ Crear pieza similar
+                    {en ? "✦ Create similar piece" : "✦ Crear pieza similar"}
                   </button>
                 </div>
               </div>
