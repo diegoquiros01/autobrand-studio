@@ -57,15 +57,33 @@ function LoginContent() {
   const inpClass = "input-focus";
 
   return (
-    <div style={{ minHeight:"100vh", background:"#0D0D1F" }}>
-      <nav style={{ display:"flex", alignItems:"center", padding:"0 28px", height:60, borderBottom:"1px solid rgba(255,255,255,0.1)", background:"#111122" }}>
+    <div style={{ minHeight:"100vh", background:"#0A0A1A", position:"relative", overflow:"hidden" }}>
+      {/* Gradient mesh background (same as home) */}
+      <div style={{ position:"absolute", inset:0, zIndex:0, overflow:"hidden" }}>
+        <div style={{ position:"absolute", inset:0, background:"linear-gradient(180deg, #1a0a2e 0%, #0A0A1A 100%)" }} />
+        <div className="login-orb-1" style={{ position:"absolute", top:"-10%", left:"30%", width:"60%", height:"60%", borderRadius:"50%", background:"radial-gradient(circle, rgba(121,80,242,0.7) 0%, rgba(121,80,242,0) 70%)", filter:"blur(60px)", pointerEvents:"none" }} />
+        <div className="login-orb-2" style={{ position:"absolute", top:"20%", right:"-5%", width:"50%", height:"50%", borderRadius:"50%", background:"radial-gradient(circle, rgba(230,73,128,0.5) 0%, rgba(230,73,128,0) 70%)", filter:"blur(80px)", pointerEvents:"none" }} />
+        <div className="login-orb-3" style={{ position:"absolute", top:"30%", left:"-10%", width:"45%", height:"50%", borderRadius:"50%", background:"radial-gradient(circle, rgba(167,139,250,0.45) 0%, rgba(167,139,250,0) 70%)", filter:"blur(70px)", pointerEvents:"none" }} />
+        <div style={{ position:"absolute", bottom:"-5%", left:"20%", width:"60%", height:"40%", borderRadius:"50%", background:"radial-gradient(circle, rgba(88,40,200,0.5) 0%, rgba(88,40,200,0) 70%)", filter:"blur(80px)", pointerEvents:"none" }} />
+        <div style={{ position:"absolute", bottom:"5%", right:"10%", width:"35%", height:"35%", borderRadius:"50%", background:"radial-gradient(circle, rgba(245,101,101,0.25) 0%, rgba(245,101,101,0) 70%)", filter:"blur(60px)", pointerEvents:"none" }} />
+        <div style={{ position:"absolute", top:"15%", left:"25%", width:"50%", height:"30%", borderRadius:"50%", background:"radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 70%)", filter:"blur(40px)", pointerEvents:"none" }} />
+      </div>
+      <style>{`
+        @keyframes loginOrbFloat1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(30px,-20px)} }
+        @keyframes loginOrbFloat2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-25px,15px)} }
+        @keyframes loginOrbFloat3 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(20px,25px)} }
+        .login-orb-1 { animation: loginOrbFloat1 8s ease-in-out infinite; }
+        .login-orb-2 { animation: loginOrbFloat2 10s ease-in-out infinite; }
+        .login-orb-3 { animation: loginOrbFloat3 12s ease-in-out infinite; }
+      `}</style>
+      <nav style={{ position:"relative", zIndex:1, display:"flex", alignItems:"center", padding:"0 28px", height:60, borderBottom:"1px solid rgba(255,255,255,0.1)", background:"rgba(17,17,34,0.5)", backdropFilter:"blur(10px)" }}>
         <div style={{ display:"flex", alignItems:"center", gap:10, cursor:"pointer" }} onClick={() => router.push("/")}>
           <div style={{ width:32, height:32, background:"linear-gradient(135deg,#7950F2,#4C6EF5)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:500, fontSize:13 }}>Ai</div>
           <span style={{ fontSize:16, fontWeight:500, color:"#fff" }}>Ai<span style={{ color:"#7950F2" }}>Studio</span>Brand</span>
         </div>
       </nav>
-      <div style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"calc(100vh - 60px)", padding:20 }}>
-        <div style={{ background:"#16162d", border:"1px solid rgba(255,255,255,0.1)", borderRadius:20, padding:"36px 32px", width:"100%", maxWidth:380, boxShadow:"0 8px 40px rgba(0,0,0,0.08)" }}>
+      <div style={{ position:"relative", zIndex:1, display:"flex", alignItems:"center", justifyContent:"center", minHeight:"calc(100vh - 60px)", padding:20 }}>
+        <div style={{ background:"rgba(22,22,45,0.85)", backdropFilter:"blur(20px)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:20, padding:"36px 32px", width:"100%", maxWidth:380, boxShadow:"0 8px 40px rgba(0,0,0,0.3)" }}>
           <div style={{ textAlign:"center", marginBottom:24 }}>
             <div style={{ width:44, height:44, background:"linear-gradient(135deg,#7950F2,#4C6EF5)", borderRadius:12, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:500, fontSize:18, margin:"0 auto 10px" }}>Ai</div>
             <div style={{ fontSize:20, fontWeight:500, color:"#fff", marginBottom:4 }}>Ai<span style={{ color:"#7950F2" }}>Studio</span>Brand</div>
