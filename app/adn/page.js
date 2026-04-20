@@ -397,10 +397,16 @@ function ADNContent() {
                 )}
                 {analyzeError && <div style={{ background: "rgba(220,38,38,0.1)", borderRadius: 8, padding: 10, fontSize: 11, color: "#FCA5A5", marginBottom: 12 }}>{analyzeError}</div>}
 
-                <button onClick={analyzeInstagram} disabled={analyzing || sources.length === 0}
-                  style={{ width: "100%", padding: 13, background: analyzing || sources.length === 0 ? "rgba(121,80,242,0.2)" : "linear-gradient(135deg,#7950F2,#4C1D95)", color: "#fff", border: "none", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: analyzing || sources.length === 0 ? "not-allowed" : "pointer", transition: "all 0.3s ease", boxShadow: sources.length > 0 ? "0 8px 24px rgba(121,80,242,0.3)" : "none", letterSpacing: "-0.02em" }}>
-                  {analyzing ? "Analizando con Claude..." : "Analizar " + sources.length + " fuente" + (sources.length !== 1 ? "s" : "") + " →"}
-                </button>
+                {analyzeProgress === 100 && !analyzing ? (
+                  <div style={{ width: "100%", padding: 13, background: "rgba(64,192,87,0.15)", border: "2px solid rgba(64,192,87,0.4)", borderRadius: 10, fontSize: 14, fontWeight: 700, color: "#40C057", textAlign: "center", letterSpacing: "-0.02em", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+                    <span style={{ fontSize: 16 }}>✓</span> Análisis completado — ADN actualizado
+                  </div>
+                ) : (
+                  <button onClick={analyzeInstagram} disabled={analyzing || sources.length === 0}
+                    style={{ width: "100%", padding: 13, background: analyzing || sources.length === 0 ? "rgba(121,80,242,0.2)" : "linear-gradient(135deg,#7950F2,#4C1D95)", color: "#fff", border: "none", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: analyzing || sources.length === 0 ? "not-allowed" : "pointer", transition: "all 0.3s ease", boxShadow: sources.length > 0 ? "0 8px 24px rgba(121,80,242,0.3)" : "none", letterSpacing: "-0.02em" }}>
+                    {analyzing ? "Analizando con Claude..." : "Analizar " + sources.length + " fuente" + (sources.length !== 1 ? "s" : "") + " →"}
+                  </button>
+                )}
               </div>
             </div>
           )}
