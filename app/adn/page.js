@@ -40,20 +40,38 @@ const STEPS = [
   { n: 3, title: "Estilo Visual y Referencias", sub: "Tu personalidad visual, colores y ejemplos de copy ideal" },
 ];
 
+const BLANK_PROFILE = {
+  nombre: "", descripcion: "", audiencia: "", tono: [],
+  idioma: "", categorias: [], propuestaValor: "",
+  instagramUrl: "", tiktokUrl: "", webUrl: "", canvaUrl: "",
+  personalidad: "", coloresMarca: [], estiloVisual: "",
+  ejemplosCopy: ["", "", ""], competidores: ["", "", ""],
+};
+
+const dataToProfile = (data) => ({
+  nombre: data.nombre || "", descripcion: data.descripcion || "",
+  audiencia: data.audiencia || "", tono: Array.isArray(data.tono) ? data.tono : (data.tono ? [data.tono] : []),
+  idioma: data.idioma || "", categorias: data.categorias || [],
+  propuestaValor: data.propuesta_valor || "",
+  instagramUrl: data.instagram_url || "", tiktokUrl: data.tiktok_url || "",
+  webUrl: data.web_url || "", canvaUrl: data.canva_url || "",
+  personalidad: data.personalidad || "", coloresMarca: data.colores_marca || [],
+  estiloVisual: data.estilo_visual || "",
+  ejemplosCopy: data.ejemplos_copy && data.ejemplos_copy.length > 0 ? data.ejemplos_copy : ["", "", ""],
+  competidores: data.competidores && data.competidores.length > 0 ? data.competidores : ["", "", ""],
+});
+
 function ADNContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isOnboarding = searchParams.get("onboarding") === "true";
+  const paramBrandId = searchParams.get("brand");
+  const isNewBrand = searchParams.get("new") === "true";
 
   const [step, setStep] = useState(1);
   const [user, setUser] = useState(null);
-  const [profile, setProfile] = useState({
-    nombre: "", descripcion: "", audiencia: "", tono: [],
-    idioma: "", categorias: [], propuestaValor: "",
-    instagramUrl: "", tiktokUrl: "", webUrl: "", canvaUrl: "",
-    personalidad: "", coloresMarca: [], estiloVisual: "",
-    ejemplosCopy: ["", "", ""], competidores: ["", "", ""],
-  });
+  const [brandId, setBrandId] = useState(null); // current brand profile ID
+  const [profile, setProfile] = useState({ ...BLANK_PROFILE });
 
   const [saveStatus, setSaveStatus] = useState("idle");
   const [analyzing, setAnalyzing] = useState(false);
@@ -71,10 +89,12 @@ function ADNContent() {
   const debounceRef = useRef(null);
   const profileRef = useRef(profile);
   const userRef = useRef(user);
+  const brandIdRef = useRef(brandId);
   const initialLoadDone = useRef(false);
 
   useEffect(() => { profileRef.current = profile; }, [profile]);
   useEffect(() => { userRef.current = user; }, [user]);
+  useEffect(() => { brandIdRef.current = brandId; }, [brandId]);
 
   // --- Load ---
   useEffect(() => {
@@ -82,22 +102,40 @@ function ADNContent() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
       setUser(user);
-      const { data } = await supabase.from("brand_profiles").select("*").eq("user_id", user.id).single();
-      if (data) {
-        const loaded = {
-          nombre: data.nombre || "", descripcion: data.descripcion || "",
-          audiencia: data.audiencia || "", tono: Array.isArray(data.tono) ? data.tono : (data.tono ? [data.tono] : []),
-          idioma: data.idioma || "", categorias: data.categorias || [],
-          propuestaValor: data.propuesta_valor || "",
-          instagramUrl: data.instagram_url || "", tiktokUrl: data.tiktok_url || "",
-          webUrl: data.web_url || "", canvaUrl: data.canva_url || "",
-          personalidad: data.personalidad || "", coloresMarca: data.colores_marca || [],
-          estiloVisual: data.estilo_visual || "",
-          ejemplosCopy: data.ejemplos_copy && data.ejemplos_copy.length > 0 ? data.ejemplos_copy : ["", "", ""],
-          competidores: data.competidores && data.competidores.length > 0 ? data.competidores : ["", "", ""],
-        };
+
+      // New brand → blank profile, no load
+      if (isNewBrand) {
+        setProfile({ ...BLANK_PROFILE });
+        setBrandId(null);
+        initialLoadDone.current = true;
+        return;
+      }
+
+      // Specific brand from URL or active brand from localStorage
+      const targetId = paramBrandId || localStorage.getItem("activeBrandId");
+
+      if (targetId) {
+        const { data } = await supabase.from("brand_profiles").select("*").eq("id", targetId).single();
+        if (data) {
+          const loaded = dataToProfile(data);
+          setProfile(loaded);
+          setBrandId(data.id);
+          localStorage.setItem("activeBrandId", data.id);
+          localStorage.setItem("brandProfile", JSON.stringify({ id: data.id, ...loaded }));
+          initialLoadDone.current = true;
+          return;
+        }
+      }
+
+      // Fallback: load first brand for this user
+      const { data: allBrands } = await supabase.from("brand_profiles").select("*").eq("user_id", user.id).order("created_at", { ascending: true }).limit(1);
+      if (allBrands && allBrands.length > 0) {
+        const data = allBrands[0];
+        const loaded = dataToProfile(data);
         setProfile(loaded);
-        localStorage.setItem("brandProfile", JSON.stringify(loaded));
+        setBrandId(data.id);
+        localStorage.setItem("activeBrandId", data.id);
+        localStorage.setItem("brandProfile", JSON.stringify({ id: data.id, ...loaded }));
       }
       initialLoadDone.current = true;
     };
@@ -108,9 +146,9 @@ function ADNContent() {
   const handleSave = useCallback(async () => {
     const u = userRef.current;
     const p = profileRef.current;
+    const currentBrandId = brandIdRef.current;
     if (!u) return;
     setSaveStatus("saving");
-    localStorage.setItem("brandProfile", JSON.stringify(p));
     const payload = {
       nombre: p.nombre, descripcion: p.descripcion,
       audiencia: p.audiencia, tono: p.tono,
@@ -125,9 +163,24 @@ function ADNContent() {
       competidores: p.competidores.filter(c => c),
       updated_at: new Date().toISOString(),
     };
-    const { data: existing } = await supabase.from("brand_profiles").select("id").eq("user_id", u.id).single();
-    if (existing) await supabase.from("brand_profiles").update(payload).eq("user_id", u.id);
-    else await supabase.from("brand_profiles").insert({ ...payload, user_id: u.id });
+
+    if (currentBrandId) {
+      // Update existing brand
+      await supabase.from("brand_profiles").update(payload).eq("id", currentBrandId);
+    } else {
+      // Insert new brand
+      const { data: inserted } = await supabase.from("brand_profiles").insert({ ...payload, user_id: u.id }).select("id").single();
+      if (inserted) {
+        brandIdRef.current = inserted.id;
+        setBrandId(inserted.id);
+        localStorage.setItem("activeBrandId", inserted.id);
+      }
+    }
+
+    // Update localStorage cache
+    const bid = brandIdRef.current;
+    localStorage.setItem("brandProfile", JSON.stringify({ id: bid, ...p }));
+    window.dispatchEvent(new Event("brandChanged"));
     setSaveStatus("saved");
     setTimeout(() => setSaveStatus("idle"), 2500);
   }, []);
@@ -135,7 +188,6 @@ function ADNContent() {
   // Autosave on change
   useEffect(() => {
     if (!initialLoadDone.current) return;
-    localStorage.setItem("brandProfile", JSON.stringify(profile));
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => handleSave(), 1500);
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };

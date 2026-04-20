@@ -61,12 +61,31 @@ function CrearContent() {
   const [savedFinal, setSavedFinal] = useState(false);
   const [error, setError] = useState("");
 
+  const [allBrands, setAllBrands] = useState([]);
+  const [brandDropdownOpen, setBrandDropdownOpen] = useState(false);
+
   const loadBrandProfile = async (user) => {
     if (!user) return;
-    const { data } = await supabase.from("brand_profiles").select("*").eq("user_id", user.id).single();
+    // Load all brands for switcher
+    const { data: brands } = await supabase.from("brand_profiles").select("id, nombre").eq("user_id", user.id).order("created_at", { ascending: true });
+    setAllBrands(brands || []);
+
+    // Load active brand
+    const activeBrandId = localStorage.getItem("activeBrandId");
+    let query;
+    if (activeBrandId) {
+      query = supabase.from("brand_profiles").select("*").eq("id", activeBrandId).single();
+    } else if (brands && brands.length > 0) {
+      query = supabase.from("brand_profiles").select("*").eq("id", brands[0].id).single();
+    } else {
+      const bp = localStorage.getItem("brandProfile");
+      if (bp) setBrandProfile(JSON.parse(bp));
+      return;
+    }
+    const { data } = await query;
     if (data) {
       const bp = {
-        nombre: data.nombre, descripcion: data.descripcion,
+        id: data.id, nombre: data.nombre, descripcion: data.descripcion,
         audiencia: data.audiencia, tono: data.tono,
         idioma: data.idioma, categorias: data.categorias,
         propuestaValor: data.propuesta_valor,
@@ -76,10 +95,28 @@ function CrearContent() {
       };
       setBrandProfile(bp);
       localStorage.setItem("brandProfile", JSON.stringify(bp));
-    } else {
-      const bp = localStorage.getItem("brandProfile");
-      if (bp) setBrandProfile(JSON.parse(bp));
+      localStorage.setItem("activeBrandId", data.id);
     }
+  };
+
+  const switchBrandInCrear = async (brand) => {
+    const { data } = await supabase.from("brand_profiles").select("*").eq("id", brand.id).single();
+    if (data) {
+      const bp = {
+        id: data.id, nombre: data.nombre, descripcion: data.descripcion,
+        audiencia: data.audiencia, tono: data.tono,
+        idioma: data.idioma, categorias: data.categorias,
+        propuestaValor: data.propuesta_valor,
+        instagramUrl: data.instagram_url, webUrl: data.web_url,
+        personalidad: data.personalidad, coloresMarca: data.colores_marca,
+        estiloVisual: data.estilo_visual, ejemplosCopy: data.ejemplos_copy,
+      };
+      setBrandProfile(bp);
+      localStorage.setItem("brandProfile", JSON.stringify(bp));
+      localStorage.setItem("activeBrandId", data.id);
+      window.dispatchEvent(new Event("brandChanged"));
+    }
+    setBrandDropdownOpen(false);
   };
 
   useEffect(() => {
@@ -87,7 +124,6 @@ function CrearContent() {
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
       await loadBrandProfile(user);
-      // Pre-fill from query params (e.g. "Crear pieza similar" from biblioteca)
       const qPrompt = searchParams.get("prompt");
       const qTipo = searchParams.get("tipo");
       if (qPrompt) setPrompt(qPrompt);
@@ -95,13 +131,18 @@ function CrearContent() {
     };
     init();
 
-    // Reload ADN when user comes back to this tab
+    // Reload ADN when user comes back to this tab or brand changes
     const handleFocus = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       await loadBrandProfile(user);
     };
+    const handleBrandChanged = () => handleFocus();
     window.addEventListener("focus", handleFocus);
-    return () => window.removeEventListener("focus", handleFocus);
+    window.addEventListener("brandChanged", handleBrandChanged);
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+      window.removeEventListener("brandChanged", handleBrandChanged);
+    };
   }, []);
 
   const toBase64 = (file) => new Promise((res, rej) => {
@@ -344,9 +385,25 @@ function CrearContent() {
           <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:16 }}>
             <h1 style={{ fontSize:18, fontWeight:700, color:D.text, letterSpacing:"-0.03em" }}>Nueva pieza</h1>
             {brandProfile && (
-              <div style={{ display:"inline-flex", alignItems:"center", gap:5, background:"rgba(121,80,242,0.1)", borderRadius:20, padding:"3px 10px", border:"1px solid rgba(121,80,242,0.2)", cursor:"pointer" }} onClick={() => router.push("/adn")}>
-                <span style={{ width:5, height:5, borderRadius:"50%", background:D.purpleLight, display:"inline-block" }} />
-                <span style={{ fontSize:10, color:D.purpleLight, fontWeight:500 }}>{brandProfile.nombre || "Tu marca"}</span>
+              <div style={{ position:"relative" }}>
+                <div style={{ display:"inline-flex", alignItems:"center", gap:5, background:"rgba(121,80,242,0.1)", borderRadius:20, padding:"3px 10px", border:"1px solid rgba(121,80,242,0.2)", cursor:"pointer" }} onClick={() => setBrandDropdownOpen(!brandDropdownOpen)}>
+                  <span style={{ width:5, height:5, borderRadius:"50%", background:D.purpleLight, display:"inline-block" }} />
+                  <span style={{ fontSize:10, color:D.purpleLight, fontWeight:500 }}>{brandProfile.nombre || "Tu marca"}</span>
+                  {allBrands.length > 1 && <span style={{ fontSize:8, color:"rgba(255,255,255,0.3)" }}>▼</span>}
+                </div>
+                {brandDropdownOpen && allBrands.length > 1 && (
+                  <div style={{ position:"absolute", top:"100%", right:0, marginTop:6, background:"#16162d", border:"1px solid rgba(255,255,255,0.12)", borderRadius:10, padding:4, zIndex:100, boxShadow:"0 8px 30px rgba(0,0,0,0.5)", minWidth:180 }}>
+                    {allBrands.map(b => (
+                      <div key={b.id} onClick={() => switchBrandInCrear(b)} style={{
+                        display:"flex", alignItems:"center", gap:8, padding:"8px 10px", borderRadius:6, cursor:"pointer",
+                        background: b.id === brandProfile?.id ? "rgba(121,80,242,0.15)" : "transparent",
+                      }}>
+                        <span style={{ width:5, height:5, borderRadius:"50%", background: b.id === brandProfile?.id ? D.purpleLight : "rgba(255,255,255,0.2)", display:"inline-block" }} />
+                        <span style={{ fontSize:12, color:"#fff", fontWeight: b.id === brandProfile?.id ? 600 : 400 }}>{b.nombre || "Sin nombre"}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </div>

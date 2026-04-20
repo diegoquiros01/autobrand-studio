@@ -9,24 +9,100 @@ export default function AppLayout({ children }) {
   const router = useRouter();
   const pathname = usePathname();
   const [user, setUser] = useState(null);
-  const [brandProfile, setBrandProfile] = useState(null);
+  const [brands, setBrands] = useState([]);
+  const [activeBrand, setActiveBrand] = useState(null);
+  const [brandMenuOpen, setBrandMenuOpen] = useState(false);
   const [lang, setLang] = useState("es");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  // Load user + brands
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const init = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
       if (!session) { router.push("/login"); return; }
       setUser(session.user);
-    });
+      await loadBrands(session.user.id);
+    };
+    init();
     supabase.auth.onAuthStateChange((_e, session) => {
       if (!session) router.push("/login");
       else setUser(session?.user);
     });
-    const bp = localStorage.getItem("brandProfile");
-    if (bp) setBrandProfile(JSON.parse(bp));
     const saved = localStorage.getItem("lang");
     if (saved) setLang(saved);
+
+    // Listen for brand changes from other components
+    const handleBrandChanged = () => loadBrandsFromUser();
+    window.addEventListener("brandChanged", handleBrandChanged);
+    window.addEventListener("storage", (e) => {
+      if (e.key === "activeBrandId") loadBrandsFromUser();
+    });
+    return () => window.removeEventListener("brandChanged", handleBrandChanged);
   }, []);
+
+  const loadBrandsFromUser = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) await loadBrands(user.id);
+  };
+
+  const loadBrands = async (userId) => {
+    const { data } = await supabase.from("brand_profiles").select("id, nombre, tono, idioma").eq("user_id", userId).order("created_at", { ascending: true });
+    const list = data || [];
+    setBrands(list);
+
+    if (list.length === 0) {
+      setActiveBrand(null);
+      return;
+    }
+
+    // Determine active brand
+    const savedId = localStorage.getItem("activeBrandId");
+    const found = savedId ? list.find(b => b.id === savedId) : null;
+    const active = found || list[0];
+    setActiveBrand(active);
+    localStorage.setItem("activeBrandId", active.id);
+
+    // Also load full profile for cache
+    const { data: full } = await supabase.from("brand_profiles").select("*").eq("id", active.id).single();
+    if (full) {
+      const bp = {
+        id: full.id, nombre: full.nombre || "", descripcion: full.descripcion || "",
+        audiencia: full.audiencia || "", tono: full.tono || "",
+        idioma: full.idioma || "", categorias: full.categorias || [],
+        propuestaValor: full.propuesta_valor || "",
+        instagramUrl: full.instagram_url || "", tiktokUrl: full.tiktok_url || "",
+        webUrl: full.web_url || "", canvaUrl: full.canva_url || "",
+        personalidad: full.personalidad || "", coloresMarca: full.colores_marca || [],
+        estiloVisual: full.estilo_visual || "",
+        ejemplosCopy: full.ejemplos_copy || [], competidores: full.competidores || [],
+      };
+      localStorage.setItem("brandProfile", JSON.stringify(bp));
+    }
+  };
+
+  const switchBrand = async (brand) => {
+    setActiveBrand(brand);
+    localStorage.setItem("activeBrandId", brand.id);
+    setBrandMenuOpen(false);
+
+    // Load full profile into cache
+    const { data: full } = await supabase.from("brand_profiles").select("*").eq("id", brand.id).single();
+    if (full) {
+      const bp = {
+        id: full.id, nombre: full.nombre || "", descripcion: full.descripcion || "",
+        audiencia: full.audiencia || "", tono: full.tono || "",
+        idioma: full.idioma || "", categorias: full.categorias || [],
+        propuestaValor: full.propuesta_valor || "",
+        instagramUrl: full.instagram_url || "", tiktokUrl: full.tiktok_url || "",
+        webUrl: full.web_url || "", canvaUrl: full.canva_url || "",
+        personalidad: full.personalidad || "", coloresMarca: full.colores_marca || [],
+        estiloVisual: full.estilo_visual || "",
+        ejemplosCopy: full.ejemplos_copy || [], competidores: full.competidores || [],
+      };
+      localStorage.setItem("brandProfile", JSON.stringify(bp));
+    }
+    window.dispatchEvent(new Event("brandChanged"));
+  };
 
   const setLanguage = (l) => { setLang(l); localStorage.setItem("lang", l); };
   const en = lang === "en";
@@ -40,6 +116,11 @@ export default function AppLayout({ children }) {
   const handleLogout = async () => {
     await supabase.auth.signOut();
     router.push("/");
+  };
+
+  const tonoDisplay = (tono) => {
+    if (Array.isArray(tono)) return tono.join(", ");
+    return tono || "";
   };
 
   return (
@@ -99,24 +180,83 @@ export default function AppLayout({ children }) {
           position: "fixed", top: 64, bottom: 0, left: 0, zIndex: 40,
           overflowY: "auto", transition: "transform 0.3s ease",
         }}>
-          {/* Brand card */}
-          {brandProfile && (
-            <div onClick={() => router.push("/adn")} style={{
-              background: "rgba(121,80,242,0.08)", border: "1px solid rgba(121,80,242,0.2)",
-              borderRadius: 12, padding: "14px 16px", marginBottom: 24, cursor: "pointer",
-              display: "flex", alignItems: "center", gap: 12, transition: "all 0.2s",
-            }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg,#7950F2,#A78BFA)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 800, color: "#fff", flexShrink: 0 }}>
-                {(brandProfile.nombre || "M").charAt(0).toUpperCase()}
-              </div>
-              <div style={{ overflow: "hidden" }}>
-                <div style={{ fontSize: 14, fontWeight: 700, color: "#fff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{brandProfile.nombre || (en ? "Your brand" : "Tu marca")}</div>
-                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)" }}>
-                  {[brandProfile.tono, brandProfile.idioma].filter(Boolean).join(" · ") || (en ? "Set up DNA" : "Configura ADN")}
+          {/* Brand switcher */}
+          <div style={{ position: "relative", marginBottom: 24 }}>
+            {activeBrand ? (
+              <div onClick={() => setBrandMenuOpen(!brandMenuOpen)} style={{
+                background: "rgba(121,80,242,0.08)", border: "1px solid rgba(121,80,242,0.2)",
+                borderRadius: 12, padding: "14px 16px", cursor: "pointer",
+                display: "flex", alignItems: "center", gap: 12, transition: "all 0.2s",
+              }}>
+                <div style={{ width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg,#7950F2,#A78BFA)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 800, color: "#fff", flexShrink: 0 }}>
+                  {(activeBrand.nombre || "M").charAt(0).toUpperCase()}
                 </div>
+                <div style={{ overflow: "hidden", flex: 1 }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: "#fff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{activeBrand.nombre || (en ? "Your brand" : "Tu marca")}</div>
+                  <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)" }}>
+                    {[tonoDisplay(activeBrand.tono), activeBrand.idioma].filter(Boolean).join(" · ") || (en ? "Set up DNA" : "Configura ADN")}
+                  </div>
+                </div>
+                <span style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", flexShrink: 0 }}>{brandMenuOpen ? "▲" : "▼"}</span>
               </div>
-            </div>
-          )}
+            ) : (
+              <button onClick={() => router.push("/adn?new=true")} style={{
+                width: "100%", padding: "14px 16px", background: "rgba(121,80,242,0.08)",
+                border: "1px dashed rgba(121,80,242,0.3)", borderRadius: 12, cursor: "pointer",
+                color: "#A78BFA", fontSize: 14, fontWeight: 600, textAlign: "center",
+              }}>
+                + {en ? "Create brand" : "Crear marca"}
+              </button>
+            )}
+
+            {/* Dropdown menu */}
+            {brandMenuOpen && (
+              <div style={{
+                position: "absolute", top: "100%", left: 0, right: 0, marginTop: 4,
+                background: "#16162d", border: "1px solid rgba(255,255,255,0.12)",
+                borderRadius: 12, padding: 6, zIndex: 100,
+                boxShadow: "0 12px 40px rgba(0,0,0,0.5)",
+              }}>
+                {brands.map(b => (
+                  <div key={b.id} onClick={() => switchBrand(b)} style={{
+                    display: "flex", alignItems: "center", gap: 10, padding: "10px 12px",
+                    borderRadius: 8, cursor: "pointer", transition: "all 0.2s",
+                    background: b.id === activeBrand?.id ? "rgba(121,80,242,0.15)" : "transparent",
+                  }}>
+                    <div style={{
+                      width: 28, height: 28, borderRadius: 8,
+                      background: b.id === activeBrand?.id ? "linear-gradient(135deg,#7950F2,#A78BFA)" : "rgba(255,255,255,0.08)",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: 11, fontWeight: 800, color: "#fff", flexShrink: 0,
+                    }}>
+                      {(b.nombre || "M").charAt(0).toUpperCase()}
+                    </div>
+                    <div style={{ overflow: "hidden", flex: 1 }}>
+                      <div style={{ fontSize: 13, fontWeight: b.id === activeBrand?.id ? 700 : 500, color: "#fff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{b.nombre || (en ? "Unnamed" : "Sin nombre")}</div>
+                    </div>
+                    {b.id === activeBrand?.id && <span style={{ fontSize: 10, color: "#A78BFA" }}>●</span>}
+                  </div>
+                ))}
+                <div style={{ height: 1, background: "rgba(255,255,255,0.08)", margin: "4px 0" }} />
+                <div onClick={() => { setBrandMenuOpen(false); router.push("/adn?new=true"); }} style={{
+                  display: "flex", alignItems: "center", gap: 10, padding: "10px 12px",
+                  borderRadius: 8, cursor: "pointer", transition: "all 0.2s",
+                }}>
+                  <div style={{ width: 28, height: 28, borderRadius: 8, border: "1px dashed rgba(121,80,242,0.4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: "#A78BFA" }}>+</div>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: "#A78BFA" }}>{en ? "New brand" : "Nueva marca"}</span>
+                </div>
+                {activeBrand && (
+                  <div onClick={() => { setBrandMenuOpen(false); router.push("/adn?brand=" + activeBrand.id); }} style={{
+                    display: "flex", alignItems: "center", gap: 10, padding: "10px 12px",
+                    borderRadius: 8, cursor: "pointer", transition: "all 0.2s",
+                  }}>
+                    <div style={{ width: 28, height: 28, borderRadius: 8, background: "rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "rgba(255,255,255,0.4)" }}>✎</div>
+                    <span style={{ fontSize: 13, fontWeight: 500, color: "rgba(255,255,255,0.5)" }}>{en ? "Edit DNA" : "Editar ADN"}</span>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
 
           {/* Nav items */}
           <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
