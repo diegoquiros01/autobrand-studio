@@ -598,14 +598,16 @@ function ADNContent() {
                   })}
                 </div>
                 <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                  <label style={{ position: "relative", width: 36, height: 36, flexShrink: 0, cursor: "pointer", display: "block" }}>
-                    <input type="color" value={customColorInput || "#7950F2"} onChange={e => setCustomColorInput(e.target.value)} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: 0, cursor: "pointer", zIndex: 2 }} />
-                    <div style={{ position: "absolute", inset: 0, borderRadius: "50%", border: "2px solid " + D.border, background: customColorInput || "rgba(255,255,255,0.06)", zIndex: 1 }} />
-                  </label>
+                  <input type="color" value={customColorInput || "#7950F2"} onChange={e => setCustomColorInput(e.target.value)} style={{ width: 36, height: 36, padding: 0, border: "2px solid " + D.border, borderRadius: "50%", cursor: "pointer", background: "transparent", WebkitAppearance: "none", appearance: "none" }} />
                   <input className="input-focus" style={{ ...inp(customColorInput), width: 120, padding: "8px 12px", fontSize: 13, fontFamily: "monospace" }} placeholder="#hex" value={customColorInput} onChange={e => setCustomColorInput(e.target.value)} />
                   <button onClick={() => { if (/^#[0-9A-Fa-f]{3,6}$/.test(customColorInput) && !profile.coloresMarca.includes(customColorInput)) { setProfile(p => ({ ...p, coloresMarca: [...p.coloresMarca, customColorInput] })); setCustomColorInput(""); } }}
                     style={{ padding: "8px 16px", borderRadius: 8, border: "1px dashed " + D.border, background: "transparent", color: D.text3, fontSize: 12, cursor: "pointer", transition: "all 0.3s ease" }}>+ Agregar</button>
                 </div>
+                <style>{`
+                  input[type="color"]::-webkit-color-swatch-wrapper { padding: 2px; }
+                  input[type="color"]::-webkit-color-swatch { border: none; border-radius: 50%; }
+                  input[type="color"]::-moz-color-swatch { border: none; border-radius: 50%; }
+                `}</style>
                 {profile.coloresMarca.length > 0 && (
                   <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 12 }}>
                     {profile.coloresMarca.map((c, i) => (
