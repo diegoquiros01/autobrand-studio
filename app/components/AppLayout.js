@@ -17,6 +17,16 @@ export default function AppLayout({ children }) {
 
   // Load user + brands
   useEffect(() => {
+    // Instant render from localStorage cache
+    const cachedBp = localStorage.getItem("brandProfile");
+    if (cachedBp) {
+      try {
+        const bp = JSON.parse(cachedBp);
+        setActiveBrand({ id: bp.id, nombre: bp.nombre, tono: bp.tono, idioma: bp.idioma });
+        setBrands([{ id: bp.id, nombre: bp.nombre, tono: bp.tono, idioma: bp.idioma }]);
+      } catch(e) {}
+    }
+
     const init = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) { router.push("/login"); return; }
@@ -46,7 +56,7 @@ export default function AppLayout({ children }) {
   };
 
   const loadBrands = async (userId) => {
-    const { data } = await supabase.from("brand_profiles").select("id, nombre, tono, idioma").eq("user_id", userId).order("created_at", { ascending: true });
+    const { data } = await supabase.from("brand_profiles").select("id, nombre, tono, idioma").eq("user_id", userId);
     const list = data || [];
     setBrands(list);
 

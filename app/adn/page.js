@@ -198,7 +198,7 @@ function ADNContent() {
     { key: "nombre", done: !!profile.nombre.trim() },
     { key: "descripcion", done: !!profile.descripcion.trim() },
     { key: "audiencia", done: !!profile.audiencia.trim() },
-    { key: "tono", done: profile.tono.length > 0 },
+    { key: "tono", done: (Array.isArray(profile.tono) ? profile.tono : [profile.tono]).filter(Boolean).length > 0 },
     { key: "idioma", done: !!profile.idioma },
     { key: "propuestaValor", done: !!profile.propuestaValor.trim() },
     { key: "instagramUrl", done: !!profile.instagramUrl.trim() },
@@ -251,7 +251,9 @@ function ADNContent() {
       });
       const data = await res.json();
       if (data.profile) {
-        setProfile(prev => ({ ...prev, ...data.profile, instagramUrl: prev.instagramUrl, tiktokUrl: prev.tiktokUrl, webUrl: prev.webUrl, canvaUrl: prev.canvaUrl }));
+        const ap = data.profile;
+        if (ap.tono && !Array.isArray(ap.tono)) ap.tono = [ap.tono];
+        setProfile(prev => ({ ...prev, ...ap, instagramUrl: prev.instagramUrl, tiktokUrl: prev.tiktokUrl, webUrl: prev.webUrl, canvaUrl: prev.canvaUrl }));
       } else if (data.error) {
         setAnalyzeError("Error: " + data.error);
       }
@@ -518,11 +520,12 @@ function ADNContent() {
                     <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                       {tonos.map(t => (
                         <button key={t} onClick={() => setProfile(p => {
-                          const has = p.tono.includes(t);
-                          if (has) return { ...p, tono: p.tono.filter(x => x !== t) };
-                          if (p.tono.length >= 2) return p;
-                          return { ...p, tono: [...p.tono, t] };
-                        })} style={chip(profile.tono.includes(t))}>{t}</button>
+                          const arr = Array.isArray(p.tono) ? p.tono : (p.tono ? [p.tono] : []);
+                          const has = arr.includes(t);
+                          if (has) return { ...p, tono: arr.filter(x => x !== t) };
+                          if (arr.length >= 2) return p;
+                          return { ...p, tono: [...arr, t] };
+                        })} style={chip((Array.isArray(profile.tono) ? profile.tono : [profile.tono]).includes(t))}>{t}</button>
                       ))}
                     </div>
                   </div>
@@ -594,10 +597,10 @@ function ADNContent() {
                   })}
                 </div>
                 <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                  <div style={{ position: "relative", width: 36, height: 36, flexShrink: 0 }}>
-                    <input type="color" value={customColorInput || "#7950F2"} onChange={e => setCustomColorInput(e.target.value)} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: "none", padding: 0, cursor: "pointer", borderRadius: "50%", background: "transparent" }} />
-                    <div style={{ position: "absolute", inset: 0, borderRadius: "50%", border: "2px solid " + D.border, background: customColorInput || "rgba(255,255,255,0.06)", pointerEvents: "none" }} />
-                  </div>
+                  <label style={{ position: "relative", width: 36, height: 36, flexShrink: 0, cursor: "pointer", display: "block" }}>
+                    <input type="color" value={customColorInput || "#7950F2"} onChange={e => setCustomColorInput(e.target.value)} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: 0, cursor: "pointer", zIndex: 2 }} />
+                    <div style={{ position: "absolute", inset: 0, borderRadius: "50%", border: "2px solid " + D.border, background: customColorInput || "rgba(255,255,255,0.06)", zIndex: 1 }} />
+                  </label>
                   <input className="input-focus" style={{ ...inp(customColorInput), width: 120, padding: "8px 12px", fontSize: 13, fontFamily: "monospace" }} placeholder="#hex" value={customColorInput} onChange={e => setCustomColorInput(e.target.value)} />
                   <button onClick={() => { if (/^#[0-9A-Fa-f]{3,6}$/.test(customColorInput) && !profile.coloresMarca.includes(customColorInput)) { setProfile(p => ({ ...p, coloresMarca: [...p.coloresMarca, customColorInput] })); setCustomColorInput(""); } }}
                     style={{ padding: "8px 16px", borderRadius: 8, border: "1px dashed " + D.border, background: "transparent", color: D.text3, fontSize: 12, cursor: "pointer", transition: "all 0.3s ease" }}>+ Agregar</button>
