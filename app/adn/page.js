@@ -35,7 +35,7 @@ const MemoInput = memo(function MemoInput({ value, onChange, placeholder, style,
 });
 
 const STEPS = [
-  { n: 1, title: "Conexión y Análisis IA", sub: "Conecta tus canales y deja que Claude construya tu ADN" },
+  { n: 1, title: "Conexión y Análisis IA", sub: "Conecta tus canales y deja que la IA construya tu ADN" },
   { n: 2, title: "Voz y Comunicación", sub: "Define quién eres, a quién le hablas y cómo suenas" },
   { n: 3, title: "Estilo Visual y Referencias", sub: "Tu personalidad visual, colores y ejemplos de copy ideal" },
 ];
@@ -358,16 +358,17 @@ function ADNContent() {
           {step === 1 && (
             <div style={{ animation: "fadeIn 0.4s ease" }}>
               {/* Hero Card — AI Analyze */}
-              <div style={{ ...card, background: D.bg2, border: "2px solid " + D.purple, padding: "36px 32px", textAlign: "center", marginBottom: 24, position: "relative", overflow: "hidden" }}>
-                <div style={{ position: "absolute", top: 0, right: 0, width: 200, height: 200, background: "radial-gradient(circle, rgba(121,80,242,0.15) 0%, transparent 70%)", pointerEvents: "none" }} />
-                <div style={{ position: "relative", zIndex: 1 }}>
-                  <div style={{ width: 56, height: 56, borderRadius: 16, background: "rgba(121,80,242,0.15)", border: "1px solid rgba(121,80,242,0.3)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={D.purpleLight} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a4 4 0 0 1 4 4c0 1.5-.8 2.8-2 3.4V11h3a3 3 0 0 1 3 3v1a2 2 0 0 1-2 2h-1v3a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-3H6a2 2 0 0 1-2-2v-1a3 3 0 0 1 3-3h3V9.4C8.8 8.8 8 7.5 8 6a4 4 0 0 1 4-4z"/></svg>
+              <div style={{ ...card, background: D.bg2, border: "1.5px solid " + D.purple, padding: "20px 24px", textAlign: "center", marginBottom: 20, position: "relative", overflow: "hidden" }}>
+                <div style={{ position: "relative", zIndex: 1, display: "flex", alignItems: "center", gap: 14 }}>
+                  <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(121,80,242,0.15)", border: "1px solid rgba(121,80,242,0.3)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={D.purpleLight} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a4 4 0 0 1 4 4c0 1.5-.8 2.8-2 3.4V11h3a3 3 0 0 1 3 3v1a2 2 0 0 1-2 2h-1v3a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-3H6a2 2 0 0 1-2-2v-1a3 3 0 0 1 3-3h3V9.4C8.8 8.8 8 7.5 8 6a4 4 0 0 1 4-4z"/></svg>
                   </div>
-                  <h2 style={{ fontSize: 22, fontWeight: 800, color: D.text, marginBottom: 8, letterSpacing: "-0.03em" }}>Deja que Claude construya tu ADN en segundos</h2>
-                  <p style={{ fontSize: 14, color: D.text2, marginBottom: 24, maxWidth: 440, margin: "0 auto 24px", lineHeight: 1.6, letterSpacing: "-0.02em" }}>
-                    Conecta tus canales abajo y Claude analiza tu contenido para extraer tu tono, audiencia y personalidad automáticamente.
-                  </p>
+                  <div style={{ textAlign: "left" }}>
+                    <h2 style={{ fontSize: 16, fontWeight: 700, color: D.text, marginBottom: 2, letterSpacing: "-0.02em" }}>AiStudioBrand construye tu ADN en segundos</h2>
+                    <p style={{ fontSize: 13, color: D.text2, lineHeight: 1.5, letterSpacing: "-0.02em", margin: 0 }}>
+                      Conecta tus canales y analiza tu contenido para extraer tono, audiencia y personalidad.
+                    </p>
+                  </div>
                 </div>
               </div>
 
@@ -393,7 +394,7 @@ function ADNContent() {
               {/* Analyze sources */}
               <div style={{ ...card, marginBottom: 24 }}>
                 <div style={{ fontSize: 15, fontWeight: 700, color: D.text, marginBottom: 4, letterSpacing: "-0.02em" }}>Selecciona fuentes para analizar</div>
-                <div style={{ fontSize: 12, color: D.text3, marginBottom: 16 }}>Claude lee tus redes y construye tu ADN automáticamente</div>
+                <div style={{ fontSize: 12, color: D.text3, marginBottom: 16 }}>La IA lee tus redes y construye tu ADN automáticamente</div>
 
                 <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
                   {[
@@ -460,7 +461,7 @@ function ADNContent() {
                 ) : (
                   <button onClick={analyzeInstagram} disabled={analyzing || sources.length === 0}
                     style={{ width: "100%", padding: 13, background: analyzing || sources.length === 0 ? "rgba(121,80,242,0.2)" : "linear-gradient(135deg,#7950F2,#4C1D95)", color: "#fff", border: "none", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: analyzing || sources.length === 0 ? "not-allowed" : "pointer", transition: "all 0.3s ease", boxShadow: sources.length > 0 ? "0 8px 24px rgba(121,80,242,0.3)" : "none", letterSpacing: "-0.02em" }}>
-                    {analyzing ? "Analizando con Claude..." : "Analizar " + sources.length + " fuente" + (sources.length !== 1 ? "s" : "") + " →"}
+                    {analyzing ? "Analizando con IA..." : "Analizar " + sources.length + " fuente" + (sources.length !== 1 ? "s" : "") + " →"}
                   </button>
                 )}
               </div>
