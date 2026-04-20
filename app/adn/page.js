@@ -14,7 +14,7 @@ const D = {
 };
 
 const tonos = ["Empoderador","Cercano","Profesional","Divertido","Inspiracional","Educativo"];
-const idiomas = ["Español","Inglés","Spanglish"];
+const idiomas = ["Español","Inglés","Bilingüe"];
 const cats = ["Coaching","Lifestyle","Moda","Belleza","Negocio","Motivación","Educación","Fitness","Recetas","Familia"];
 const presetColors = ["#FF6B35","#7950F2","#E64980","#FFD93D","#40C057","#1971C2","#F8F9FA","#0A0A0A"];
 
@@ -48,7 +48,7 @@ function ADNContent() {
   const [step, setStep] = useState(1);
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState({
-    nombre: "", descripcion: "", audiencia: "", tono: "",
+    nombre: "", descripcion: "", audiencia: "", tono: [],
     idioma: "", categorias: [], propuestaValor: "",
     instagramUrl: "", tiktokUrl: "", webUrl: "", canvaUrl: "",
     personalidad: "", coloresMarca: [], estiloVisual: "",
@@ -64,6 +64,8 @@ function ADNContent() {
   const [sources, setSources] = useState([]);
   const [showConfetti, setShowConfetti] = useState(false);
   const [customColorInput, setCustomColorInput] = useState("");
+  const [customCatInput, setCustomCatInput] = useState("");
+  const [showCustomCat, setShowCustomCat] = useState(false);
   const [exitWarning, setExitWarning] = useState(false);
 
   const debounceRef = useRef(null);
@@ -84,7 +86,7 @@ function ADNContent() {
       if (data) {
         const loaded = {
           nombre: data.nombre || "", descripcion: data.descripcion || "",
-          audiencia: data.audiencia || "", tono: data.tono || "",
+          audiencia: data.audiencia || "", tono: Array.isArray(data.tono) ? data.tono : (data.tono ? [data.tono] : []),
           idioma: data.idioma || "", categorias: data.categorias || [],
           propuestaValor: data.propuesta_valor || "",
           instagramUrl: data.instagram_url || "", tiktokUrl: data.tiktok_url || "",
@@ -144,7 +146,7 @@ function ADNContent() {
     { key: "nombre", done: !!profile.nombre.trim() },
     { key: "descripcion", done: !!profile.descripcion.trim() },
     { key: "audiencia", done: !!profile.audiencia.trim() },
-    { key: "tono", done: !!profile.tono },
+    { key: "tono", done: profile.tono.length > 0 },
     { key: "idioma", done: !!profile.idioma },
     { key: "propuestaValor", done: !!profile.propuestaValor.trim() },
     { key: "instagramUrl", done: !!profile.instagramUrl.trim() },
@@ -460,10 +462,15 @@ function ADNContent() {
                     </div>
                   </div>
                   <div>
-                    <label style={label}>Tono de voz</label>
+                    <label style={label}>Tono de voz <span style={{ color: D.text3, fontWeight: 400 }}>(máx. 2)</span></label>
                     <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                       {tonos.map(t => (
-                        <button key={t} onClick={() => setProfile(p => ({ ...p, tono: t }))} style={chip(profile.tono === t)}>{t}</button>
+                        <button key={t} onClick={() => setProfile(p => {
+                          const has = p.tono.includes(t);
+                          if (has) return { ...p, tono: p.tono.filter(x => x !== t) };
+                          if (p.tono.length >= 2) return p;
+                          return { ...p, tono: [...p.tono, t] };
+                        })} style={chip(profile.tono.includes(t))}>{t}</button>
                       ))}
                     </div>
                   </div>
@@ -474,7 +481,21 @@ function ADNContent() {
                     {cats.map(c => (
                       <button key={c} onClick={() => setProfile(p => ({ ...p, categorias: p.categorias.includes(c) ? p.categorias.filter(x => x !== c) : [...p.categorias, c] }))} style={chip(profile.categorias.includes(c))}>{c}</button>
                     ))}
+                    {profile.categorias.filter(c => !cats.includes(c)).map(c => (
+                      <div key={c} style={{ ...chip(true), display: "flex", alignItems: "center", gap: 6 }}>
+                        {c}
+                        <span onClick={() => setProfile(p => ({ ...p, categorias: p.categorias.filter(x => x !== c) }))} style={{ cursor: "pointer", fontSize: 14, lineHeight: 1 }}>×</span>
+                      </div>
+                    ))}
+                    <button onClick={() => setShowCustomCat(true)} style={chip(false)}>+ Otro</button>
                   </div>
+                  {showCustomCat && (
+                    <div style={{ display: "flex", gap: 8, marginTop: 10, alignItems: "center" }}>
+                      <input className="input-focus" style={{ ...inp(customCatInput), flex: 1, padding: "8px 12px", fontSize: 13 }} placeholder="Ej: Tecnología" value={customCatInput} onChange={e => setCustomCatInput(e.target.value)} onKeyDown={e => { if (e.key === "Enter" && customCatInput.trim()) { setProfile(p => ({ ...p, categorias: [...p.categorias, customCatInput.trim()] })); setCustomCatInput(""); setShowCustomCat(false); } }} />
+                      <button onClick={() => { if (customCatInput.trim()) { setProfile(p => ({ ...p, categorias: [...p.categorias, customCatInput.trim()] })); setCustomCatInput(""); setShowCustomCat(false); } }} style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: D.purple, color: "#fff", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>Agregar</button>
+                      <button onClick={() => { setShowCustomCat(false); setCustomCatInput(""); }} style={{ padding: "8px 10px", borderRadius: 8, border: "1px solid " + D.border, background: "transparent", color: D.text3, fontSize: 12, cursor: "pointer" }}>×</button>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -483,6 +504,16 @@ function ADNContent() {
           {/* ═══ STEP 3: Estilo Visual y Referencias ═══ */}
           {step === 3 && (
             <div style={{ animation: "fadeIn 0.4s ease" }}>
+              {/* AI-generated notice */}
+              {profile.personalidad.trim() && (
+                <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 16px", borderRadius: 10, background: "rgba(121,80,242,0.08)", border: "1px solid rgba(121,80,242,0.2)", marginBottom: 16 }}>
+                  <span style={{ fontSize: 16 }}>✨</span>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: D.purpleLight, letterSpacing: "-0.02em" }}>Generado por IA a partir de tus fuentes</div>
+                    <div style={{ fontSize: 12, color: D.text3 }}>Revisa y edita cada campo para que suene exactamente como tú</div>
+                  </div>
+                </div>
+              )}
               {/* Personalidad */}
               <div style={{ ...card, marginBottom: 24 }}>
                 <div style={{ fontSize: 15, fontWeight: 700, color: D.text, marginBottom: 16, letterSpacing: "-0.02em" }}>Personalidad de marca</div>
@@ -511,8 +542,12 @@ function ADNContent() {
                   })}
                 </div>
                 <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                  <input className="input-focus" style={{ ...inp(customColorInput), width: 130, padding: "8px 12px", fontSize: 13, fontFamily: "monospace" }} placeholder="#hex" value={customColorInput} onChange={e => setCustomColorInput(e.target.value)} />
-                  <button onClick={() => { if (/^#[0-9A-Fa-f]{6}$/.test(customColorInput) && !profile.coloresMarca.includes(customColorInput)) { setProfile(p => ({ ...p, coloresMarca: [...p.coloresMarca, customColorInput] })); setCustomColorInput(""); } }}
+                  <div style={{ position: "relative", width: 36, height: 36, flexShrink: 0 }}>
+                    <input type="color" value={customColorInput || "#7950F2"} onChange={e => setCustomColorInput(e.target.value)} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: "none", padding: 0, cursor: "pointer", borderRadius: "50%", background: "transparent" }} />
+                    <div style={{ position: "absolute", inset: 0, borderRadius: "50%", border: "2px solid " + D.border, background: customColorInput || "rgba(255,255,255,0.06)", pointerEvents: "none" }} />
+                  </div>
+                  <input className="input-focus" style={{ ...inp(customColorInput), width: 120, padding: "8px 12px", fontSize: 13, fontFamily: "monospace" }} placeholder="#hex" value={customColorInput} onChange={e => setCustomColorInput(e.target.value)} />
+                  <button onClick={() => { if (/^#[0-9A-Fa-f]{3,6}$/.test(customColorInput) && !profile.coloresMarca.includes(customColorInput)) { setProfile(p => ({ ...p, coloresMarca: [...p.coloresMarca, customColorInput] })); setCustomColorInput(""); } }}
                     style={{ padding: "8px 16px", borderRadius: 8, border: "1px dashed " + D.border, background: "transparent", color: D.text3, fontSize: 12, cursor: "pointer", transition: "all 0.3s ease" }}>+ Agregar</button>
                 </div>
                 {profile.coloresMarca.length > 0 && (
