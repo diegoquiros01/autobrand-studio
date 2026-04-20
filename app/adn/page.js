@@ -414,6 +414,16 @@ function ADNContent() {
           {/* ═══ STEP 2: Voz y Comunicación ═══ */}
           {step === 2 && (
             <div style={{ animation: "fadeIn 0.4s ease" }}>
+              {/* AI-generated notice */}
+              {profile.descripcion.trim() && (
+                <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 16px", borderRadius: 10, background: "rgba(121,80,242,0.08)", border: "1px solid rgba(121,80,242,0.2)", marginBottom: 16 }}>
+                  <span style={{ fontSize: 16 }}>✨</span>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: D.purpleLight, letterSpacing: "-0.02em" }}>Generado por IA a partir de tus fuentes</div>
+                    <div style={{ fontSize: 12, color: D.text3 }}>Revisa y edita cada campo para que suene exactamente como tú</div>
+                  </div>
+                </div>
+              )}
               {/* Marca info */}
               <div style={{ ...card, marginBottom: 24 }}>
                 <div style={{ fontSize: 15, fontWeight: 700, color: D.text, marginBottom: 16, letterSpacing: "-0.02em" }}>Tu marca</div>
