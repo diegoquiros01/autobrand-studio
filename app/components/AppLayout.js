@@ -117,8 +117,9 @@ export default function AppLayout({ children }) {
   const setLanguage = (l) => { setLang(l); localStorage.setItem("lang", l); };
   const en = lang === "en";
 
+  const [dnaSectionOpen, setDnaSectionOpen] = useState(true);
+
   const navItems = [
-    { icon: "◉", label: en ? "Brand DNA" : "ADN de marca", path: "/adn" },
     { icon: "✦", label: en ? "New piece" : "Nueva pieza", path: "/crear" },
     { icon: "◈", label: en ? "Library" : "Biblioteca", path: "/biblioteca" },
   ];
@@ -190,80 +191,69 @@ export default function AppLayout({ children }) {
           position: "fixed", top: 64, bottom: 0, left: 0, zIndex: 40,
           overflowY: "auto", transition: "transform 0.3s ease",
         }}>
-          {/* Brand switcher */}
-          <div style={{ position: "relative", marginBottom: 24 }}>
-            {activeBrand ? (
-              <div onClick={() => setBrandMenuOpen(!brandMenuOpen)} style={{
-                background: "rgba(121,80,242,0.08)", border: "1px solid rgba(121,80,242,0.2)",
-                borderRadius: 12, padding: "14px 16px", cursor: "pointer",
-                display: "flex", alignItems: "center", gap: 12, transition: "all 0.2s",
+          {/* Brand DNA section with submenu */}
+          <div style={{ marginBottom: 4 }}>
+            <button onClick={() => setDnaSectionOpen(!dnaSectionOpen)}
+              style={{
+                display: "flex", alignItems: "center", gap: 14, padding: "13px 18px",
+                borderRadius: 10, fontSize: 15, fontWeight: pathname === "/adn" ? 700 : 500,
+                color: pathname === "/adn" ? "#fff" : "rgba(255,255,255,0.5)",
+                background: pathname === "/adn" ? "rgba(121,80,242,0.15)" : "transparent",
+                border: pathname === "/adn" ? "1px solid rgba(121,80,242,0.25)" : "1px solid transparent",
+                cursor: "pointer", textAlign: "left", width: "100%",
+                transition: "all 0.2s",
               }}>
-                <div style={{ width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg,#7950F2,#A78BFA)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 800, color: "#fff", flexShrink: 0 }}>
-                  {(activeBrand.nombre || "M").charAt(0).toUpperCase()}
-                </div>
-                <div style={{ overflow: "hidden", flex: 1 }}>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: "#fff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{activeBrand.nombre || (en ? "Your brand" : "Tu marca")}</div>
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)" }}>
-                    {[tonoDisplay(activeBrand.tono), activeBrand.idioma].filter(Boolean).join(" · ") || (en ? "Set up DNA" : "Configura ADN")}
-                  </div>
-                </div>
-                <span style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", flexShrink: 0 }}>{brandMenuOpen ? "▲" : "▼"}</span>
-              </div>
-            ) : (
-              <button onClick={() => router.push("/adn?new=true")} style={{
-                width: "100%", padding: "14px 16px", background: "rgba(121,80,242,0.08)",
-                border: "1px dashed rgba(121,80,242,0.3)", borderRadius: 12, cursor: "pointer",
-                color: "#A78BFA", fontSize: 14, fontWeight: 600, textAlign: "center",
-              }}>
-                + {en ? "Create brand" : "Crear marca"}
-              </button>
-            )}
+              <span style={{ fontSize: 17, color: pathname === "/adn" ? "#A78BFA" : "rgba(255,255,255,0.35)" }}>◉</span>
+              <span style={{ flex: 1 }}>{en ? "Brand DNA" : "ADN de marca"}</span>
+              <span style={{ fontSize: 9, color: "rgba(255,255,255,0.25)", transition: "transform 0.2s", transform: dnaSectionOpen ? "rotate(180deg)" : "rotate(0deg)" }}>▼</span>
+            </button>
 
-            {/* Dropdown menu */}
-            {brandMenuOpen && (
-              <div style={{
-                position: "absolute", top: "100%", left: 0, right: 0, marginTop: 4,
-                background: "#16162d", border: "1px solid rgba(255,255,255,0.12)",
-                borderRadius: 12, padding: 6, zIndex: 100,
-                boxShadow: "0 12px 40px rgba(0,0,0,0.5)",
-              }}>
-                {brands.map(b => (
-                  <div key={b.id} onClick={() => switchBrand(b)} style={{
-                    display: "flex", alignItems: "center", gap: 10, padding: "10px 12px",
-                    borderRadius: 8, cursor: "pointer", transition: "all 0.2s",
-                    background: b.id === activeBrand?.id ? "rgba(121,80,242,0.15)" : "transparent",
-                  }}>
-                    <div style={{
-                      width: 28, height: 28, borderRadius: 8,
-                      background: b.id === activeBrand?.id ? "linear-gradient(135deg,#7950F2,#A78BFA)" : "rgba(255,255,255,0.08)",
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      fontSize: 11, fontWeight: 800, color: "#fff", flexShrink: 0,
-                    }}>
-                      {(b.nombre || "M").charAt(0).toUpperCase()}
+            {/* Submenu: list of brands */}
+            {dnaSectionOpen && (
+              <div style={{ paddingLeft: 18, paddingTop: 4, display: "flex", flexDirection: "column", gap: 2 }}>
+                {brands.map(b => {
+                  const isActive = b.id === activeBrand?.id;
+                  return (
+                    <div key={b.id} style={{ display: "flex", alignItems: "center", gap: 0 }}>
+                      <button onClick={() => { switchBrand(b); }}
+                        style={{
+                          flex: 1, display: "flex", alignItems: "center", gap: 10, padding: "9px 14px",
+                          borderRadius: 8, cursor: "pointer", textAlign: "left",
+                          background: isActive ? "rgba(121,80,242,0.1)" : "transparent",
+                          border: "none", transition: "all 0.2s",
+                        }}>
+                        <div style={{
+                          width: 24, height: 24, borderRadius: 7, flexShrink: 0,
+                          background: isActive ? "linear-gradient(135deg,#7950F2,#A78BFA)" : "rgba(255,255,255,0.08)",
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          fontSize: 10, fontWeight: 800, color: "#fff",
+                        }}>
+                          {(b.nombre || "M").charAt(0).toUpperCase()}
+                        </div>
+                        <div style={{ overflow: "hidden", flex: 1 }}>
+                          <div style={{ fontSize: 13, fontWeight: isActive ? 600 : 400, color: isActive ? "#fff" : "rgba(255,255,255,0.5)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                            {b.nombre || (en ? "Unnamed" : "Sin nombre")}
+                          </div>
+                        </div>
+                        {isActive && <span style={{ fontSize: 8, color: "#A78BFA" }}>●</span>}
+                      </button>
+                      <button onClick={() => { router.push("/adn?brand=" + b.id); setSidebarOpen(false); }}
+                        style={{ background: "none", border: "none", cursor: "pointer", padding: "6px 8px", color: "rgba(255,255,255,0.25)", fontSize: 12, borderRadius: 6, transition: "all 0.2s", flexShrink: 0 }}
+                        title={en ? "Edit" : "Editar"}>
+                        ✎
+                      </button>
                     </div>
-                    <div style={{ overflow: "hidden", flex: 1 }}>
-                      <div style={{ fontSize: 13, fontWeight: b.id === activeBrand?.id ? 700 : 500, color: "#fff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{b.nombre || (en ? "Unnamed" : "Sin nombre")}</div>
-                    </div>
-                    {b.id === activeBrand?.id && <span style={{ fontSize: 10, color: "#A78BFA" }}>●</span>}
-                  </div>
-                ))}
-                <div style={{ height: 1, background: "rgba(255,255,255,0.08)", margin: "4px 0" }} />
-                <div onClick={() => { setBrandMenuOpen(false); router.push("/adn?new=true"); }} style={{
-                  display: "flex", alignItems: "center", gap: 10, padding: "10px 12px",
-                  borderRadius: 8, cursor: "pointer", transition: "all 0.2s",
-                }}>
-                  <div style={{ width: 28, height: 28, borderRadius: 8, border: "1px dashed rgba(121,80,242,0.4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: "#A78BFA" }}>+</div>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: "#A78BFA" }}>{en ? "New brand" : "Nueva marca"}</span>
-                </div>
-                {activeBrand && (
-                  <div onClick={() => { setBrandMenuOpen(false); router.push("/adn?brand=" + activeBrand.id); }} style={{
-                    display: "flex", alignItems: "center", gap: 10, padding: "10px 12px",
-                    borderRadius: 8, cursor: "pointer", transition: "all 0.2s",
+                  );
+                })}
+                <button onClick={() => { router.push("/adn?new=true"); setSidebarOpen(false); }}
+                  style={{
+                    display: "flex", alignItems: "center", gap: 10, padding: "9px 14px",
+                    borderRadius: 8, cursor: "pointer", textAlign: "left",
+                    background: "transparent", border: "none", transition: "all 0.2s",
                   }}>
-                    <div style={{ width: 28, height: 28, borderRadius: 8, background: "rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "rgba(255,255,255,0.4)" }}>✎</div>
-                    <span style={{ fontSize: 13, fontWeight: 500, color: "rgba(255,255,255,0.5)" }}>{en ? "Edit DNA" : "Editar ADN"}</span>
-                  </div>
-                )}
+                  <div style={{ width: 24, height: 24, borderRadius: 7, border: "1px dashed rgba(121,80,242,0.4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "#A78BFA" }}>+</div>
+                  <span style={{ fontSize: 13, fontWeight: 500, color: "#A78BFA" }}>{en ? "New brand" : "Nueva marca"}</span>
+                </button>
               </div>
             )}
           </div>
