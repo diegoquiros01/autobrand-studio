@@ -22,9 +22,9 @@ const presetColors = ["#FF6B35","#7950F2","#E64980","#FFD93D","#40C057","#1971C2
 const MemoInput = memo(function MemoInput({ value, onChange, placeholder, style, type = "input", minHeight }) {
   const inpStyle = {
     width: "100%",
-    backgroundColor: value && value.toString().trim() ? "rgba(121,80,242,0.06)" : D.bg3,
-    border: "1px solid " + (value && value.toString().trim() ? "rgba(121,80,242,0.3)" : D.border),
-    borderRadius: 10, padding: "12px 16px", fontSize: 14, color: D.text,
+    backgroundColor: value && value.toString().trim() ? "rgba(121,80,242,0.06)" : "rgba(255,255,255,0.03)",
+    border: "1px solid " + (value && value.toString().trim() ? "rgba(121,80,242,0.3)" : "rgba(255,255,255,0.06)"),
+    borderRadius: 12, padding: "14px 18px", fontSize: 14, color: D.text,
     outline: "none", transition: "all 0.3s ease", fontFamily: "Inter, sans-serif",
     letterSpacing: "-0.02em", ...(style || {}),
   };
@@ -285,19 +285,19 @@ function ADNContent() {
   // --- Styles ---
   const inp = (value) => ({
     width: "100%",
-    backgroundColor: value && value.toString().trim() ? "rgba(121,80,242,0.06)" : D.bg3,
-    border: "1px solid " + (value && value.toString().trim() ? "rgba(121,80,242,0.3)" : D.border),
-    borderRadius: 10, padding: "12px 16px", fontSize: 14, color: D.text,
+    backgroundColor: value && value.toString().trim() ? "rgba(121,80,242,0.06)" : "rgba(255,255,255,0.03)",
+    border: "1px solid " + (value && value.toString().trim() ? "rgba(121,80,242,0.3)" : "rgba(255,255,255,0.06)"),
+    borderRadius: 12, padding: "14px 18px", fontSize: 14, color: D.text,
     outline: "none", transition: "all 0.3s ease", fontFamily: "Inter, sans-serif",
     letterSpacing: "-0.02em",
   });
 
-  const card = { background: D.bg2, border: "1px solid " + D.border, borderRadius: 16, padding: "24px", transition: "all 0.3s ease" };
-  const label = { fontSize: 13, color: D.text2, display: "block", marginBottom: 6, fontWeight: 500, letterSpacing: "-0.02em" };
+  const card = { background: D.bg2, border: "1px solid rgba(255,255,255,0.06)", borderRadius: 16, padding: "28px 32px", transition: "all 0.3s ease" };
+  const label = { fontSize: 13, color: "rgba(255,255,255,0.5)", display: "block", marginBottom: 6, fontWeight: 500, letterSpacing: "-0.01em" };
   const chip = (active) => ({
-    padding: "8px 16px", borderRadius: 8, fontSize: 13, fontWeight: 500, cursor: "pointer",
-    border: active ? "1.5px solid " + D.purple : "1px solid " + D.border,
-    background: active ? "rgba(121,80,242,0.15)" : "transparent",
+    padding: "9px 18px", borderRadius: 10, fontSize: 13, fontWeight: 500, cursor: "pointer",
+    border: active ? "1.5px solid " + D.purple : "1px solid rgba(255,255,255,0.08)",
+    background: active ? "rgba(121,80,242,0.12)" : "transparent",
     color: active ? D.purpleLight : D.text2,
     transition: "all 0.3s ease",
   });
@@ -619,7 +619,7 @@ function ADNContent() {
                   })}
                 </div>
                 <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                  <input type="color" value={customColorInput || "#7950F2"} onChange={e => setCustomColorInput(e.target.value)} style={{ width: 36, height: 36, padding: 0, border: "2px solid " + D.border, borderRadius: "50%", cursor: "pointer", background: "transparent", WebkitAppearance: "none", appearance: "none" }} />
+                  <input type="color" value={customColorInput || "#7950F2"} onChange={e => setCustomColorInput(e.target.value)} style={{ width: 40, height: 40, padding: 0, border: "2px solid rgba(255,255,255,0.08)", borderRadius: "50%", cursor: "pointer", background: "transparent", WebkitAppearance: "none", appearance: "none" }} />
                   <input className="input-focus" style={{ ...inp(customColorInput), width: 120, padding: "8px 12px", fontSize: 13, fontFamily: "monospace" }} placeholder="#hex" value={customColorInput} onChange={e => setCustomColorInput(e.target.value)} />
                   <button onClick={() => { if (/^#[0-9A-Fa-f]{3,6}$/.test(customColorInput) && !profile.coloresMarca.includes(customColorInput)) { setProfile(p => ({ ...p, coloresMarca: [...p.coloresMarca, customColorInput] })); setCustomColorInput(""); } }}
                     style={{ padding: "8px 16px", borderRadius: 8, border: "1px dashed " + D.border, background: "transparent", color: D.text3, fontSize: 12, cursor: "pointer", transition: "all 0.3s ease" }}>{en ? "+ Add" : "+ Agregar"}</button>
