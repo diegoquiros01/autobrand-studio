@@ -121,31 +121,28 @@ function ADNContent() {
         return;
       }
 
-      // Specific brand from URL or active brand from localStorage
+      // Load brand: try specific ID first, then fallback to first brand for user
       const targetId = paramBrandId || localStorage.getItem("activeBrandId");
+      let loaded = null;
 
-      if (targetId) {
-        const { data } = await supabase.from("brand_profiles").select("*").eq("id", targetId).single();
-        if (data) {
-          const loaded = dataToProfile(data);
-          setProfile(loaded);
-          setBrandId(data.id);
-          localStorage.setItem("activeBrandId", data.id);
-          localStorage.setItem("brandProfile", JSON.stringify({ id: data.id, ...loaded }));
-          initialLoadDone.current = true;
-          return;
-        }
+      // Try loading by specific ID
+      if (targetId && targetId !== "cached") {
+        const { data } = await supabase.from("brand_profiles").select("*").eq("id", targetId).maybeSingle();
+        if (data) loaded = data;
       }
 
       // Fallback: load first brand for this user
-      const { data: allBrands } = await supabase.from("brand_profiles").select("*").eq("user_id", user.id).limit(1);
-      if (allBrands && allBrands.length > 0) {
-        const data = allBrands[0];
-        const loaded = dataToProfile(data);
-        setProfile(loaded);
-        setBrandId(data.id);
-        localStorage.setItem("activeBrandId", data.id);
-        localStorage.setItem("brandProfile", JSON.stringify({ id: data.id, ...loaded }));
+      if (!loaded) {
+        const { data: allBrands } = await supabase.from("brand_profiles").select("*").eq("user_id", user.id).limit(1);
+        if (allBrands && allBrands.length > 0) loaded = allBrands[0];
+      }
+
+      if (loaded) {
+        const p = dataToProfile(loaded);
+        setProfile(p);
+        setBrandId(loaded.id);
+        localStorage.setItem("activeBrandId", loaded.id);
+        localStorage.setItem("brandProfile", JSON.stringify({ id: loaded.id, ...p }));
       }
       initialLoadDone.current = true;
     };
