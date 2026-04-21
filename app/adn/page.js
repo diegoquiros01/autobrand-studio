@@ -127,15 +127,19 @@ function ADNContent() {
 
       // Try loading by specific ID
       if (targetId && targetId !== "cached") {
-        const { data } = await supabase.from("brand_profiles").select("*").eq("id", targetId).maybeSingle();
+        const { data, error } = await supabase.from("brand_profiles").select("*").eq("id", targetId).maybeSingle();
+        if (error) console.warn("ADN load by ID error:", error.message);
         if (data) loaded = data;
       }
 
       // Fallback: load first brand for this user
       if (!loaded) {
-        const { data: allBrands } = await supabase.from("brand_profiles").select("*").eq("user_id", user.id).limit(1);
+        const { data: allBrands, error: err2 } = await supabase.from("brand_profiles").select("*").eq("user_id", user.id).limit(1);
+        if (err2) console.warn("ADN load fallback error:", err2.message);
         if (allBrands && allBrands.length > 0) loaded = allBrands[0];
       }
+
+      console.log("ADN loaded:", loaded ? loaded.nombre : "nothing found");
 
       if (loaded) {
         const p = dataToProfile(loaded);
@@ -155,6 +159,9 @@ function ADNContent() {
     const p = profileRef.current;
     const currentBrandId = brandIdRef.current;
     if (!u) return;
+    // Don't save empty profiles — prevents overwriting real data
+    const hasContent = p.nombre.trim() || p.descripcion.trim() || p.audiencia.trim() || p.personalidad.trim();
+    if (!hasContent && !currentBrandId) return;
     setSaveStatus("saving");
     const payload = {
       nombre: p.nombre, descripcion: p.descripcion,
