@@ -216,35 +216,31 @@ export default function AppLayout({ children }) {
                 {brands.map(b => {
                   const isActive = b.id === activeBrand?.id;
                   return (
-                    <div key={b.id} style={{ display: "flex", alignItems: "center", gap: 0 }}>
-                      <button onClick={() => switchBrand(b)}
-                        style={{
-                          flex: 1, display: "flex", alignItems: "center", gap: 10, padding: "9px 14px",
-                          borderRadius: 8, cursor: "pointer", textAlign: "left",
-                          background: isActive ? "rgba(121,80,242,0.1)" : "transparent",
-                          border: "none", transition: "all 0.2s",
-                        }}>
-                        <div style={{
-                          width: 24, height: 24, borderRadius: 7, flexShrink: 0,
-                          background: isActive ? "linear-gradient(135deg,#7950F2,#A78BFA)" : "rgba(255,255,255,0.08)",
-                          display: "flex", alignItems: "center", justifyContent: "center",
-                          fontSize: 10, fontWeight: 800, color: "#fff",
-                        }}>
-                          {(b.nombre || "M").charAt(0).toUpperCase()}
+                    <button key={b.id} onClick={() => { switchBrand(b); router.push("/adn?brand=" + b.id); setSidebarOpen(false); }}
+                      style={{
+                        width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "10px 14px",
+                        borderRadius: 8, cursor: "pointer", textAlign: "left",
+                        background: isActive ? "rgba(121,80,242,0.1)" : "transparent",
+                        border: "none", transition: "all 0.2s",
+                      }}>
+                      <div style={{
+                        width: 26, height: 26, borderRadius: 7, flexShrink: 0,
+                        background: isActive ? "linear-gradient(135deg,#7950F2,#A78BFA)" : "rgba(255,255,255,0.08)",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        fontSize: 10, fontWeight: 800, color: "#fff",
+                      }}>
+                        {(b.nombre || "M").charAt(0).toUpperCase()}
+                      </div>
+                      <div style={{ overflow: "hidden", flex: 1 }}>
+                        <div style={{ fontSize: 13, fontWeight: isActive ? 600 : 400, color: isActive ? "#fff" : "rgba(255,255,255,0.5)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                          {b.nombre || (en ? "Unnamed" : "Sin nombre")}
                         </div>
-                        <div style={{ overflow: "hidden", flex: 1 }}>
-                          <div style={{ fontSize: 13, fontWeight: isActive ? 600 : 400, color: isActive ? "#fff" : "rgba(255,255,255,0.5)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                            {b.nombre || (en ? "Unnamed" : "Sin nombre")}
-                          </div>
+                        <div style={{ fontSize: 10, color: "rgba(255,255,255,0.25)", marginTop: 1 }}>
+                          {en ? "View & edit" : "Ver y editar"}
                         </div>
-                        {isActive && <span style={{ fontSize: 8, color: "#A78BFA" }}>●</span>}
-                      </button>
-                      <button onClick={() => { router.push("/adn?brand=" + b.id); setSidebarOpen(false); }}
-                        style={{ background: "none", border: "none", cursor: "pointer", padding: "6px 8px", color: "rgba(255,255,255,0.25)", fontSize: 12, borderRadius: 6, transition: "all 0.2s", flexShrink: 0 }}
-                        title={en ? "Edit" : "Editar"}>
-                        ✎
-                      </button>
-                    </div>
+                      </div>
+                      {isActive && <span style={{ fontSize: 8, color: "#A78BFA" }}>●</span>}
+                    </button>
                   );
                 })}
                 <button onClick={() => { router.push("/adn?new=true"); setSidebarOpen(false); }}
