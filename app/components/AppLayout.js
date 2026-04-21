@@ -65,11 +65,7 @@ export default function AppLayout({ children }) {
   }, []);
 
   const reloadBrands = async () => {
-    // Try with auth user first
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) { await loadBrands(user.id); return; }
-
-    // Fallback: load single brand by activeBrandId
+    // Load by activeBrandId — always works, no auth needed
     const bid = localStorage.getItem("activeBrandId");
     if (bid) {
       try {
@@ -78,11 +74,14 @@ export default function AppLayout({ children }) {
         if (json.brand) {
           const b = json.brand;
           const item = { id: b.id, nombre: b.nombre, tono: b.tono, idioma: b.idioma };
-          setBrands([item]);
+          // Update active brand info without clearing the list
           setActiveBrand(item);
+          setBrands(prev => {
+            const exists = prev.find(x => x.id === b.id);
+            if (exists) return prev.map(x => x.id === b.id ? item : x);
+            return [...prev, item];
+          });
           localStorage.setItem("brandProfile", JSON.stringify(fullToCache(b)));
-          // Try loading all brands by brand's user_id
-          if (b.user_id) await loadBrands(b.user_id);
         }
       } catch(e) {}
     }
@@ -94,7 +93,8 @@ export default function AppLayout({ children }) {
       const json = await res.json();
       const list = json.data || [];
 
-      if (list.length === 0) { setBrands([]); setActiveBrand(null); return; }
+      // Only update if we got results — never clear existing brands
+      if (list.length === 0) return;
 
       setBrands(list);
 
@@ -124,7 +124,7 @@ export default function AppLayout({ children }) {
         localStorage.setItem("brandProfile", JSON.stringify(fullToCache(json.brand)));
       }
     } catch(e) {}
-    window.dispatchEvent(new Event("brandChanged"));
+    // No dispatchEvent here — state is already updated locally
   };
 
   const setLanguage = (l) => { setLang(l); localStorage.setItem("lang", l); };
