@@ -5,154 +5,123 @@ import { supabase } from "../../lib/supabase";
 
 const SIDEBAR_W = 260;
 
+const fullToCache = (full) => ({
+  id: full.id, nombre: full.nombre || "", descripcion: full.descripcion || "",
+  audiencia: full.audiencia || "", tono: full.tono || "",
+  idioma: full.idioma || "", categorias: full.categorias || [],
+  propuestaValor: full.propuesta_valor || "",
+  instagramUrl: full.instagram_url || "", tiktokUrl: full.tiktok_url || "",
+  webUrl: full.web_url || "", canvaUrl: full.canva_url || "",
+  personalidad: full.personalidad || "", coloresMarca: full.colores_marca || [],
+  estiloVisual: full.estilo_visual || "",
+  ejemplosCopy: full.ejemplos_copy || [], competidores: full.competidores || [],
+});
+
 export default function AppLayout({ children }) {
   const router = useRouter();
   const pathname = usePathname();
   const [user, setUser] = useState(null);
   const [brands, setBrands] = useState([]);
   const [activeBrand, setActiveBrand] = useState(null);
-  const [brandMenuOpen, setBrandMenuOpen] = useState(false);
   const [lang, setLang] = useState("es");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [dnaSectionOpen, setDnaSectionOpen] = useState(true);
 
-  // Load user + brands
   useEffect(() => {
     // Instant render from localStorage cache
     const cachedBp = localStorage.getItem("brandProfile");
     if (cachedBp) {
       try {
         const bp = JSON.parse(cachedBp);
-        setActiveBrand({ id: bp.id, nombre: bp.nombre, tono: bp.tono, idioma: bp.idioma });
-        setBrands([{ id: bp.id, nombre: bp.nombre, tono: bp.tono, idioma: bp.idioma }]);
+        if (bp.id && bp.nombre) {
+          setActiveBrand({ id: bp.id, nombre: bp.nombre, tono: bp.tono, idioma: bp.idioma });
+          setBrands([{ id: bp.id, nombre: bp.nombre, tono: bp.tono, idioma: bp.idioma }]);
+        }
       } catch(e) {}
     }
 
     const init = async () => {
+      // Get auth session
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) { router.push("/login"); return; }
       setUser(session.user);
 
-      // Try loading brands by userId first
-      const foundBrands = await loadBrands(session.user.id);
-
-      // Fallback: if no brands found, try loading by activeBrandId directly
-      if (!foundBrands) {
-        const bid = localStorage.getItem("activeBrandId");
-        if (bid && bid !== "cached") {
-          try {
-            const res = await fetch("/api/debug-brands?brandId=" + bid);
-            const json = await res.json();
-            if (json.brand) {
-              const b = json.brand;
-              const item = { id: b.id, nombre: b.nombre, tono: b.tono, idioma: b.idioma };
-              setBrands([item]);
-              setActiveBrand(item);
-              // Try loading all brands by the brand's user_id
-              if (b.user_id) await loadBrands(b.user_id);
-            }
-          } catch(e) {}
-        }
-      }
+      // Load brands via server API
+      await loadBrands(session.user.id);
     };
     init();
+
     supabase.auth.onAuthStateChange((_e, session) => {
       if (!session) router.push("/login");
       else { setUser(session?.user); if (session?.user) loadBrands(session.user.id); }
     });
+
     const saved = localStorage.getItem("lang");
     if (saved) setLang(saved);
 
-    // Listen for brand changes from other components
-    const handleBrandChanged = () => loadBrandsFromUser();
+    const handleBrandChanged = () => reloadBrands();
     window.addEventListener("brandChanged", handleBrandChanged);
-    window.addEventListener("storage", (e) => {
-      if (e.key === "activeBrandId") loadBrandsFromUser();
-    });
     return () => window.removeEventListener("brandChanged", handleBrandChanged);
   }, []);
 
-  const loadBrandsFromUser = async () => {
+  const reloadBrands = async () => {
+    // Try with auth user first
     const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      await loadBrands(user.id);
-    } else {
-      // No auth session — try loading by activeBrandId
-      const bid = localStorage.getItem("activeBrandId");
-      if (bid && bid !== "cached") {
-        try {
-          const res = await fetch("/api/debug-brands?brandId=" + bid);
-          const json = await res.json();
-          if (json.brand) {
-            const b = json.brand;
-            const item = { id: b.id, nombre: b.nombre, tono: b.tono, idioma: b.idioma };
-            setBrands([item]);
-            setActiveBrand(item);
-            const bp = fullToCache(b);
-            localStorage.setItem("brandProfile", JSON.stringify(bp));
-          }
-        } catch(e) {}
-      }
+    if (user) { await loadBrands(user.id); return; }
+
+    // Fallback: load single brand by activeBrandId
+    const bid = localStorage.getItem("activeBrandId");
+    if (bid) {
+      try {
+        const res = await fetch("/api/brands?brandId=" + bid);
+        const json = await res.json();
+        if (json.brand) {
+          const b = json.brand;
+          const item = { id: b.id, nombre: b.nombre, tono: b.tono, idioma: b.idioma };
+          setBrands([item]);
+          setActiveBrand(item);
+          localStorage.setItem("brandProfile", JSON.stringify(fullToCache(b)));
+          // Try loading all brands by brand's user_id
+          if (b.user_id) await loadBrands(b.user_id);
+        }
+      } catch(e) {}
     }
   };
 
-  const fullToCache = (full) => ({
-    id: full.id, nombre: full.nombre || "", descripcion: full.descripcion || "",
-    audiencia: full.audiencia || "", tono: full.tono || "",
-    idioma: full.idioma || "", categorias: full.categorias || [],
-    propuestaValor: full.propuesta_valor || "",
-    instagramUrl: full.instagram_url || "", tiktokUrl: full.tiktok_url || "",
-    webUrl: full.web_url || "", canvaUrl: full.canva_url || "",
-    personalidad: full.personalidad || "", coloresMarca: full.colores_marca || [],
-    estiloVisual: full.estilo_visual || "",
-    ejemplosCopy: full.ejemplos_copy || [], competidores: full.competidores || [],
-  });
-
   const loadBrands = async (userId) => {
-    // Use server API route (bypasses RLS issues)
-    let list = [];
     try {
-      const res = await fetch("/api/debug-brands?userId=" + userId);
+      const res = await fetch("/api/brands?userId=" + userId);
       const json = await res.json();
-      list = json.data || [];
-    } catch(e) { console.warn("loadBrands fetch error:", e); }
+      const list = json.data || [];
 
-    setBrands(list);
+      if (list.length === 0) { setBrands([]); setActiveBrand(null); return; }
 
-    if (list.length === 0) {
-      setActiveBrand(null);
-      return false;
-    }
+      setBrands(list);
 
-    // Determine active brand
-    const savedId = localStorage.getItem("activeBrandId");
-    const found = savedId ? list.find(b => b.id === savedId) : null;
-    const active = found || list[0];
-    setActiveBrand(active);
-    localStorage.setItem("activeBrandId", active.id);
+      // Determine active brand
+      const savedId = localStorage.getItem("activeBrandId");
+      const found = savedId ? list.find(b => b.id === savedId) : null;
+      const active = found || list[0];
+      setActiveBrand(active);
+      localStorage.setItem("activeBrandId", active.id);
 
-    // Load full profile for cache
-    try {
-      const res = await fetch("/api/debug-brands?brandId=" + active.id);
-      const json = await res.json();
-      if (json.brand) {
-        const bp = fullToCache(json.brand);
-        localStorage.setItem("brandProfile", JSON.stringify(bp));
+      // Load full profile into cache
+      const res2 = await fetch("/api/brands?brandId=" + active.id);
+      const json2 = await res2.json();
+      if (json2.brand) {
+        localStorage.setItem("brandProfile", JSON.stringify(fullToCache(json2.brand)));
       }
-    } catch(e) {}
-    return true;
+    } catch(e) { console.warn("loadBrands error:", e); }
   };
 
   const switchBrand = async (brand) => {
     setActiveBrand(brand);
     localStorage.setItem("activeBrandId", brand.id);
-
-    // Load full profile into cache
     try {
-      const res = await fetch("/api/debug-brands?brandId=" + brand.id);
+      const res = await fetch("/api/brands?brandId=" + brand.id);
       const json = await res.json();
       if (json.brand) {
-        const bp = fullToCache(json.brand);
-        localStorage.setItem("brandProfile", JSON.stringify(bp));
+        localStorage.setItem("brandProfile", JSON.stringify(fullToCache(json.brand)));
       }
     } catch(e) {}
     window.dispatchEvent(new Event("brandChanged"));
@@ -161,7 +130,7 @@ export default function AppLayout({ children }) {
   const setLanguage = (l) => { setLang(l); localStorage.setItem("lang", l); };
   const en = lang === "en";
 
-  const [dnaSectionOpen, setDnaSectionOpen] = useState(true);
+  const tonoDisplay = (tono) => Array.isArray(tono) ? tono.join(", ") : tono || "";
 
   const navItems = [
     { icon: "✦", label: en ? "New piece" : "Nueva pieza", path: "/crear" },
@@ -171,11 +140,6 @@ export default function AppLayout({ children }) {
   const handleLogout = async () => {
     await supabase.auth.signOut();
     router.push("/");
-  };
-
-  const tonoDisplay = (tono) => {
-    if (Array.isArray(tono)) return tono.join(", ");
-    return tono || "";
   };
 
   return (
@@ -188,7 +152,6 @@ export default function AppLayout({ children }) {
         background: "rgba(10,10,26,0.92)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
         position: "fixed", top: 0, left: 0, right: 0, zIndex: 50,
       }}>
-        {/* Left: hamburger + logo */}
         <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
           <button className="sidebar-toggle" onClick={() => setSidebarOpen(!sidebarOpen)}
             style={{ display: "none", background: "none", border: "none", color: "#fff", fontSize: 22, cursor: "pointer", padding: 4 }}>
@@ -200,7 +163,6 @@ export default function AppLayout({ children }) {
           </div>
         </div>
 
-        {/* Right */}
         <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8 }}>
           <button onClick={() => router.push("/pricing")} style={{ padding: "8px 16px", background: "none", border: "none", color: "rgba(255,255,255,0.6)", fontSize: 14, fontWeight: 500, cursor: "pointer", borderRadius: 8, transition: "color 0.2s" }}>
             {en ? "Pricing" : "Precios"}
@@ -223,8 +185,6 @@ export default function AppLayout({ children }) {
 
       {/* ═══ BODY ═══ */}
       <div style={{ display: "flex", flex: 1, marginTop: 64, position: "relative", zIndex: 1 }}>
-
-        {/* Mobile overlay */}
         {sidebarOpen && <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 39, display: "none" }} />}
 
         {/* ═══ SIDEBAR ═══ */}
@@ -235,7 +195,7 @@ export default function AppLayout({ children }) {
           position: "fixed", top: 64, bottom: 0, left: 0, zIndex: 40,
           overflowY: "auto", transition: "transform 0.3s ease",
         }}>
-          {/* Brand DNA section with submenu */}
+          {/* Brand DNA section */}
           <div style={{ marginBottom: 4 }}>
             <button onClick={() => setDnaSectionOpen(!dnaSectionOpen)}
               style={{
@@ -244,22 +204,20 @@ export default function AppLayout({ children }) {
                 color: pathname === "/adn" ? "#fff" : "rgba(255,255,255,0.5)",
                 background: pathname === "/adn" ? "rgba(121,80,242,0.15)" : "transparent",
                 border: pathname === "/adn" ? "1px solid rgba(121,80,242,0.25)" : "1px solid transparent",
-                cursor: "pointer", textAlign: "left", width: "100%",
-                transition: "all 0.2s",
+                cursor: "pointer", textAlign: "left", width: "100%", transition: "all 0.2s",
               }}>
               <span style={{ fontSize: 17, color: pathname === "/adn" ? "#A78BFA" : "rgba(255,255,255,0.35)" }}>◉</span>
               <span style={{ flex: 1 }}>{en ? "Brand DNA" : "ADN de marca"}</span>
               <span style={{ fontSize: 9, color: "rgba(255,255,255,0.25)", transition: "transform 0.2s", transform: dnaSectionOpen ? "rotate(180deg)" : "rotate(0deg)" }}>▼</span>
             </button>
 
-            {/* Submenu: list of brands */}
             {dnaSectionOpen && (
               <div style={{ paddingLeft: 18, paddingTop: 4, display: "flex", flexDirection: "column", gap: 2 }}>
                 {brands.map(b => {
                   const isActive = b.id === activeBrand?.id;
                   return (
                     <div key={b.id} style={{ display: "flex", alignItems: "center", gap: 0 }}>
-                      <button onClick={() => { switchBrand(b); }}
+                      <button onClick={() => switchBrand(b)}
                         style={{
                           flex: 1, display: "flex", alignItems: "center", gap: 10, padding: "9px 14px",
                           borderRadius: 8, cursor: "pointer", textAlign: "left",
@@ -314,8 +272,7 @@ export default function AppLayout({ children }) {
                     color: active ? "#fff" : "rgba(255,255,255,0.5)",
                     background: active ? "rgba(121,80,242,0.15)" : "transparent",
                     border: active ? "1px solid rgba(121,80,242,0.25)" : "1px solid transparent",
-                    cursor: "pointer", textAlign: "left", width: "100%",
-                    transition: "all 0.2s",
+                    cursor: "pointer", textAlign: "left", width: "100%", transition: "all 0.2s",
                   }}>
                   <span style={{ fontSize: 17, color: active ? "#A78BFA" : "rgba(255,255,255,0.35)" }}>{item.icon}</span>
                   {item.label}

@@ -127,7 +127,7 @@ function ADNContent() {
       // Try loading by specific ID
       if (targetId && targetId !== "cached") {
         try {
-          const res = await fetch("/api/debug-brands?brandId=" + targetId);
+          const res = await fetch("/api/brands?brandId=" + targetId);
           const json = await res.json();
           if (json.brand) loaded = json.brand;
         } catch(e) {}
@@ -136,10 +136,10 @@ function ADNContent() {
       // Fallback: load first brand for this user (only if we have user)
       if (!loaded && user) {
         try {
-          const res = await fetch("/api/debug-brands?userId=" + user.id);
+          const res = await fetch("/api/brands?userId=" + user.id);
           const json = await res.json();
           if (json.data && json.data.length > 0) {
-            const res2 = await fetch("/api/debug-brands?brandId=" + json.data[0].id);
+            const res2 = await fetch("/api/brands?brandId=" + json.data[0].id);
             const json2 = await res2.json();
             if (json2.brand) loaded = json2.brand;
           }
@@ -185,7 +185,7 @@ function ADNContent() {
 
     // Save via server API route (bypasses RLS)
     try {
-      const res = await fetch("/api/debug-brands", {
+      const res = await fetch("/api/brands", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ brandId: currentBrandId, userId: u.id, payload }),

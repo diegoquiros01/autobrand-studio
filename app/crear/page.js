@@ -74,65 +74,67 @@ function CrearContent() {
   }, []);
   const en = lang === "en";
 
+  const dataToProfile = (data) => ({
+    id: data.id, nombre: data.nombre, descripcion: data.descripcion,
+    audiencia: data.audiencia, tono: data.tono,
+    idioma: data.idioma, categorias: data.categorias,
+    propuestaValor: data.propuesta_valor,
+    instagramUrl: data.instagram_url, webUrl: data.web_url,
+    personalidad: data.personalidad, coloresMarca: data.colores_marca,
+    estiloVisual: data.estilo_visual, ejemplosCopy: data.ejemplos_copy,
+  });
+
   const loadBrandProfile = async (user) => {
-    if (!user) return;
-    // Load all brands for switcher
-    const { data: brands } = await supabase.from("brand_profiles").select("id, nombre").eq("user_id", user.id).order("created_at", { ascending: true });
-    setAllBrands(brands || []);
+    // Load all brands via server API
+    if (user) {
+      try {
+        const res = await fetch("/api/brands?userId=" + user.id);
+        const json = await res.json();
+        setAllBrands(json.data || []);
+      } catch(e) {}
+    }
 
     // Load active brand
     const activeBrandId = localStorage.getItem("activeBrandId");
-    let query;
-    if (activeBrandId) {
-      query = supabase.from("brand_profiles").select("*").eq("id", activeBrandId).single();
-    } else if (brands && brands.length > 0) {
-      query = supabase.from("brand_profiles").select("*").eq("id", brands[0].id).single();
-    } else {
-      const bp = localStorage.getItem("brandProfile");
-      if (bp) setBrandProfile(JSON.parse(bp));
-      return;
+    const targetId = activeBrandId || (user ? null : null);
+    if (targetId) {
+      try {
+        const res = await fetch("/api/brands?brandId=" + targetId);
+        const json = await res.json();
+        if (json.brand) {
+          const bp = dataToProfile(json.brand);
+          setBrandProfile(bp);
+          localStorage.setItem("brandProfile", JSON.stringify(bp));
+          localStorage.setItem("activeBrandId", json.brand.id);
+          return;
+        }
+      } catch(e) {}
     }
-    const { data } = await query;
-    if (data) {
-      const bp = {
-        id: data.id, nombre: data.nombre, descripcion: data.descripcion,
-        audiencia: data.audiencia, tono: data.tono,
-        idioma: data.idioma, categorias: data.categorias,
-        propuestaValor: data.propuesta_valor,
-        instagramUrl: data.instagram_url, webUrl: data.web_url,
-        personalidad: data.personalidad, coloresMarca: data.colores_marca,
-        estiloVisual: data.estilo_visual, ejemplosCopy: data.ejemplos_copy,
-      };
-      setBrandProfile(bp);
-      localStorage.setItem("brandProfile", JSON.stringify(bp));
-      localStorage.setItem("activeBrandId", data.id);
-    }
+
+    // Fallback: localStorage cache
+    const cached = localStorage.getItem("brandProfile");
+    if (cached) { try { setBrandProfile(JSON.parse(cached)); } catch(e) {} }
   };
 
   const switchBrandInCrear = async (brand) => {
-    const { data } = await supabase.from("brand_profiles").select("*").eq("id", brand.id).single();
-    if (data) {
-      const bp = {
-        id: data.id, nombre: data.nombre, descripcion: data.descripcion,
-        audiencia: data.audiencia, tono: data.tono,
-        idioma: data.idioma, categorias: data.categorias,
-        propuestaValor: data.propuesta_valor,
-        instagramUrl: data.instagram_url, webUrl: data.web_url,
-        personalidad: data.personalidad, coloresMarca: data.colores_marca,
-        estiloVisual: data.estilo_visual, ejemplosCopy: data.ejemplos_copy,
-      };
-      setBrandProfile(bp);
-      localStorage.setItem("brandProfile", JSON.stringify(bp));
-      localStorage.setItem("activeBrandId", data.id);
-      window.dispatchEvent(new Event("brandChanged"));
-    }
+    try {
+      const res = await fetch("/api/brands?brandId=" + brand.id);
+      const json = await res.json();
+      if (json.brand) {
+        const bp = dataToProfile(json.brand);
+        setBrandProfile(bp);
+        localStorage.setItem("brandProfile", JSON.stringify(bp));
+        localStorage.setItem("activeBrandId", json.brand.id);
+        window.dispatchEvent(new Event("brandChanged"));
+      }
+    } catch(e) {}
     setBrandDropdownOpen(false);
   };
 
   useEffect(() => {
     const init = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
+      if (user) setUser(user);
       await loadBrandProfile(user);
       const qPrompt = searchParams.get("prompt");
       const qTipo = searchParams.get("tipo");
