@@ -31,12 +31,33 @@ export default function AppLayout({ children }) {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) { router.push("/login"); return; }
       setUser(session.user);
-      await loadBrands(session.user.id);
+
+      // Try loading brands by userId first
+      const foundBrands = await loadBrands(session.user.id);
+
+      // Fallback: if no brands found, try loading by activeBrandId directly
+      if (!foundBrands) {
+        const bid = localStorage.getItem("activeBrandId");
+        if (bid && bid !== "cached") {
+          try {
+            const res = await fetch("/api/debug-brands?brandId=" + bid);
+            const json = await res.json();
+            if (json.brand) {
+              const b = json.brand;
+              const item = { id: b.id, nombre: b.nombre, tono: b.tono, idioma: b.idioma };
+              setBrands([item]);
+              setActiveBrand(item);
+              // Try loading all brands by the brand's user_id
+              if (b.user_id) await loadBrands(b.user_id);
+            }
+          } catch(e) {}
+        }
+      }
     };
     init();
     supabase.auth.onAuthStateChange((_e, session) => {
       if (!session) router.push("/login");
-      else setUser(session?.user);
+      else { setUser(session?.user); if (session?.user) loadBrands(session.user.id); }
     });
     const saved = localStorage.getItem("lang");
     if (saved) setLang(saved);
@@ -80,7 +101,7 @@ export default function AppLayout({ children }) {
 
     if (list.length === 0) {
       setActiveBrand(null);
-      return;
+      return false;
     }
 
     // Determine active brand
@@ -99,6 +120,7 @@ export default function AppLayout({ children }) {
         localStorage.setItem("brandProfile", JSON.stringify(bp));
       }
     } catch(e) {}
+    return true;
   };
 
   const switchBrand = async (brand) => {
