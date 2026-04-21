@@ -23,11 +23,37 @@ export async function GET(request) {
   return Response.json({ data, error: error?.message || null, count: data?.length || 0 });
 }
 
+// Sanitize tono — unwrap nested JSON strings to get clean value
+function sanitizeTono(tono) {
+  if (!tono) return "";
+  let val = tono;
+  // Unwrap nested JSON strings
+  for (let i = 0; i < 20; i++) {
+    if (typeof val === "string") {
+      try {
+        const parsed = JSON.parse(val);
+        val = parsed;
+      } catch(e) { break; }
+    } else { break; }
+  }
+  // At this point val should be a clean string or array
+  if (Array.isArray(val)) {
+    // Recursively clean array elements
+    return val.map(v => sanitizeTono(v)).filter(Boolean).join(", ");
+  }
+  return typeof val === "string" ? val : "";
+}
+
 // POST: save/update brand profile
 export async function POST(request) {
   try {
     const { brandId, userId, payload } = await request.json();
     if (!userId || !payload) return Response.json({ error: "missing data" }, { status: 400 });
+
+    // Sanitize tono to prevent nested JSON corruption
+    if (payload.tono) {
+      payload.tono = sanitizeTono(payload.tono);
+    }
 
     if (brandId) {
       // Update existing
