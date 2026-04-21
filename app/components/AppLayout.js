@@ -138,6 +138,8 @@ export default function AppLayout({ children }) {
   ];
 
   const handleLogout = async () => {
+    localStorage.removeItem("brandProfile");
+    localStorage.removeItem("activeBrandId");
     await supabase.auth.signOut();
     router.push("/");
   };

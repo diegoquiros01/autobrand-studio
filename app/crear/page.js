@@ -190,10 +190,14 @@ function CrearContent() {
       const refB = referencias.length > 0 ? await Promise.all(referencias.map(async r => ({ data: await toBase64(r.file), mimeType: "image/jpeg" }))) : [];
       const talB = talentos.length > 0 ? await Promise.all(talentos.map(async t => ({ data: await toBase64(t.file), mimeType: "image/jpeg" }))) : [];
       const promptFinal = feedbackText ? prompt + ". Feedback del usuario: " + feedbackText : prompt;
+      const imgController = new AbortController();
+      const imgTimeout = setTimeout(() => imgController.abort(), 120000);
       const res = await fetch("/api/generate-image", {
         method:"POST", headers:{"Content-Type":"application/json"},
         body: JSON.stringify({ prompt: promptFinal, brandProfile, referencias: refB, talentos: talB, editedCopy: prompt, userId: user?.id || "", idiomapieza: idiomapieza === "ADN" ? (brandProfile?.idioma || "") : idiomapieza, formato }),
+        signal: imgController.signal,
       });
+      clearTimeout(imgTimeout);
       const data = await res.json();
       if (data.error === "limit_reached") {
         setError("Alcanzaste tu límite de " + (data.limit || 20) + " generaciones este mes. Actualiza tu plan en Pricing.");
@@ -204,24 +208,34 @@ function CrearContent() {
         // Store in IndexedDB to avoid localStorage overflow
         saveImage("latest-" + Date.now(), { image: data.image, mimeType: data.mimeType }).catch(() => {});
       } else setError("No se pudo generar la imagen. Intenta de nuevo.");
-    } catch(e) { setError("Error generando imagen: " + e.message); }
+    } catch(e) {
+      if (e.name === "AbortError") { setError(en ? "Image generation timed out. Try again." : "La generación de imagen tardó demasiado. Intenta de nuevo."); }
+      else { setError("Error generando imagen: " + e.message); }
+    }
     clearInterval(iv); setGenProgress(100); setGeneratingImg(false); setGenMsg("");
   };
 
   const generarCopies = async () => {
     setGeneratingCopy(true); setError("");
     try {
+      const copyController = new AbortController();
+      const copyTimeout = setTimeout(() => copyController.abort(), 60000);
       const res = await fetch("/api/generate", {
         method:"POST", headers:{"Content-Type":"application/json"},
         body: JSON.stringify({ prompt, tipo, brandProfile, userId: user?.id || "", idiomapieza: idiomapieza === "ADN" ? (brandProfile?.idioma || "") : idiomapieza }),
+        signal: copyController.signal,
       });
+      clearTimeout(copyTimeout);
       const data = await res.json();
       if (data.error === "limit_reached") {
         setError("Alcanzaste tu límite de " + (data.limit || 20) + " generaciones este mes. Actualiza tu plan en Pricing.");
       } else {
         setCopies((data.propuestas || []).slice(0, 3));
       }
-    } catch(e) { setError("Error generando copies."); }
+    } catch(e) {
+      if (e.name === "AbortError") { setError(en ? "Copy generation timed out. Try again." : "La generación de copies tardó demasiado. Intenta de nuevo."); }
+      else { setError("Error generando copies."); }
+    }
     setGeneratingCopy(false);
   };
 
@@ -411,7 +425,7 @@ function CrearContent() {
             <h1 style={{ fontSize:18, fontWeight:700, color:D.text, letterSpacing:"-0.03em" }}>{en ? "New piece" : "Nueva pieza"}</h1>
             {brandProfile && (
               <div style={{ position:"relative" }}>
-                <div style={{ display:"inline-flex", alignItems:"center", gap:5, background:"rgba(121,80,242,0.1)", borderRadius:20, padding:"3px 10px", border:"1px solid rgba(121,80,242,0.2)", cursor:"pointer" }} onClick={() => setBrandDropdownOpen(!brandDropdownOpen)}>
+                <div style={{ display:"inline-flex", alignItems:"center", gap:5, background:"rgba(121,80,242,0.1)", borderRadius:20, padding:"3px 10px", border:"1px solid rgba(121,80,242,0.2)", cursor: step === 1 ? "pointer" : "default", opacity: step === 1 ? 1 : 0.5 }} onClick={() => step === 1 && setBrandDropdownOpen(!brandDropdownOpen)}>
                   <span style={{ width:5, height:5, borderRadius:"50%", background:D.purpleLight, display:"inline-block" }} />
                   <span style={{ fontSize:10, color:D.purpleLight, fontWeight:500 }}>{brandProfile.nombre || "Tu marca"}</span>
                   {allBrands.length > 1 && <span style={{ fontSize:8, color:"rgba(255,255,255,0.3)" }}>▼</span>}
@@ -563,10 +577,10 @@ function CrearContent() {
                 </UploadZone>
               )}
             </div>
-            <button className="btn-primary" onClick={() => { goToStep(4); generarImagen(); }} style={{ ...NB, background:"linear-gradient(135deg,#E64980,#7950F2)" }}>
+            <button className="btn-primary" onClick={() => { if (!brandProfile) { setError(en ? "You need to create a Brand DNA first" : "Necesitas crear un ADN de marca primero"); return; } goToStep(4); generarImagen(); }} style={{ ...NB, background:"linear-gradient(135deg,#E64980,#7950F2)" }}>
               {en ? "Generate image with AI →" : "Generar imagen con IA →"}
             </button>
-            <button onClick={() => { setTalentos([]); setSkipTalent(true); goToStep(4); generarImagen(); }} style={SB}>
+            <button onClick={() => { if (!brandProfile) { setError(en ? "You need to create a Brand DNA first" : "Necesitas crear un ADN de marca primero"); return; } setTalentos([]); setSkipTalent(true); goToStep(4); generarImagen(); }} style={SB}>
               {en ? "Generate without talent" : "Generar sin talento"}
             </button>
           </div>
@@ -719,12 +733,10 @@ function CrearContent() {
                     )}
                   </div>
                 ))}
-                {copySeleccionado && (
-                  <button onClick={() => { guardarFinal(); goToStep(6); }} disabled={savingFinal}
-                    style={{ width:"100%", padding:13, background: savingFinal ? "rgba(64,192,87,0.3)" : "linear-gradient(135deg,#40C057,#2F9E44)", color:"#fff", border:"none", borderRadius:10, fontSize:14, fontWeight:500, cursor: savingFinal ? "not-allowed" : "pointer", marginTop:6 }}>
-                    {savingFinal ? (en ? "Saving..." : "Guardando...") : (en ? "Save final art →" : "Guardar arte final →")}
-                  </button>
-                )}
+                <button onClick={() => { guardarFinal(); goToStep(6); }} disabled={savingFinal || !copySeleccionado}
+                  style={{ width:"100%", padding:13, background: (savingFinal || !copySeleccionado) ? "rgba(64,192,87,0.3)" : "linear-gradient(135deg,#40C057,#2F9E44)", color:"#fff", border:"none", borderRadius:10, fontSize:14, fontWeight:500, cursor: (savingFinal || !copySeleccionado) ? "not-allowed" : "pointer", marginTop:6, opacity: !copySeleccionado ? 0.5 : 1 }}>
+                  {savingFinal ? (en ? "Saving..." : "Guardando...") : (en ? "Save final art →" : "Guardar arte final →")}
+                </button>
                 {error && <div style={{ background:"rgba(220,38,38,0.1)", border:"1px solid rgba(220,38,38,0.2)", borderRadius:8, padding:10, fontSize:11, color:"#FCA5A5", marginTop:8 }}>{error}</div>}
               </div>
             )}

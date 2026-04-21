@@ -156,6 +156,12 @@ function ADNContent() {
       initialLoadDone.current = true;
     };
     initialLoadDone.current = false;
+    setStep(1);
+    setAnalyzeProgress(0);
+    setAnalyzeMsg("");
+    setAnalyzeError("");
+    setSources([]);
+    setScreenshots([]);
     init();
   }, [isNewBrand, paramBrandId]);
 
@@ -197,7 +203,11 @@ function ADNContent() {
         setBrandId(json.brandId);
         localStorage.setItem("activeBrandId", json.brandId);
       }
-    } catch(e) { console.warn("Save error:", e); }
+    } catch(e) {
+      console.warn("Save error:", e);
+      setSaveStatus("error");
+      setTimeout(() => setSaveStatus("idle"), 4000);
+    }
 
     // Update localStorage cache
     const bid = brandIdRef.current;
@@ -211,7 +221,14 @@ function ADNContent() {
   useEffect(() => {
     if (!initialLoadDone.current) return;
     if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => handleSave(), 1500);
+    debounceRef.current = setTimeout(() => {
+      // Don't autosave if brandId doesn't match current URL context
+      const urlBrandId = new URLSearchParams(window.location.search).get("brand");
+      const isNew = new URLSearchParams(window.location.search).get("new") === "true";
+      if (isNew && brandIdRef.current) return; // New brand mode but somehow has an ID - skip
+      if (urlBrandId && brandIdRef.current && urlBrandId !== brandIdRef.current) return; // URL brand doesn't match ref - skip
+      handleSave();
+    }, 1500);
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
   }, [profile, handleSave]);
 
@@ -697,6 +714,7 @@ function ADNContent() {
           <div style={{ fontSize: 14, color: D.text2, letterSpacing: "-0.02em", minWidth: 160 }}>
             {saveStatus === "saving" && <span style={{ color: D.purpleLight, fontWeight: 600 }}>{en ? "Saving changes..." : "💾 Guardando cambios..."}</span>}
             {saveStatus === "saved" && <span style={{ color: "#40C057", fontWeight: 600 }}>{en ? "✓ Changes saved" : "✓ Cambios guardados"}</span>}
+            {saveStatus === "error" && <span style={{ color: "#FCA5A5", fontWeight: 600 }}>{en ? "⚠ Error saving — check connection" : "⚠ Error al guardar — revisa tu conexión"}</span>}
             {saveStatus === "idle" && <span style={{ color: D.text3 }}>{en ? "Step" : "Paso"} {step} {en ? "of" : "de"} 3</span>}
           </div>
           <div style={{ display: "flex", gap: 10 }}>

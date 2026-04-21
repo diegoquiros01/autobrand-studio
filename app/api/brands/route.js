@@ -49,6 +49,7 @@ export async function POST(request) {
   try {
     const { brandId, userId, payload } = await request.json();
     if (!userId || !payload) return Response.json({ error: "missing data" }, { status: 400 });
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId)) return Response.json({ error: "invalid userId" }, { status: 400 });
 
     // Sanitize tono to prevent nested JSON corruption
     if (payload.tono) {

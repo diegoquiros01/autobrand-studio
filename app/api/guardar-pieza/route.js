@@ -14,6 +14,7 @@ export async function POST(request) {
     if (!userId || !imageBase64) {
       return Response.json({ error: "Missing data" }, { status: 400 });
     }
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId)) return Response.json({ error: "invalid userId" }, { status: 400 });
 
     const byteCharacters = Buffer.from(imageBase64, "base64");
     const ext = (mimeType || "image/png").split("/")[1] || "png";
@@ -31,20 +32,20 @@ export async function POST(request) {
       return Response.json({ error: uploadError.message }, { status: 500 });
     }
 
-    const { error: insertError } = await supabase.from("generaciones").insert({
+    const { data: inserted, error: insertError } = await supabase.from("generaciones").insert({
       user_id: userId,
       prompt: prompt,
       tipo: tipo,
       propuestas: [copy],
       imagen_url: fileName,
-    });
+    }).select("id").single();
 
     if (insertError) {
       console.error("Insert error:", insertError);
       return Response.json({ error: insertError.message }, { status: 500 });
     }
 
-    return Response.json({ success: true, fileName });
+    return Response.json({ success: true, fileName, id: inserted.id });
   } catch(e) {
     console.error("guardar-pieza error:", e);
     return Response.json({ error: e.message }, { status: 500 });
