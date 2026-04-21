@@ -138,7 +138,7 @@ function ADNContent() {
       }
 
       // Fallback: load first brand for this user
-      const { data: allBrands } = await supabase.from("brand_profiles").select("*").eq("user_id", user.id).order("created_at", { ascending: true }).limit(1);
+      const { data: allBrands } = await supabase.from("brand_profiles").select("*").eq("user_id", user.id).limit(1);
       if (allBrands && allBrands.length > 0) {
         const data = allBrands[0];
         const loaded = dataToProfile(data);
@@ -178,12 +178,21 @@ function ADNContent() {
       // Update existing brand
       await supabase.from("brand_profiles").update(payload).eq("id", currentBrandId);
     } else {
-      // Insert new brand
-      const { data: inserted } = await supabase.from("brand_profiles").insert({ ...payload, user_id: u.id }).select("id").single();
-      if (inserted) {
-        brandIdRef.current = inserted.id;
-        setBrandId(inserted.id);
-        localStorage.setItem("activeBrandId", inserted.id);
+      // Check if user already has a profile before inserting
+      const { data: existing } = await supabase.from("brand_profiles").select("id").eq("user_id", u.id).limit(1);
+      if (existing && existing.length > 0) {
+        // Update the existing one instead
+        brandIdRef.current = existing[0].id;
+        setBrandId(existing[0].id);
+        await supabase.from("brand_profiles").update(payload).eq("id", existing[0].id);
+      } else {
+        // Insert new brand
+        const { data: inserted } = await supabase.from("brand_profiles").insert({ ...payload, user_id: u.id }).select("id").single();
+        if (inserted) {
+          brandIdRef.current = inserted.id;
+          setBrandId(inserted.id);
+          localStorage.setItem("activeBrandId", inserted.id);
+        }
       }
     }
 
