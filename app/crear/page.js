@@ -881,7 +881,7 @@ function CrearContent() {
             </div>
 
             <div style={{ display:"flex", gap:10 }}>
-              <button onClick={resetAll} style={{ flex:1, padding:11, background:"rgba(255,255,255,0.06)", color:D.text2, border:"1px solid rgba(255,255,255,0.1)", borderRadius:9, fontSize:13, fontWeight:500, cursor:"pointer" }}>
+              <button onClick={() => { if (confirm(en ? "Start a new piece? Current progress will be lost." : "¿Crear nueva pieza? El progreso actual se perderá.")) resetAll(); }} style={{ flex:1, padding:11, background:"rgba(255,255,255,0.06)", color:D.text2, border:"1px solid rgba(255,255,255,0.1)", borderRadius:9, fontSize:13, fontWeight:500, cursor:"pointer" }}>
                 {en ? "+ New piece" : "+ Nueva pieza"}
               </button>
               <button onClick={() => router.push("/biblioteca")} style={{ flex:1, padding:11, background:D.purple, color:"#fff", border:"none", borderRadius:9, fontSize:13, fontWeight:500, cursor:"pointer" }}>

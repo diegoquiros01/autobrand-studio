@@ -52,7 +52,11 @@ export default function Cuenta() {
 
   if (loading) return (
     <div style={{ minHeight:"100vh", background:D.bg, display:"flex", alignItems:"center", justifyContent:"center" }}>
-      <div style={{ fontSize:14, color:D.text2 }}>{en ? "Loading..." : "Cargando..."}</div>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      <div style={{ textAlign: "center", padding: "80px 0" }}>
+        <div style={{ width: 40, height: 40, border: "3px solid rgba(121,80,242,0.2)", borderTop: "3px solid #7950F2", borderRadius: "50%", margin: "0 auto 16px", animation: "spin 0.8s linear infinite" }} />
+        <div style={{ fontSize: 14, color: "rgba(255,255,255,0.4)" }}>{en ? "Loading..." : "Cargando..."}</div>
+      </div>
     </div>
   );
 

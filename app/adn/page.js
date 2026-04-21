@@ -276,7 +276,9 @@ function ADNContent() {
   const analyzeInstagram = async () => {
     if (sources.length === 0) return;
     setAnalyzing(true); setAnalyzeProgress(0); setAnalyzeError("");
-    const msgs = ["Recopilando tus fuentes...", "Leyendo tu página web...", "Analizando tu contenido visual...", "Identificando tu tono y personalidad...", "Detectando tu audiencia...", "Construyendo tu ADN de marca..."];
+    const msgs = en
+      ? ["Gathering your sources...", "Reading your website...", "Analyzing your visual content...", "Identifying your tone and personality...", "Detecting your audience...", "Building your brand DNA..."]
+      : ["Recopilando tus fuentes...", "Leyendo tu página web...", "Analizando tu contenido visual...", "Identificando tu tono y personalidad...", "Detectando tu audiencia...", "Construyendo tu ADN de marca..."];
     let mi = 0; setAnalyzeMsg(msgs[0]);
     const iv = setInterval(() => {
       setAnalyzeProgress(p => Math.min(p + Math.random() * 15, 88));

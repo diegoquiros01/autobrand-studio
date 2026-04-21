@@ -32,7 +32,8 @@ export default function Biblioteca() {
     const init = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { setLoading(false); return; }
-      const { data } = await supabase.from("generaciones").select("*").eq("user_id", user.id).order("created_at", { ascending: false });
+      const { data, error } = await supabase.from("generaciones").select("*").eq("user_id", user.id).order("created_at", { ascending: false });
+      if (error) console.warn("Biblioteca load error:", error.message);
       if (data && data.length > 0) {
         const withUrls = await Promise.all(data.map(async g => {
           if (g.imagen_url) {
@@ -84,13 +85,17 @@ export default function Biblioteca() {
           {TIPOS.map(t => (
             <button key={t} onClick={() => { setFilter(t); setPage(1); }}
               style={{ padding:"5px 12px", borderRadius:20, fontSize:11.5, border: filter===t ? "1.5px solid " + D.purple : "1px solid rgba(255,255,255,0.1)", background: filter===t ? "rgba(121,80,242,0.12)" : "transparent", color: filter===t ? D.purpleLight : D.text3, fontWeight: filter===t ? 500 : 400, cursor:"pointer" }}>
-              {t === "todas" ? (en ? "All" : "Todas") + " (" + generaciones.length + ")" : t}
+              {t === "todas" ? (en ? "All" : "Todas") + " (" + generaciones.length + ")" : t + " (" + generaciones.filter(g => g.tipo === t).length + ")"}
             </button>
           ))}
         </div>
 
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
         {loading ? (
-          <div style={{ textAlign:"center", padding:"60px 0", color:D.text3 }}>{en ? "Loading your library..." : "Cargando tu biblioteca..."}</div>
+          <div style={{ textAlign: "center", padding: "80px 0" }}>
+            <div style={{ width: 40, height: 40, border: "3px solid rgba(121,80,242,0.2)", borderTop: "3px solid #7950F2", borderRadius: "50%", margin: "0 auto 16px", animation: "spin 0.8s linear infinite" }} />
+            <div style={{ fontSize: 14, color: "rgba(255,255,255,0.4)" }}>{en ? "Loading your library..." : "Cargando tu biblioteca..."}</div>
+          </div>
         ) : filtered.length === 0 ? (
           <div style={{ background:D.bg3, border:"1px solid " + D.border, borderRadius:14, padding:"60px 24px", textAlign:"center" }}>
             <div style={{ fontSize:40, opacity:0.1, marginBottom:12 }}>◉</div>
@@ -166,10 +171,10 @@ export default function Biblioteca() {
                 {selected.propuestas && selected.propuestas.length > 0 && (
                   <div style={{ background:"rgba(255,255,255,0.03)", border:"1px solid " + D.border, borderRadius:8, padding:"10px 12px", marginBottom:14 }}>
                     <div style={{ fontSize:10, fontWeight:500, color:D.text3, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:8 }}>Copy</div>
-                    <div style={{ fontSize:13, fontWeight:500, color:D.text, marginBottom:4 }}>{selected.propuestas[0].hook}</div>
-                    <div style={{ fontSize:12, color:D.text2, lineHeight:1.6, marginBottom:4 }}>{selected.propuestas[0].copy}</div>
-                    <div style={{ fontSize:12, color:D.purpleLight, marginBottom:4 }}>{selected.propuestas[0].cta}</div>
-                    {selected.propuestas[0].hashtags && <div style={{ fontSize:11, color:"rgba(167,139,250,0.45)" }}>{selected.propuestas[0].hashtags}</div>}
+                    <div style={{ fontSize:13, fontWeight:500, color:D.text, marginBottom:4 }}>{selected?.propuestas?.[0]?.hook}</div>
+                    <div style={{ fontSize:12, color:D.text2, lineHeight:1.6, marginBottom:4 }}>{selected?.propuestas?.[0]?.copy}</div>
+                    <div style={{ fontSize:12, color:D.purpleLight, marginBottom:4 }}>{selected?.propuestas?.[0]?.cta}</div>
+                    {selected?.propuestas?.[0]?.hashtags && <div style={{ fontSize:11, color:"rgba(167,139,250,0.45)" }}>{selected?.propuestas?.[0]?.hashtags}</div>}
                   </div>
                 )}
 
@@ -182,7 +187,7 @@ export default function Biblioteca() {
                       ⬇ Descargar imagen
                     </button>
                   )}
-                  <button onClick={() => { navigator.clipboard.writeText((selected.propuestas?.[0]?.hook || "") + "\n\n" + (selected.propuestas?.[0]?.copy || "") + "\n\n" + (selected.propuestas?.[0]?.cta || "") + "\n\n" + (selected.propuestas?.[0]?.hashtags || "")); alert(en ? "Text copied!" : "Copy copiado!"); }}
+                  <button onClick={() => { navigator.clipboard.writeText((selected.propuestas?.[0]?.hook || "") + "\n\n" + (selected.propuestas?.[0]?.copy || "") + "\n\n" + (selected.propuestas?.[0]?.cta || "") + "\n\n" + (selected.propuestas?.[0]?.hashtags || "")); alert(en ? "Text copied!" : "¡Copy copiado!"); }}
                     style={{ width:"100%", padding:10, background:"rgba(255,255,255,0.06)", color:D.text2, border:"1px solid " + D.border, borderRadius:8, fontSize:12, fontWeight:500, cursor:"pointer" }}>
                     ⎘ Copiar texto
                   </button>
