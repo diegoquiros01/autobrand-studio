@@ -14,6 +14,9 @@ function LoginContent() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [lang, setLang] = useState("es");
+  useEffect(() => { const saved = localStorage.getItem("lang"); if (saved) setLang(saved); }, []);
+  const en = lang === "en";
 
   const handleLogin = async () => {
     if (!email || !password) return;
@@ -48,7 +51,7 @@ function LoginContent() {
       } else {
         setTimeout(() => router.push("/adn?onboarding=true"), 800);
       }
-      setSuccess("Cuenta creada exitosamente.");
+      setSuccess(en ? "Account created successfully." : "Cuenta creada exitosamente.");
     }
     setLoading(false);
   };
@@ -81,33 +84,37 @@ function LoginContent() {
           <div style={{ width:32, height:32, background:"linear-gradient(135deg,#7950F2,#4C6EF5)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:500, fontSize:13 }}>Ai</div>
           <span style={{ fontSize:16, fontWeight:500, color:"#fff" }}>Ai<span style={{ color:"#7950F2" }}>Studio</span>Brand</span>
         </div>
+        <div style={{ marginLeft: "auto", display: "flex", background: "rgba(255,255,255,0.08)", borderRadius: 8, padding: 3, gap: 2 }}>
+          <button onClick={() => { setLang("es"); localStorage.setItem("lang", "es"); }} style={{ padding: "4px 10px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", background: lang === "es" ? "#fff" : "transparent", border: "none", color: lang === "es" ? "#0A0A0A" : "rgba(255,255,255,0.4)" }}>ES</button>
+          <button onClick={() => { setLang("en"); localStorage.setItem("lang", "en"); }} style={{ padding: "4px 10px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", background: lang === "en" ? "#fff" : "transparent", border: "none", color: lang === "en" ? "#0A0A0A" : "rgba(255,255,255,0.4)" }}>EN</button>
+        </div>
       </nav>
       <div style={{ position:"relative", zIndex:1, display:"flex", alignItems:"center", justifyContent:"center", minHeight:"calc(100vh - 60px)", padding:20 }}>
         <div style={{ background:"rgba(22,22,45,0.85)", backdropFilter:"blur(20px)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:20, padding:"36px 32px", width:"100%", maxWidth:380, boxShadow:"0 8px 40px rgba(0,0,0,0.3)" }}>
           <div style={{ textAlign:"center", marginBottom:24 }}>
             <div style={{ width:44, height:44, background:"linear-gradient(135deg,#7950F2,#4C6EF5)", borderRadius:12, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:500, fontSize:18, margin:"0 auto 10px" }}>Ai</div>
             <div style={{ fontSize:20, fontWeight:500, color:"#fff", marginBottom:4 }}>Ai<span style={{ color:"#7950F2" }}>Studio</span>Brand</div>
-            <div style={{ fontSize:13.5, color:"rgba(255,255,255,0.7)" }}>Contenido que suena como tú</div>
+            <div style={{ fontSize:13.5, color:"rgba(255,255,255,0.7)" }}>{en ? "Content that sounds like you" : "Contenido que suena como tú"}</div>
           </div>
           <div style={{ display:"flex", background:"rgba(255,255,255,0.06)", borderRadius:10, padding:3, marginBottom:20, gap:3 }}>
-            <button onClick={() => setMode("login")} style={{ flex:1, padding:8, borderRadius:8, fontSize:13.5, fontWeight:500, cursor:"pointer", background: mode==="login" ? "#fff" : "transparent", border:"none", color: mode==="login" ? "#0A0A0A" : "#666", boxShadow: mode==="login" ? "0 1px 4px rgba(0,0,0,0.1)" : "none" }}>Iniciar sesión</button>
-            <button onClick={() => setMode("register")} style={{ flex:1, padding:8, borderRadius:8, fontSize:13.5, fontWeight:500, cursor:"pointer", background: mode==="register" ? "#fff" : "transparent", border:"none", color: mode==="register" ? "#0A0A0A" : "#666", boxShadow: mode==="register" ? "0 1px 4px rgba(0,0,0,0.1)" : "none" }}>Crear cuenta</button>
+            <button onClick={() => setMode("login")} style={{ flex:1, padding:8, borderRadius:8, fontSize:13.5, fontWeight:500, cursor:"pointer", background: mode==="login" ? "#fff" : "transparent", border:"none", color: mode==="login" ? "#0A0A0A" : "#666", boxShadow: mode==="login" ? "0 1px 4px rgba(0,0,0,0.1)" : "none" }}>{en ? "Sign in" : "Iniciar sesión"}</button>
+            <button onClick={() => setMode("register")} style={{ flex:1, padding:8, borderRadius:8, fontSize:13.5, fontWeight:500, cursor:"pointer", background: mode==="register" ? "#fff" : "transparent", border:"none", color: mode==="register" ? "#0A0A0A" : "#666", boxShadow: mode==="register" ? "0 1px 4px rgba(0,0,0,0.1)" : "none" }}>{en ? "Create account" : "Crear cuenta"}</button>
           </div>
           {error && <div style={{ background:"rgba(220,38,38,0.1)", border:"1px solid rgba(220,38,38,0.3)", borderRadius:8, padding:"10px 13px", color:"#FCA5A5", fontSize:13, marginBottom:12 }}>{error}</div>}
           {success && <div style={{ background:"rgba(64,192,87,0.08)", border:"1px solid rgba(64,192,87,0.2)", borderRadius:8, padding:"10px 13px", color:"#86EFAC", fontSize:13, marginBottom:12 }}>{success}</div>}
           {mode === "register" && (
             <div style={{ marginBottom:12 }}>
-              <label style={{ fontSize:13, fontWeight:500, color:"rgba(255,255,255,0.8)", display:"block", marginBottom:5 }}>Tu nombre</label>
+              <label style={{ fontSize:13, fontWeight:500, color:"rgba(255,255,255,0.8)", display:"block", marginBottom:5 }}>{en ? "Your name" : "Tu nombre"}</label>
               <input className={inpClass} style={inp} type="text" placeholder="Maria Garcia" value={nombre} onChange={e => setNombre(e.target.value)} />
             </div>
           )}
           <div style={{ marginBottom:12 }}>
             <label style={{ fontSize:13, fontWeight:500, color:"rgba(255,255,255,0.8)", display:"block", marginBottom:5 }}>Email</label>
-            <input className={inpClass} style={inp} type="email" placeholder="tu@email.com" value={email} onChange={e => setEmail(e.target.value)} />
+            <input className={inpClass} style={inp} type="email" placeholder={en ? "your@email.com" : "tu@email.com"} value={email} onChange={e => setEmail(e.target.value)} />
           </div>
           <div style={{ marginBottom:4 }}>
-            <label style={{ fontSize:13, fontWeight:500, color:"rgba(255,255,255,0.8)", display:"block", marginBottom:5 }}>Contrasena</label>
-            <input className={inpClass} style={inp} type="password" placeholder="Minimo 6 caracteres" value={password} onChange={e => setPassword(e.target.value)} />
+            <label style={{ fontSize:13, fontWeight:500, color:"rgba(255,255,255,0.8)", display:"block", marginBottom:5 }}>{en ? "Password" : "Contraseña"}</label>
+            <input className={inpClass} style={inp} type="password" placeholder={en ? "Minimum 6 characters" : "Mínimo 6 caracteres"} value={password} onChange={e => setPassword(e.target.value)} />
           </div>
           <button
             className="btn-primary"
@@ -115,18 +122,18 @@ function LoginContent() {
             onClick={mode === "login" ? handleLogin : handleRegister}
             disabled={loading}
           >
-            {loading ? "Cargando..." : mode === "login" ? "Iniciar sesion" : "Crear cuenta gratis"}
+            {loading ? (en ? "Loading..." : "Cargando...") : mode === "login" ? (en ? "Sign in" : "Iniciar sesión") : (en ? "Create free account" : "Crear cuenta gratis")}
           </button>
           <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:14 }}>
             <div style={{ flex:1, height:1, background:"#F0F0F0" }} />
-            <div style={{ fontSize:12, color:"rgba(255,255,255,0.25)" }}>o continua con</div>
+            <div style={{ fontSize:12, color:"rgba(255,255,255,0.25)" }}>{en ? "or continue with" : "o continúa con"}</div>
             <div style={{ flex:1, height:1, background:"#F0F0F0" }} />
           </div>
           <button
             onClick={async () => { await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: window.location.origin } }); }}
             style={{ width:"100%", padding:11, background:"rgba(255,255,255,0.06)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:10, fontSize:13.5, fontWeight:500, cursor:"pointer", color:"rgba(255,255,255,0.8)", display:"flex", alignItems:"center", justifyContent:"center", gap:8 }}
           >
-            Continuar con Google
+            {en ? "Continue with Google" : "Continuar con Google"}
           </button>
         </div>
       </div>

@@ -57,6 +57,7 @@ function CrearContent() {
   const [copySeleccionado, setCopySeleccionado] = useState(null);
   const [editingCopy, setEditingCopy] = useState(null);
   const [editedText, setEditedText] = useState("");
+  const [translatingCopy, setTranslatingCopy] = useState(null);
 
   const [savedFinal, setSavedFinal] = useState(false);
   const [error, setError] = useState("");
@@ -213,6 +214,30 @@ function CrearContent() {
       else { setError("Error generando imagen: " + e.message); }
     }
     clearInterval(iv); setGenProgress(100); setGeneratingImg(false); setGenMsg("");
+  };
+
+  const translateCopy = async (copyItem, targetLang) => {
+    setTranslatingCopy(copyItem.id);
+    try {
+      const text = copyItem.hook + "\n\n" + copyItem.copy + "\n\n" + copyItem.cta + (copyItem.hashtags ? "\n\n" + copyItem.hashtags : "");
+      const res = await fetch("/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prompt: "Translate this Instagram post to " + targetLang + ". Keep the same tone, style, and formatting. Return ONLY the translation, nothing else:\n\n" + text,
+          tipo: "translation",
+          brandProfile,
+          userId: user?.id || "",
+          idiomapieza: targetLang,
+        }),
+      });
+      const data = await res.json();
+      if (data.propuestas && data.propuestas.length > 0) {
+        const translated = data.propuestas[0];
+        setCopies(prev => prev.map(c => c.id === copyItem.id ? { ...c, hook: translated.hook || c.hook, copy: translated.copy || c.copy, cta: translated.cta || c.cta, hashtags: translated.hashtags || c.hashtags } : c));
+      }
+    } catch(e) { console.warn("Translation error:", e); }
+    setTranslatingCopy(null);
   };
 
   const generarCopies = async () => {
@@ -728,6 +753,22 @@ function CrearContent() {
                             style={{ padding:"5px 12px", borderRadius:6, fontSize:11, background:"rgba(255,255,255,0.04)", color:D.text2, border:"1px solid rgba(255,255,255,0.1)", cursor:"pointer" }}>
                             {en ? "✏ Edit" : "✏ Editar"}
                           </button>
+                          <div style={{ position: "relative", display: "inline-block" }}>
+                            <button onClick={(e) => {
+                              const btn = e.currentTarget;
+                              const menu = btn.nextElementSibling;
+                              menu.style.display = menu.style.display === "block" ? "none" : "block";
+                            }}
+                              disabled={translatingCopy === c.id}
+                              style={{ padding:"5px 12px", borderRadius:6, fontSize:11, background:"rgba(255,255,255,0.04)", color: translatingCopy === c.id ? D.purpleLight : D.text2, border:"1px solid rgba(255,255,255,0.1)", cursor:"pointer" }}>
+                              {translatingCopy === c.id ? (en ? "Translating..." : "Traduciendo...") : (en ? "🌐 Translate" : "🌐 Traducir")}
+                            </button>
+                            <div style={{ display: "none", position: "absolute", bottom: "100%", left: 0, marginBottom: 4, background: "#16162d", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: 4, zIndex: 10, minWidth: 120 }}>
+                              <button onClick={() => translateCopy(c, "Español")} style={{ display: "block", width: "100%", padding: "6px 12px", background: "none", border: "none", color: "#fff", fontSize: 11, cursor: "pointer", textAlign: "left", borderRadius: 4 }}>Español</button>
+                              <button onClick={() => translateCopy(c, "English")} style={{ display: "block", width: "100%", padding: "6px 12px", background: "none", border: "none", color: "#fff", fontSize: 11, cursor: "pointer", textAlign: "left", borderRadius: 4 }}>English</button>
+                              <button onClick={() => translateCopy(c, "Spanglish")} style={{ display: "block", width: "100%", padding: "6px 12px", background: "none", border: "none", color: "#fff", fontSize: 11, cursor: "pointer", textAlign: "left", borderRadius: 4 }}>Spanglish</button>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     )}
