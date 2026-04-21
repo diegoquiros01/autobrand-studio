@@ -73,7 +73,26 @@ export default function AppLayout({ children }) {
 
   const loadBrandsFromUser = async () => {
     const { data: { user } } = await supabase.auth.getUser();
-    if (user) await loadBrands(user.id);
+    if (user) {
+      await loadBrands(user.id);
+    } else {
+      // No auth session — try loading by activeBrandId
+      const bid = localStorage.getItem("activeBrandId");
+      if (bid && bid !== "cached") {
+        try {
+          const res = await fetch("/api/debug-brands?brandId=" + bid);
+          const json = await res.json();
+          if (json.brand) {
+            const b = json.brand;
+            const item = { id: b.id, nombre: b.nombre, tono: b.tono, idioma: b.idioma };
+            setBrands([item]);
+            setActiveBrand(item);
+            const bp = fullToCache(b);
+            localStorage.setItem("brandProfile", JSON.stringify(bp));
+          }
+        } catch(e) {}
+      }
+    }
   };
 
   const fullToCache = (full) => ({
