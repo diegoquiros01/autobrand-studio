@@ -110,8 +110,7 @@ function ADNContent() {
   useEffect(() => {
     const init = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      setUser(user);
+      if (user) setUser(user);
 
       // New brand → blank profile, no load
       if (isNewBrand) {
@@ -121,7 +120,7 @@ function ADNContent() {
         return;
       }
 
-      // Load brand via server API route (bypasses RLS)
+      // Load brand via server API route (bypasses RLS and auth issues)
       const targetId = paramBrandId || localStorage.getItem("activeBrandId");
       let loaded = null;
 
@@ -134,13 +133,12 @@ function ADNContent() {
         } catch(e) {}
       }
 
-      // Fallback: load first brand for this user
-      if (!loaded) {
+      // Fallback: load first brand for this user (only if we have user)
+      if (!loaded && user) {
         try {
           const res = await fetch("/api/debug-brands?userId=" + user.id);
           const json = await res.json();
           if (json.data && json.data.length > 0) {
-            // Got summary, now load full profile
             const res2 = await fetch("/api/debug-brands?brandId=" + json.data[0].id);
             const json2 = await res2.json();
             if (json2.brand) loaded = json2.brand;
