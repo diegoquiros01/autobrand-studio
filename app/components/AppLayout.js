@@ -57,15 +57,16 @@ export default function AppLayout({ children }) {
 
   const loadBrands = async (userId) => {
     const { data, error } = await supabase.from("brand_profiles").select("id, nombre, tono, idioma").eq("user_id", userId);
+    if (error) console.warn("loadBrands error:", error.message);
     let list = data || [];
 
-    // Fallback: if DB returns empty but we have a cached profile, use it
+    // Fallback: if DB returns empty, use cached profile
     if (list.length === 0) {
       const cachedBp = localStorage.getItem("brandProfile");
       if (cachedBp) {
         try {
           const bp = JSON.parse(cachedBp);
-          if (bp.id) list = [{ id: bp.id, nombre: bp.nombre, tono: bp.tono, idioma: bp.idioma }];
+          if (bp.id || bp.nombre) list = [{ id: bp.id || "cached", nombre: bp.nombre || "", tono: bp.tono || "", idioma: bp.idioma || "" }];
         } catch(e) {}
       }
     }
