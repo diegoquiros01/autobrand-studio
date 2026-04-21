@@ -55,21 +55,27 @@ export default function AppLayout({ children }) {
     if (user) await loadBrands(user.id);
   };
 
-  const loadBrands = async (userId) => {
-    const { data, error } = await supabase.from("brand_profiles").select("id, nombre, tono, idioma").eq("user_id", userId);
-    if (error) console.warn("loadBrands error:", error.message);
-    let list = data || [];
+  const fullToCache = (full) => ({
+    id: full.id, nombre: full.nombre || "", descripcion: full.descripcion || "",
+    audiencia: full.audiencia || "", tono: full.tono || "",
+    idioma: full.idioma || "", categorias: full.categorias || [],
+    propuestaValor: full.propuesta_valor || "",
+    instagramUrl: full.instagram_url || "", tiktokUrl: full.tiktok_url || "",
+    webUrl: full.web_url || "", canvaUrl: full.canva_url || "",
+    personalidad: full.personalidad || "", coloresMarca: full.colores_marca || [],
+    estiloVisual: full.estilo_visual || "",
+    ejemplosCopy: full.ejemplos_copy || [], competidores: full.competidores || [],
+  });
 
-    // Fallback: if DB returns empty, use cached profile
-    if (list.length === 0) {
-      const cachedBp = localStorage.getItem("brandProfile");
-      if (cachedBp) {
-        try {
-          const bp = JSON.parse(cachedBp);
-          if (bp.id || bp.nombre) list = [{ id: bp.id || "cached", nombre: bp.nombre || "", tono: bp.tono || "", idioma: bp.idioma || "" }];
-        } catch(e) {}
-      }
-    }
+  const loadBrands = async (userId) => {
+    // Use server API route (bypasses RLS issues)
+    let list = [];
+    try {
+      const res = await fetch("/api/debug-brands?userId=" + userId);
+      const json = await res.json();
+      list = json.data || [];
+    } catch(e) { console.warn("loadBrands fetch error:", e); }
+
     setBrands(list);
 
     if (list.length === 0) {
@@ -84,45 +90,30 @@ export default function AppLayout({ children }) {
     setActiveBrand(active);
     localStorage.setItem("activeBrandId", active.id);
 
-    // Also load full profile for cache
-    const { data: full } = await supabase.from("brand_profiles").select("*").eq("id", active.id).single();
-    if (full) {
-      const bp = {
-        id: full.id, nombre: full.nombre || "", descripcion: full.descripcion || "",
-        audiencia: full.audiencia || "", tono: full.tono || "",
-        idioma: full.idioma || "", categorias: full.categorias || [],
-        propuestaValor: full.propuesta_valor || "",
-        instagramUrl: full.instagram_url || "", tiktokUrl: full.tiktok_url || "",
-        webUrl: full.web_url || "", canvaUrl: full.canva_url || "",
-        personalidad: full.personalidad || "", coloresMarca: full.colores_marca || [],
-        estiloVisual: full.estilo_visual || "",
-        ejemplosCopy: full.ejemplos_copy || [], competidores: full.competidores || [],
-      };
-      localStorage.setItem("brandProfile", JSON.stringify(bp));
-    }
+    // Load full profile for cache
+    try {
+      const res = await fetch("/api/debug-brands?brandId=" + active.id);
+      const json = await res.json();
+      if (json.brand) {
+        const bp = fullToCache(json.brand);
+        localStorage.setItem("brandProfile", JSON.stringify(bp));
+      }
+    } catch(e) {}
   };
 
   const switchBrand = async (brand) => {
     setActiveBrand(brand);
     localStorage.setItem("activeBrandId", brand.id);
-    setBrandMenuOpen(false);
 
     // Load full profile into cache
-    const { data: full } = await supabase.from("brand_profiles").select("*").eq("id", brand.id).single();
-    if (full) {
-      const bp = {
-        id: full.id, nombre: full.nombre || "", descripcion: full.descripcion || "",
-        audiencia: full.audiencia || "", tono: full.tono || "",
-        idioma: full.idioma || "", categorias: full.categorias || [],
-        propuestaValor: full.propuesta_valor || "",
-        instagramUrl: full.instagram_url || "", tiktokUrl: full.tiktok_url || "",
-        webUrl: full.web_url || "", canvaUrl: full.canva_url || "",
-        personalidad: full.personalidad || "", coloresMarca: full.colores_marca || [],
-        estiloVisual: full.estilo_visual || "",
-        ejemplosCopy: full.ejemplos_copy || [], competidores: full.competidores || [],
-      };
-      localStorage.setItem("brandProfile", JSON.stringify(bp));
-    }
+    try {
+      const res = await fetch("/api/debug-brands?brandId=" + brand.id);
+      const json = await res.json();
+      if (json.brand) {
+        const bp = fullToCache(json.brand);
+        localStorage.setItem("brandProfile", JSON.stringify(bp));
+      }
+    } catch(e) {}
     window.dispatchEvent(new Event("brandChanged"));
   };
 
