@@ -155,8 +155,9 @@ function ADNContent() {
       }
       initialLoadDone.current = true;
     };
+    initialLoadDone.current = false;
     init();
-  }, []);
+  }, [isNewBrand, paramBrandId]);
 
   // --- Save ---
   const handleSave = useCallback(async () => {
