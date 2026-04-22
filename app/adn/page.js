@@ -88,7 +88,7 @@ function ADNContent() {
   const [brandId, setBrandId] = useState(null); // current brand profile ID
   const [profile, setProfile] = useState({ ...BLANK_PROFILE });
   const [aiOriginal, setAiOriginal] = useState({});
-  const [showCompetitors, setShowCompetitors] = useState(false);
+  const [showCompetitors, setShowCompetitors] = useState(true);
 
   const [saveStatus, setSaveStatus] = useState("idle");
   const [analyzing, setAnalyzing] = useState(false);
@@ -194,7 +194,15 @@ function ADNContent() {
     const u = userRef.current;
     const p = profileRef.current;
     const currentBrandId = brandIdRef.current;
-    if (!u) return;
+    // Get userId from auth or fallback to fetching it
+    let userId = u?.id;
+    if (!userId) {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) { userId = user.id; setUser(user); }
+      } catch(e) {}
+    }
+    if (!userId) return;
     // Don't save empty profiles — prevents overwriting real data
     const hasContent = p.nombre.trim() || p.descripcion.trim() || p.audiencia.trim() || p.personalidad.trim();
     if (!hasContent && !currentBrandId) return;
@@ -219,7 +227,7 @@ function ADNContent() {
       const res = await fetch("/api/brands", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ brandId: currentBrandId, userId: u.id, payload }),
+        body: JSON.stringify({ brandId: currentBrandId, userId, payload }),
       });
       const json = await res.json();
       if (json.brandId && !currentBrandId) {
@@ -281,7 +289,9 @@ function ADNContent() {
     if (fields.length === 0) return 0;
     return Math.round((fields.filter(f => f.done).length / fields.length) * 100);
   };
-  const stepProgress = [stepPct(step1Fields), stepPct(step2Fields), stepPct(step3Fields)];
+  const rawStepProgress = [stepPct(step1Fields), stepPct(step2Fields), stepPct(step3Fields)];
+  // Don't show 100% for steps the user hasn't visited yet — cap at 95% until they go there
+  const stepProgress = rawStepProgress.map((p, i) => (p === 100 && maxStep <= i + 1 && step !== i + 1) ? 95 : p);
 
   // Confetti
   useEffect(() => {
