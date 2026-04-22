@@ -15,7 +15,7 @@ export default function MarketingNav({ lang, setLang, activePage }) {
     <nav style={navStyle}>
       {/* Logo */}
       <div style={{ display:"flex", alignItems:"center", gap:10, cursor:"pointer" }} onClick={() => router.push("/")}>
-        <img src="/logo.svg" alt="AiStudioBrand" style={{ height: 28 }} />
+        <img src="/logo.svg" alt="AiStudioBrand" style={{ height: 32 }} />
       </div>
 
       {/* Center links */}

@@ -264,7 +264,7 @@ export default function Landing() {
       {/* ═══ FOOTER ═══ */}
       <footer style={s.footer}>
         <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-          <img src="/logo.svg" alt="" style={{ height: 16 }} />
+          <img src="/logo.svg" alt="" style={{ height: 22 }} />
           <span style={{ fontSize:12, color:"rgba(255,255,255,0.25)" }}>{en ? "Content that sounds like you" : "Contenido que suena como tú"}</span>
         </div>
         <div style={{ display:"flex", gap:16 }}>

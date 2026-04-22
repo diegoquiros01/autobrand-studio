@@ -81,7 +81,7 @@ function LoginContent() {
       `}</style>
       <nav style={{ position:"relative", zIndex:1, display:"flex", alignItems:"center", padding:"0 28px", height:60, borderBottom:"1px solid rgba(255,255,255,0.1)", background:"rgba(17,17,34,0.5)", backdropFilter:"blur(10px)" }}>
         <div style={{ display:"flex", alignItems:"center", gap:10, cursor:"pointer" }} onClick={() => router.push("/")}>
-          <img src="/logo.svg" alt="AiStudioBrand" style={{ height: 24 }} />
+          <img src="/logo.svg" alt="AiStudioBrand" style={{ height: 28 }} />
         </div>
         <div style={{ marginLeft: "auto", display: "flex", background: "rgba(255,255,255,0.08)", borderRadius: 8, padding: 3, gap: 2 }}>
           <button onClick={() => { setLang("es"); localStorage.setItem("lang", "es"); }} style={{ padding: "4px 10px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", background: lang === "es" ? "#fff" : "transparent", border: "none", color: lang === "es" ? "#0A0A0A" : "rgba(255,255,255,0.4)" }}>ES</button>
@@ -91,7 +91,7 @@ function LoginContent() {
       <div style={{ position:"relative", zIndex:1, display:"flex", alignItems:"center", justifyContent:"center", minHeight:"calc(100vh - 60px)", padding:20 }}>
         <div style={{ background:"rgba(22,22,45,0.85)", backdropFilter:"blur(20px)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:20, padding:"36px 32px", width:"100%", maxWidth:380, boxShadow:"0 8px 40px rgba(0,0,0,0.3)" }}>
           <div style={{ textAlign:"center", marginBottom:24 }}>
-            <img src="/logo.svg" alt="AiStudioBrand" style={{ height: 36, margin: "0 auto 10px", display: "block" }} />
+            <img src="/logo.svg" alt="AiStudioBrand" style={{ height: 44, margin: "0 auto 10px", display: "block" }} />
             <div style={{ fontSize:13.5, color:"rgba(255,255,255,0.7)" }}>{en ? "Content that sounds like you" : "Contenido que suena como tú"}</div>
           </div>
           <div style={{ display:"flex", background:"rgba(255,255,255,0.06)", borderRadius:10, padding:3, marginBottom:20, gap:3 }}>
