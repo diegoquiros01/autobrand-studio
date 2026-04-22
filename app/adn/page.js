@@ -3,6 +3,8 @@ import { useState, useEffect, useRef, useCallback, memo, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "../../lib/supabase";
 import AppLayout from "../components/AppLayout";
+import SourceCard from '../components/adn/SourceCard';
+import SectionStepper from '../components/adn/SectionStepper';
 
 const D = {
   bg: "#0A0A1A", bg2: "#16162D",
@@ -95,6 +97,13 @@ function ADNContent() {
   const [customCatInput, setCustomCatInput] = useState("");
   const [showCustomCat, setShowCustomCat] = useState(false);
   const [exitWarning, setExitWarning] = useState(false);
+  const [sourceStates, setSourceStates] = useState({
+    screenshots: { state: 'empty', enabled: false, progress: 0, extractedTags: [] },
+    instagram: { state: 'empty', enabled: false, progress: 0, extractedTags: [] },
+    tiktok: { state: 'empty', enabled: false, progress: 0, extractedTags: [] },
+    web: { state: 'empty', enabled: false, progress: 0, extractedTags: [] },
+    canva: { state: 'empty', enabled: false, progress: 0, extractedTags: [] },
+  });
 
   const debounceRef = useRef(null);
   const profileRef = useRef(profile);
@@ -152,6 +161,14 @@ function ADNContent() {
         setBrandId(loaded.id);
         localStorage.setItem("activeBrandId", loaded.id);
         localStorage.setItem("brandProfile", JSON.stringify({ id: loaded.id, ...p }));
+        // Initialize source states from loaded profile
+        setSourceStates(prev => ({
+          ...prev,
+          instagram: { ...prev.instagram, state: loaded.instagram_url ? 'ready' : 'empty', enabled: !!loaded.instagram_url },
+          tiktok: { ...prev.tiktok, state: loaded.tiktok_url ? 'ready' : 'empty', enabled: !!loaded.tiktok_url },
+          web: { ...prev.web, state: loaded.web_url ? 'ready' : 'empty', enabled: !!loaded.web_url },
+          canva: { ...prev.canva, state: loaded.canva_url ? 'ready' : 'empty', enabled: !!loaded.canva_url },
+        }));
       }
       initialLoadDone.current = true;
     };
@@ -285,7 +302,8 @@ function ADNContent() {
   });
 
   const analyzeInstagram = async () => {
-    if (sources.length === 0) return;
+    const enabledSources = Object.entries(sourceStates).filter(([_, s]) => s.enabled).map(([type]) => type);
+    if (enabledSources.length === 0 && sources.length === 0) return;
     setAnalyzing(true); setAnalyzeProgress(0); setAnalyzeError("");
     const msgs = en
       ? ["Gathering your sources...", "Reading your website...", "Analyzing your visual content...", "Identifying your tone and personality...", "Detecting your audience...", "Building your brand DNA..."]
@@ -306,6 +324,16 @@ function ADNContent() {
         const ap = data.profile;
         if (ap.tono && !Array.isArray(ap.tono)) ap.tono = [ap.tono];
         setProfile(prev => ({ ...prev, ...ap, instagramUrl: prev.instagramUrl, tiktokUrl: prev.tiktokUrl, webUrl: prev.webUrl, canvaUrl: prev.canvaUrl }));
+        // Update sourceStates to 'complete' for all analyzed sources
+        setSourceStates(prev => {
+          const updated = { ...prev };
+          Object.entries(updated).forEach(([key, val]) => {
+            if (val.enabled) {
+              updated[key] = { ...val, state: 'complete', progress: 100 };
+            }
+          });
+          return updated;
+        });
       } else if (data.error) {
         setAnalyzeError("Error: " + data.error);
       }
@@ -379,32 +407,15 @@ function ADNContent() {
             </div>
 
             {/* Stepper */}
-            <div style={{ display: "flex", alignItems: "center" }}>
-              {STEPS.map((s, i) => (
-                <div key={s.n} style={{ display: "flex", alignItems: "center", flex: i < STEPS.length - 1 ? 1 : "none" }}>
-                  <button onClick={() => setStep(s.n)} style={{ display: "flex", alignItems: "center", gap: 14, background: "none", border: "none", cursor: "pointer", padding: "8px 4px" }}>
-                    <div style={{ position: "relative", width: 38, height: 38, flexShrink: 0 }}>
-                      <svg width="38" height="38" style={{ transform: "rotate(-90deg)", position: "absolute", inset: 0 }}>
-                        <circle cx="19" cy="19" r="16" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="2.5" />
-                        <circle cx="19" cy="19" r="16" fill="none" stroke={stepProgress[i] === 100 ? "#40C057" : D.purple} strokeWidth="2.5" strokeDasharray={2 * Math.PI * 16} strokeDashoffset={2 * Math.PI * 16 * (1 - stepProgress[i] / 100)} strokeLinecap="round" style={{ transition: "stroke-dashoffset 0.6s ease" }} />
-                      </svg>
-                      <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, color: step === s.n ? "#fff" : stepProgress[i] === 100 ? "#40C057" : D.text3 }}>
-                        {stepProgress[i] === 100 ? "✓" : s.n}
-                      </div>
-                    </div>
-                    <div style={{ minWidth: 0 }}>
-                      <div style={{ fontSize: 13, fontWeight: step === s.n ? 600 : 400, color: step === s.n ? D.text : D.text3, letterSpacing: "-0.02em", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", transition: "all 0.3s ease", textAlign: "left" }}>{s.title}</div>
-                      <div style={{ fontSize: 10, color: stepProgress[i] === 100 ? "#40C057" : step === s.n ? D.purpleLight : D.text3, fontWeight: 500, marginTop: 2, transition: "all 0.3s ease", textAlign: "left" }}>
-                        {stepProgress[i] === 100 ? (en ? "Complete" : "Completo") : stepProgress[i] + "%"}
-                      </div>
-                    </div>
-                  </button>
-                  {i < STEPS.length - 1 && (
-                    <div style={{ flex: 1, height: 2, margin: "0 20px", background: stepProgress[i] === 100 ? "rgba(64,192,87,0.3)" : "rgba(255,255,255,0.06)", borderRadius: 2, transition: "background 0.3s ease" }} />
-                  )}
-                </div>
-              ))}
-            </div>
+            <SectionStepper
+              steps={STEPS.map((s, i) => ({
+                label: s.title,
+                progress: stepProgress[i],
+                completeLabel: en ? "Complete" : "Completo",
+              }))}
+              currentStep={step - 1}
+              onStepClick={(index) => setStep(index + 1)}
+            />
           </div>
         </div>
 
@@ -429,74 +440,55 @@ function ADNContent() {
                 </div>
               </div>
 
-              {/* Channels card */}
-              <div style={{ ...card, marginBottom: 24 }}>
-                <div style={{ fontSize: 15, fontWeight: 700, color: D.text, marginBottom: 4, letterSpacing: "-0.02em" }}>{en ? "Your channels" : "Tus canales"}</div>
-                <div style={{ fontSize: 12, color: D.text3, marginBottom: 16 }}>{en ? "Add at least one for AI analysis" : "Agrega al menos uno para el análisis con IA"}</div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                  {[
-                    { icon: "📸", placeholder: "instagram.com/tucuenta", key: "instagramUrl", name: "Instagram" },
-                    { icon: "🎵", placeholder: "tiktok.com/@tucuenta", key: "tiktokUrl", name: "TikTok" },
-                    { icon: "🌐", placeholder: "tuweb.com", key: "webUrl", name: "Web" },
-                    { icon: "🎨", placeholder: "canva.com/tucuenta", key: "canvaUrl", name: "Canva" },
-                  ].map(ch => (
-                    <div key={ch.key} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                      <span style={{ fontSize: 16, width: 28, textAlign: "center" }}>{ch.icon}</span>
-                      <input className="input-focus" style={{ ...inp(profile[ch.key]), flex: 1 }} placeholder={ch.placeholder} value={profile[ch.key]} onChange={e => setProfile(p => ({ ...p, [ch.key]: e.target.value }))} />
+              {/* Source Cards */}
+              <div style={{ marginBottom: 24 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 12 }}>
+                  <div>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: D.text, letterSpacing: "-0.02em" }}>
+                      {en ? "Connect your sources" : "Conecta tus fuentes"}
                     </div>
-                  ))}
+                    <div style={{ fontSize: 12, color: D.text3, marginTop: 2 }}>
+                      {en ? "AI reads your social media and builds your DNA automatically" : "La IA lee tus redes y construye tu ADN automáticamente"}
+                    </div>
+                  </div>
                 </div>
+
+                {['screenshots', 'instagram', 'tiktok', 'web', 'canva'].map(type => (
+                  <SourceCard
+                    key={type}
+                    type={type}
+                    state={sourceStates[type].state}
+                    value={type === 'screenshots' ? screenshots : profile[{instagram:'instagramUrl',tiktok:'tiktokUrl',web:'webUrl',canva:'canvaUrl'}[type]]}
+                    enabled={sourceStates[type].enabled}
+                    progress={sourceStates[type].progress}
+                    extractedTags={sourceStates[type].extractedTags}
+                    featured={type === 'screenshots'}
+                    onChange={(newValue) => {
+                      if (type === 'screenshots') {
+                        const files = Array.isArray(newValue) ? newValue.slice(0, 6).map(f => ({ file: f, url: URL.createObjectURL(f) })) : [];
+                        setScreenshots(files);
+                        setSourceStates(prev => ({...prev, screenshots: {...prev.screenshots, state: files.length > 0 ? 'ready' : 'empty', enabled: files.length > 0}}));
+                      } else {
+                        const key = {instagram:'instagramUrl',tiktok:'tiktokUrl',web:'webUrl',canva:'canvaUrl'}[type];
+                        setProfile(p => ({...p, [key]: newValue}));
+                        setSourceStates(prev => ({...prev, [type]: {...prev[type], state: newValue.trim() ? 'ready' : 'empty', enabled: !!newValue.trim()}}));
+                      }
+                    }}
+                    onToggle={(enabled) => {
+                      setSourceStates(prev => ({...prev, [type]: {...prev[type], enabled}}));
+                      // Also sync with old sources array for analyze
+                      if (enabled) setSources(prev => prev.includes(type) ? prev : [...prev, type]);
+                      else setSources(prev => prev.filter(s => s !== type));
+                    }}
+                    onAnalyze={() => {
+                      // Trigger individual source analysis — for now collect enabled sources and analyze all
+                    }}
+                  />
+                ))}
               </div>
 
-              {/* Analyze sources */}
+              {/* Analyze section */}
               <div style={{ ...card, marginBottom: 24 }}>
-                <div style={{ fontSize: 15, fontWeight: 700, color: D.text, marginBottom: 4, letterSpacing: "-0.02em" }}>{en ? "Select sources to analyze" : "Selecciona fuentes para analizar"}</div>
-                <div style={{ fontSize: 12, color: D.text3, marginBottom: 16 }}>{en ? "AI reads your social media and builds your DNA automatically" : "La IA lee tus redes y construye tu ADN automáticamente"}</div>
-
-                <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
-                  {[
-                    { key: "screenshots", lbl: en ? "Post screenshots" : "Screenshots de posts", icon: "🖼", ok: true, hint: en ? "The most powerful source" : "La fuente más poderosa" },
-                    { key: "web", lbl: en ? "Website" : "Página web", icon: "🌐", ok: !!profile.webUrl, hint: profile.webUrl || (en ? "Add URL above" : "Agrega URL arriba") },
-                    { key: "instagram", lbl: "Instagram", icon: "📸", ok: !!profile.instagramUrl, hint: profile.instagramUrl || (en ? "Add URL above" : "Agrega URL arriba") },
-                    { key: "tiktok", lbl: "TikTok", icon: "🎵", ok: !!profile.tiktokUrl, hint: profile.tiktokUrl || (en ? "Add URL above" : "Agrega URL arriba") },
-                  ].map(src => (
-                    <div key={src.key}
-                      onClick={() => { if (!src.ok) return; setSources(prev => prev.includes(src.key) ? prev.filter(s => s !== src.key) : [...prev, src.key]); }}
-                      style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 14px", borderRadius: 10, background: sources.includes(src.key) ? "rgba(121,80,242,0.1)" : D.bg3, border: "1px solid " + (sources.includes(src.key) ? "rgba(121,80,242,0.3)" : D.border), opacity: src.ok ? 1 : 0.35, cursor: src.ok ? "pointer" : "not-allowed", transition: "all 0.3s ease" }}>
-                      <div style={{ width: 20, height: 20, borderRadius: 6, border: "2px solid " + (sources.includes(src.key) ? D.purple : "rgba(255,255,255,0.15)"), background: sources.includes(src.key) ? D.purple : "transparent", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, color: "#fff", flexShrink: 0, transition: "all 0.3s ease" }}>
-                        {sources.includes(src.key) ? "✓" : ""}
-                      </div>
-                      <span style={{ fontSize: 15 }}>{src.icon}</span>
-                      <div>
-                        <div style={{ fontSize: 13, fontWeight: 600, color: D.text, letterSpacing: "-0.02em" }}>{src.lbl}</div>
-                        <div style={{ fontSize: 11, color: D.text3 }}>{src.hint}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Screenshots upload */}
-                {sources.includes("screenshots") && (
-                  <div style={{ marginBottom: 16 }}>
-                    <input type="file" accept="image/*" multiple id="screenshots" style={{ display: "none" }} onChange={e => { const arr = Array.from(e.target.files).slice(0, 6).map(f => ({ file: f, url: URL.createObjectURL(f) })); setScreenshots(prev => [...prev, ...arr].slice(0, 6)); }} />
-                    {screenshots.length > 0 ? (
-                      <div style={{ display: "grid", gridTemplateColumns: "repeat(6,1fr)", gap: 6 }}>
-                        {screenshots.map((s, i) => (
-                          <div key={i} style={{ position: "relative" }}>
-                            <img src={s.url} alt="" style={{ width: "100%", aspectRatio: "1", objectFit: "cover", borderRadius: 8, display: "block" }} />
-                            <button onClick={() => setScreenshots(prev => prev.filter((_, j) => j !== i))} style={{ position: "absolute", top: 2, right: 2, width: 16, height: 16, borderRadius: "50%", background: "#DC2626", border: "none", color: "#fff", fontSize: 9, cursor: "pointer" }}>x</button>
-                          </div>
-                        ))}
-                        {screenshots.length < 6 && <label htmlFor="screenshots" style={{ aspectRatio: "1", border: "2px dashed rgba(121,80,242,0.3)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 20, color: D.text3 }}>+</label>}
-                      </div>
-                    ) : (
-                      <label htmlFor="screenshots" style={{ display: "block", border: "2px dashed rgba(121,80,242,0.3)", borderRadius: 12, padding: 20, textAlign: "center", cursor: "pointer" }}>
-                        <div style={{ fontSize: 13, color: D.text2, fontWeight: 500 }}>{en ? "Upload post screenshots · Up to 6" : "Sube screenshots de tus posts · Hasta 6"}</div>
-                      </label>
-                    )}
-                  </div>
-                )}
-
                 {/* Analyze progress */}
                 {analyzing && (
                   <div style={{ marginBottom: 12 }}>
@@ -516,9 +508,9 @@ function ADNContent() {
                     <span style={{ fontSize: 16 }}>✓</span> {en ? "Analysis complete — DNA updated" : "Análisis completado — ADN actualizado"}
                   </div>
                 ) : (
-                  <button onClick={analyzeInstagram} disabled={analyzing || sources.length === 0}
-                    style={{ width: "100%", padding: 13, background: analyzing || sources.length === 0 ? "rgba(121,80,242,0.2)" : "linear-gradient(135deg,#7950F2,#4C1D95)", color: "#fff", border: "none", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: analyzing || sources.length === 0 ? "not-allowed" : "pointer", transition: "all 0.3s ease", boxShadow: sources.length > 0 ? "0 8px 24px rgba(121,80,242,0.3)" : "none", letterSpacing: "-0.02em" }}>
-                    {analyzing ? (en ? "Analyzing with AI..." : "Analizando con IA...") : (en ? "Analyze " + sources.length + " source" + (sources.length !== 1 ? "s" : "") + " →" : "Analizar " + sources.length + " fuente" + (sources.length !== 1 ? "s" : "") + " →")}
+                  <button onClick={analyzeInstagram} disabled={analyzing || Object.entries(sourceStates).filter(([_, s]) => s.enabled).length === 0}
+                    style={{ width: "100%", padding: 13, background: analyzing || Object.entries(sourceStates).filter(([_, s]) => s.enabled).length === 0 ? "rgba(121,80,242,0.2)" : "linear-gradient(135deg,#7950F2,#4C1D95)", color: "#fff", border: "none", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: analyzing || Object.entries(sourceStates).filter(([_, s]) => s.enabled).length === 0 ? "not-allowed" : "pointer", transition: "all 0.3s ease", boxShadow: Object.entries(sourceStates).filter(([_, s]) => s.enabled).length > 0 ? "0 8px 24px rgba(121,80,242,0.3)" : "none", letterSpacing: "-0.02em" }}>
+                    {(() => { const enabledCount = Object.entries(sourceStates).filter(([_, s]) => s.enabled).length; return analyzing ? (en ? "Analyzing with AI..." : "Analizando con IA...") : (en ? "Analyze " + enabledCount + " source" + (enabledCount !== 1 ? "s" : "") + " \u2192" : "Analizar " + enabledCount + " fuente" + (enabledCount !== 1 ? "s" : "") + " \u2192"); })()}
                   </button>
                 )}
               </div>
