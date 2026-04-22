@@ -379,26 +379,28 @@ function ADNContent() {
             </div>
 
             {/* Stepper */}
-            <div style={{ display: "flex", alignItems: "center", gap: 0 }}>
+            <div style={{ display: "flex", alignItems: "center" }}>
               {STEPS.map((s, i) => (
                 <div key={s.n} style={{ display: "flex", alignItems: "center", flex: i < STEPS.length - 1 ? 1 : "none" }}>
-                  <button onClick={() => setStep(s.n)} style={{ display: "flex", alignItems: "center", gap: 10, background: "none", border: "none", cursor: "pointer", padding: 0 }}>
-                    <div style={{ position: "relative", width: 32, height: 32, flexShrink: 0 }}>
-                      <svg width="32" height="32" style={{ transform: "rotate(-90deg)", position: "absolute", inset: 0 }}>
-                        <circle cx="16" cy="16" r="13" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="3" />
-                        <circle cx="16" cy="16" r="13" fill="none" stroke={stepProgress[i] === 100 ? "#40C057" : D.purple} strokeWidth="3" strokeDasharray={2 * Math.PI * 13} strokeDashoffset={2 * Math.PI * 13 * (1 - stepProgress[i] / 100)} strokeLinecap="round" style={{ transition: "stroke-dashoffset 0.6s ease" }} />
+                  <button onClick={() => setStep(s.n)} style={{ display: "flex", alignItems: "center", gap: 14, background: "none", border: "none", cursor: "pointer", padding: "8px 4px" }}>
+                    <div style={{ position: "relative", width: 38, height: 38, flexShrink: 0 }}>
+                      <svg width="38" height="38" style={{ transform: "rotate(-90deg)", position: "absolute", inset: 0 }}>
+                        <circle cx="19" cy="19" r="16" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="2.5" />
+                        <circle cx="19" cy="19" r="16" fill="none" stroke={stepProgress[i] === 100 ? "#40C057" : D.purple} strokeWidth="2.5" strokeDasharray={2 * Math.PI * 16} strokeDashoffset={2 * Math.PI * 16 * (1 - stepProgress[i] / 100)} strokeLinecap="round" style={{ transition: "stroke-dashoffset 0.6s ease" }} />
                       </svg>
-                      <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: step === s.n ? "#fff" : stepProgress[i] === 100 ? "#40C057" : D.text3 }}>
+                      <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, color: step === s.n ? "#fff" : stepProgress[i] === 100 ? "#40C057" : D.text3 }}>
                         {stepProgress[i] === 100 ? "✓" : s.n}
                       </div>
                     </div>
-                    <div>
-                      <div style={{ fontSize: 13, fontWeight: step === s.n ? 600 : 400, color: step === s.n ? D.text : D.text3, letterSpacing: "-0.02em", whiteSpace: "nowrap", transition: "all 0.3s ease", textAlign: "left" }}>{s.title}</div>
-                      <div style={{ fontSize: 10, color: stepProgress[i] === 100 ? "#40C057" : D.text3, transition: "all 0.3s ease" }}>{stepProgress[i]}%</div>
+                    <div style={{ minWidth: 0 }}>
+                      <div style={{ fontSize: 13, fontWeight: step === s.n ? 600 : 400, color: step === s.n ? D.text : D.text3, letterSpacing: "-0.02em", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", transition: "all 0.3s ease", textAlign: "left" }}>{s.title}</div>
+                      <div style={{ fontSize: 10, color: stepProgress[i] === 100 ? "#40C057" : step === s.n ? D.purpleLight : D.text3, fontWeight: 500, marginTop: 2, transition: "all 0.3s ease", textAlign: "left" }}>
+                        {stepProgress[i] === 100 ? (en ? "Complete" : "Completo") : stepProgress[i] + "%"}
+                      </div>
                     </div>
                   </button>
                   {i < STEPS.length - 1 && (
-                    <div style={{ flex: 1, height: 2, margin: "0 12px", background: step > s.n ? "rgba(64,192,87,0.3)" : "rgba(255,255,255,0.06)", borderRadius: 2, transition: "background 0.3s ease" }} />
+                    <div style={{ flex: 1, height: 2, margin: "0 20px", background: stepProgress[i] === 100 ? "rgba(64,192,87,0.3)" : "rgba(255,255,255,0.06)", borderRadius: 2, transition: "background 0.3s ease" }} />
                   )}
                 </div>
               ))}
