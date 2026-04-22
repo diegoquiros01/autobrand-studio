@@ -160,7 +160,7 @@ export default function AppLayout({ children }) {
             ☰
           </button>
           <div style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }} onClick={() => router.push("/")}>
-            <img src="/logo.svg" alt="AiStudioBrand" style={{ height: 32 }} />
+            <img src="/logo.svg" alt="AiStudioBrand" style={{ height: 38 }} />
           </div>
         </div>
 

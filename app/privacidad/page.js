@@ -13,7 +13,7 @@ export default function Privacidad() {
     <div style={{ minHeight:"100vh", background:D.bg }}>
       <nav style={{ display:"flex", alignItems:"center", padding:"0 28px", height:60, borderBottom:"1px solid " + D.border, background:D.bg2 }}>
         <div style={{ display:"flex", alignItems:"center", gap:10, cursor:"pointer" }} onClick={() => router.push("/")}>
-          <img src="/logo.svg" alt="AiStudioBrand" style={{ height: 28 }} />
+          <img src="/logo.svg" alt="AiStudioBrand" style={{ height: 34 }} />
         </div>
         <button onClick={() => router.push("/")} style={{ marginLeft:"auto", fontSize:13, color:D.text2, background:"none", border:"none", cursor:"pointer" }}>← Volver</button>
       </nav>
