@@ -127,6 +127,7 @@ export default function ADNContextPanel({
   generatedCopy,
   brandName = 'Tu marca',
   pieceType,
+  en = false,
 }) {
   const { voz, idioma, audiencia, paleta = [] } = adn;
 
@@ -146,7 +147,7 @@ export default function ADNContextPanel({
       borderRadius: t.radiusMd,
       padding: 14,
     }}>
-      <p style={sectionHead}>Se aplicará este ADN</p>
+      <p style={sectionHead}>{en ? 'This DNA will be applied' : 'Se aplicará este ADN'}</p>
 
       <div style={{
         background: t.bgCard,
@@ -157,23 +158,23 @@ export default function ADNContextPanel({
       }}>
         {voz && (
           <div style={{ marginBottom: 7 }}>
-            <div style={{ fontSize: 9, color: t.textMuted, textTransform: 'uppercase', letterSpacing: 0.3, marginBottom: 2 }}>Voz</div>
+            <div style={{ fontSize: 9, color: t.textMuted, textTransform: 'uppercase', letterSpacing: 0.3, marginBottom: 2 }}>{en ? 'Voice' : 'Voz'}</div>
             <div style={{ fontSize: 11, color: t.text, lineHeight: 1.4 }}>
-              {voz}{idioma && `, en ${idioma.toLowerCase()}`}
+              {voz}{idioma && `${en ? ', in ' : ', en '}${idioma.toLowerCase()}`}
             </div>
           </div>
         )}
 
         {audiencia && (
           <div style={{ marginBottom: paleta.length > 0 ? 7 : 0 }}>
-            <div style={{ fontSize: 9, color: t.textMuted, textTransform: 'uppercase', letterSpacing: 0.3, marginBottom: 2 }}>Audiencia</div>
+            <div style={{ fontSize: 9, color: t.textMuted, textTransform: 'uppercase', letterSpacing: 0.3, marginBottom: 2 }}>{en ? 'Audience' : 'Audiencia'}</div>
             <div style={{ fontSize: 11, color: t.text, lineHeight: 1.4 }}>{audiencia}</div>
           </div>
         )}
 
         {paleta.length > 0 && (
           <div>
-            <div style={{ fontSize: 9, color: t.textMuted, textTransform: 'uppercase', letterSpacing: 0.3, marginBottom: 4 }}>Paleta</div>
+            <div style={{ fontSize: 9, color: t.textMuted, textTransform: 'uppercase', letterSpacing: 0.3, marginBottom: 4 }}>{en ? 'Palette' : 'Paleta'}</div>
             <div style={{ display: 'flex', gap: 4 }}>
               {paleta.slice(0, 6).map((color, i) => (
                 <div
@@ -188,12 +189,12 @@ export default function ADNContextPanel({
 
         {!voz && !audiencia && paleta.length === 0 && (
           <p style={{ fontSize: 11, color: t.textDim, margin: 0, fontStyle: 'italic' }}>
-            Completa tu ADN para ver el contexto aquí.
+            {en ? 'Complete your DNA to see context here.' : 'Completa tu ADN para ver el contexto aquí.'}
           </p>
         )}
       </div>
 
-      <p style={sectionHead}>Vista previa</p>
+      <p style={sectionHead}>{en ? 'Preview' : 'Vista previa'}</p>
 
       {previewState === 'empty' && <EmptyPreview paleta={paleta} />}
       {previewState === 'generating' && <GeneratingPreview paleta={paleta} />}
@@ -208,12 +209,12 @@ export default function ADNContextPanel({
 
       {previewState === 'empty' && (
         <p style={{ fontSize: 10, color: t.textDim, margin: '6px 0 0', textAlign: 'center' }}>
-          Se llena al generar
+          {en ? 'Fills when generating' : 'Se llena al generar'}
         </p>
       )}
       {previewState === 'generating' && (
         <p style={{ fontSize: 10, color: t.accentLight, margin: '6px 0 0', textAlign: 'center', fontWeight: 500 }}>
-          Generando con tu ADN…
+          {en ? 'Generating with your DNA…' : 'Generando con tu ADN…'}
         </p>
       )}
     </div>

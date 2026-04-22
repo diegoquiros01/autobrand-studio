@@ -8,10 +8,10 @@ import ADNContextPanel from '../components/adn/ADNContextPanel';
 import ChipSelector from '../components/adn/ChipSelector';
 
 const TIPOS = ["Comercial","Branding","Educativo","Storytelling","Promocional","Posicionamiento"];
-const FORMATOS = [
-  { key:"square", label:"Post cuadrado", desc:"1:1 · Feed" },
-  { key:"story", label:"Story vertical", desc:"9:16 · Stories/Reels" },
-  { key:"carousel", label:"Carrusel", desc:"1:1 · Slides" },
+const FORMATOS_DATA = [
+  { key:"square", label_es:"Post cuadrado", label_en:"Square post", desc:"1:1 · Feed" },
+  { key:"story", label_es:"Story vertical", label_en:"Vertical story", desc:"9:16 · Stories/Reels" },
+  { key:"carousel", label_es:"Carrusel", label_en:"Carousel", desc:"1:1 · Slides" },
 ];
 
 const D = {
@@ -78,6 +78,8 @@ function CrearContent() {
     return () => window.removeEventListener("storage", handler);
   }, []);
   const en = lang === "en";
+
+  const FORMATOS = FORMATOS_DATA.map(f => ({ key: f.key, label: en ? f.label_en : f.label_es, desc: f.desc }));
 
   const TIPO_OPTIONS = [
     { id: "Comercial", label: en ? "Comercial · Sells" : "Comercial · Vende" },
@@ -194,7 +196,9 @@ function CrearContent() {
 
   const generarImagen = async (feedbackText = "") => {
     setGeneratingImg(true); setError(""); setGenProgress(0);
-    const msgs = ["Art Director analizando tu marca...","Creando brief visual con IA...","Describiendo referencias y estilo...","Generando imagen con Gemini...","Componiendo la imagen...","Aplicando estilo de marca...","Validando calidad de imagen...","Ajustes finales del Art Director...","Casi listo..."];
+    const msgs = en
+      ? ["Art Director analyzing your brand...","Creating visual brief with AI...","Describing references and style...","Generating image with Gemini...","Composing the image...","Applying brand style...","Validating image quality...","Final Art Director adjustments...","Almost ready..."]
+      : ["Art Director analizando tu marca...","Creando brief visual con IA...","Describiendo referencias y estilo...","Generando imagen con Gemini...","Componiendo la imagen...","Aplicando estilo de marca...","Validando calidad de imagen...","Ajustes finales del Art Director...","Casi listo..."];
     let mi = 0; setGenMsg(msgs[0]);
     const iv = setInterval(() => {
       setGenProgress(p => Math.min(p + Math.random() * 8, 90));
@@ -214,14 +218,14 @@ function CrearContent() {
       clearTimeout(imgTimeout);
       const data = await res.json();
       if (data.error === "limit_reached") {
-        setError("Alcanzaste tu límite de " + (data.limit || 20) + " generaciones este mes. Actualiza tu plan en Pricing.");
+        setError(en ? "You reached your limit of " + (data.limit || 20) + " generations this month. Upgrade your plan in Pricing." : "Alcanzaste tu límite de " + (data.limit || 20) + " generaciones este mes. Actualiza tu plan en Pricing.");
       } else if (data.image) {
         const newVersion = { image: data.image, mimeType: data.mimeType, feedback: feedbackText, timestamp: new Date().toLocaleTimeString() };
         setVersiones(prev => { const updated = [...prev, newVersion]; setVersionActiva(updated.length - 1); return updated; });
         setFeedback("");
         // Store in IndexedDB to avoid localStorage overflow
         saveImage("latest-" + Date.now(), { image: data.image, mimeType: data.mimeType }).catch(() => {});
-      } else setError("No se pudo generar la imagen. Intenta de nuevo.");
+      } else setError(en ? "Could not generate the image. Try again." : "No se pudo generar la imagen. Intenta de nuevo.");
     } catch(e) {
       if (e.name === "AbortError") { setError(en ? "Image generation timed out. Try again." : "La generación de imagen tardó demasiado. Intenta de nuevo."); }
       else { setError("Error generando imagen: " + e.message); }
@@ -266,13 +270,13 @@ function CrearContent() {
       clearTimeout(copyTimeout);
       const data = await res.json();
       if (data.error === "limit_reached") {
-        setError("Alcanzaste tu límite de " + (data.limit || 20) + " generaciones este mes. Actualiza tu plan en Pricing.");
+        setError(en ? "You reached your limit of " + (data.limit || 20) + " generations this month. Upgrade your plan in Pricing." : "Alcanzaste tu límite de " + (data.limit || 20) + " generaciones este mes. Actualiza tu plan en Pricing.");
       } else {
         setCopies((data.propuestas || []).slice(0, 3));
       }
     } catch(e) {
       if (e.name === "AbortError") { setError(en ? "Copy generation timed out. Try again." : "La generación de copies tardó demasiado. Intenta de nuevo."); }
-      else { setError("Error generando copies."); }
+      else { setError(en ? "Error generating copies." : "Error generando copies."); }
     }
     setGeneratingCopy(false);
   };
@@ -287,7 +291,7 @@ function CrearContent() {
     try {
       const imgData = versiones[versionActiva];
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { setError("Debes iniciar sesión para guardar."); setSavingFinal(false); return; }
+      if (!user) { setError(en ? "You must sign in to save." : "Debes iniciar sesión para guardar."); setSavingFinal(false); return; }
 
       // Save directly to Supabase storage + DB using service role API
       const res = await fetch("/api/guardar-pieza", {
@@ -303,7 +307,7 @@ function CrearContent() {
       });
       if (!res.ok) {
         const text = await res.text();
-        setError("Error guardando (" + res.status + "): " + text);
+        setError((en ? "Error saving (" : "Error guardando (") + res.status + "): " + text);
         setSavingFinal(false);
         return;
       }
@@ -311,10 +315,10 @@ function CrearContent() {
       if (data.success) {
         setSavedFinal(true);
       } else {
-        setError("Error guardando pieza: " + (data.error || "Intenta de nuevo"));
+        setError((en ? "Error saving piece: " : "Error guardando pieza: ") + (data.error || (en ? "Try again" : "Intenta de nuevo")));
       }
     } catch(e) {
-      setError("Error guardando pieza: " + e.message);
+      setError((en ? "Error saving piece: " : "Error guardando pieza: ") + e.message);
     }
     setSavingFinal(false);
   };
@@ -410,7 +414,7 @@ function CrearContent() {
               <div style={{ position:"relative" }}>
                 <div style={{ display:"inline-flex", alignItems:"center", gap:5, background:"rgba(121,80,242,0.1)", borderRadius:20, padding:"3px 10px", border:"1px solid rgba(121,80,242,0.2)", cursor: step === 1 ? "pointer" : "default", opacity: step === 1 ? 1 : 0.5 }} onClick={() => step === 1 && setBrandDropdownOpen(!brandDropdownOpen)}>
                   <span style={{ width:5, height:5, borderRadius:"50%", background:D.purpleLight, display:"inline-block" }} />
-                  <span style={{ fontSize:10, color:D.purpleLight, fontWeight:500 }}>{brandProfile.nombre || "Tu marca"}</span>
+                  <span style={{ fontSize:10, color:D.purpleLight, fontWeight:500 }}>{brandProfile.nombre || (en ? "Your brand" : "Tu marca")}</span>
                   {allBrands.length > 1 && <span style={{ fontSize:8, color:"rgba(255,255,255,0.3)" }}>▼</span>}
                 </div>
                 {brandDropdownOpen && allBrands.length > 1 && (
@@ -421,7 +425,7 @@ function CrearContent() {
                         background: b.id === brandProfile?.id ? "rgba(121,80,242,0.15)" : "transparent",
                       }}>
                         <span style={{ width:5, height:5, borderRadius:"50%", background: b.id === brandProfile?.id ? D.purpleLight : "rgba(255,255,255,0.2)", display:"inline-block" }} />
-                        <span style={{ fontSize:12, color:"#fff", fontWeight: b.id === brandProfile?.id ? 600 : 400 }}>{b.nombre || "Sin nombre"}</span>
+                        <span style={{ fontSize:12, color:"#fff", fontWeight: b.id === brandProfile?.id ? 600 : 400 }}>{b.nombre || (en ? "Unnamed" : "Sin nombre")}</span>
                       </div>
                     ))}
                   </div>
@@ -442,6 +446,7 @@ function CrearContent() {
               <div style={{ fontSize:12, color:D.text3, marginTop:12, marginBottom:8 }}>{en ? "What type of piece?" : "¿Qué tipo de pieza es?"}</div>
               <ChipSelector
                 mode="single"
+                en={en}
                 options={TIPO_OPTIONS}
                 value={tipo}
                 onChange={setTipo}
@@ -450,6 +455,7 @@ function CrearContent() {
               <div style={{ fontSize:12, color:D.text3, marginTop:12, marginBottom:8 }}>{en ? "Format" : "Formato"}</div>
               <ChipSelector
                 mode="single"
+                en={en}
                 options={FORMATOS.map(f => ({ id: f.key, label: f.label + " · " + f.desc }))}
                 value={formato}
                 onChange={setFormato}
@@ -463,6 +469,7 @@ function CrearContent() {
                 </div>
                 <ChipSelector
                   mode="single"
+                  en={en}
                   options={[
                     { id: "ADN", label: en ? "From DNA" : "Según ADN" },
                     { id: "Español", label: "Español" },
@@ -573,7 +580,7 @@ function CrearContent() {
             <BackBtn toStep={1} />
             <div style={{ display:"flex", gap:6, marginBottom:12, flexWrap:"wrap" }}>
               <span style={{ fontSize:10, padding:"3px 10px", borderRadius:12, background:"rgba(121,80,242,0.1)", border:"1px solid rgba(121,80,242,0.2)", color:D.purpleLight }}>{tipo}</span>
-              <span style={{ fontSize:10, padding:"3px 10px", borderRadius:12, background:"rgba(121,80,242,0.1)", border:"1px solid rgba(121,80,242,0.2)", color:D.purpleLight }}>{FORMATOS.find(f => f.key === formato)?.label || "Post cuadrado"}</span>
+              <span style={{ fontSize:10, padding:"3px 10px", borderRadius:12, background:"rgba(121,80,242,0.1)", border:"1px solid rgba(121,80,242,0.2)", color:D.purpleLight }}>{FORMATOS.find(f => f.key === formato)?.label || (en ? "Square post" : "Post cuadrado")}</span>
               {referencias.length === 0 && <span style={{ fontSize:10, padding:"3px 10px", borderRadius:12, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", color:D.text3 }}>{en ? "No refs" : "Sin refs"}</span>}
               {talentos.length === 0 && <span style={{ fontSize:10, padding:"3px 10px", borderRadius:12, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", color:D.text3 }}>{en ? "No talent" : "Sin talento"}</span>}
             </div>
@@ -756,7 +763,7 @@ function CrearContent() {
             <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:20 }}>
               <div>
                 <div style={{ fontSize:16, fontWeight:500, color:D.text }}>{en ? "Final art" : "Arte final"}</div>
-                <div style={{ fontSize:12, color:D.text2 }}>{tipo} · {FORMATOS.find(f => f.key === formato)?.label || "Post cuadrado"}</div>
+                <div style={{ fontSize:12, color:D.text2 }}>{tipo} · {FORMATOS.find(f => f.key === formato)?.label || (en ? "Square post" : "Post cuadrado")}</div>
               </div>
             </div>
 
@@ -859,6 +866,7 @@ function CrearContent() {
           <div style={{ position:"absolute", top:"20%", left:"30%", width:300, height:300, background:"radial-gradient(circle, rgba(121,80,242,0.06) 0%, transparent 60%)", filter:"blur(60px)", pointerEvents:"none" }} />
 
           <ADNContextPanel
+            en={en}
             adn={{
               voz: brandProfile ? (Array.isArray(brandProfile.tono) ? brandProfile.tono.join(' + ') : brandProfile.tono || '') : '',
               idioma: brandProfile?.idioma || '',
@@ -868,7 +876,7 @@ function CrearContent() {
             previewState={generatingImg ? "generating" : versiones.length > 0 ? "ready" : "empty"}
             generatedImageUrl={versiones.length > 0 ? "data:" + versiones[versionActiva].mimeType + ";base64," + versiones[versionActiva].image : null}
             generatedCopy={selectedCopy ? selectedCopy.hook + " " + selectedCopy.copy : null}
-            brandName={brandProfile?.nombre || "Tu marca"}
+            brandName={brandProfile?.nombre || (en ? "Your brand" : "Tu marca")}
             pieceType={tipo}
           />
         </div>

@@ -134,7 +134,7 @@ function Connector({ filled }) {
   );
 }
 
-export default function SectionStepper({ steps, currentStep = 0, onStepClick }) {
+export default function SectionStepper({ steps, currentStep = 0, onStepClick, en = false }) {
   return (
     <div
       style={{
@@ -153,10 +153,10 @@ export default function SectionStepper({ steps, currentStep = 0, onStepClick }) 
         const isClickable = typeof onStepClick === 'function' && (isComplete || index <= currentStep);
 
         const metaText = isComplete
-          ? (step.completeLabel || 'Completo')
+          ? (step.completeLabel || (en ? 'Complete' : 'Completo'))
           : isActive
             ? `${step.progress || 0}%${step.meta ? ' · ' + step.meta : ''}`
-            : 'Pendiente';
+            : (en ? 'Pending' : 'Pendiente');
 
         const metaColor = isComplete ? t.success : isActive ? t.accentLight : t.textDim;
 

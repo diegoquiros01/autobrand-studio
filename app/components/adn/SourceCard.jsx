@@ -29,41 +29,20 @@ import { adnTheme as t } from './adn-theme';
  *   - complete:  tags extraídos visibles, borde verde sutil, chip "Completo"
  */
 
-const SOURCE_CONFIG = {
-  screenshots: {
-    label: 'Screenshots de posts',
-    badge: 'La más poderosa',
-    placeholder: 'Arrastra imágenes o haz click',
-    isFileUpload: true,
-  },
-  instagram: {
-    label: 'Instagram',
-    placeholder: 'instagram.com/tucuenta',
-    isFileUpload: false,
-  },
-  tiktok: {
-    label: 'TikTok',
-    placeholder: 'tiktok.com/@tucuenta',
-    isFileUpload: false,
-  },
-  web: {
-    label: 'Sitio web',
-    placeholder: 'tuweb.com',
-    isFileUpload: false,
-  },
-  canva: {
-    label: 'Canva',
-    placeholder: 'canva.com/tucuenta',
-    isFileUpload: false,
-  },
-};
+const getSourceConfig = (en) => ({
+  screenshots: { label: en ? 'Post screenshots' : 'Screenshots de posts', badge: en ? 'Most powerful' : 'La más poderosa', placeholder: en ? 'Drag images or click' : 'Arrastra imágenes o haz click', isFileUpload: true },
+  instagram: { label: 'Instagram', placeholder: 'instagram.com/tucuenta', isFileUpload: false },
+  tiktok: { label: 'TikTok', placeholder: 'tiktok.com/@tucuenta', isFileUpload: false },
+  web: { label: en ? 'Website' : 'Sitio web', placeholder: 'tuweb.com', isFileUpload: false },
+  canva: { label: 'Canva', placeholder: 'canva.com/tucuenta', isFileUpload: false },
+});
 
-const STATUS_CHIP = {
-  empty:     { label: 'Sin conectar',  bg: 'transparent',  color: t.textDim,     border: t.border },
-  ready:     { label: 'Listo',         bg: t.accentBg,     color: t.accentLight, border: 'transparent' },
-  analyzing: { label: 'Analizando',    bg: t.accentBg,     color: t.accentLight, border: 'transparent' },
-  complete:  { label: 'Completo',      bg: t.successBg,    color: t.success,     border: 'transparent' },
-};
+const getStatusChip = (en) => ({
+  empty:     { label: en ? 'Not connected' : 'Sin conectar',  bg: 'transparent',  color: t.textDim,     border: t.border },
+  ready:     { label: en ? 'Ready' : 'Listo',                 bg: t.accentBg,     color: t.accentLight, border: 'transparent' },
+  analyzing: { label: en ? 'Analyzing' : 'Analizando',        bg: t.accentBg,     color: t.accentLight, border: 'transparent' },
+  complete:  { label: en ? 'Complete' : 'Completo',            bg: t.successBg,    color: t.success,     border: 'transparent' },
+});
 
 function SourceIcon({ type }) {
   const p = { width: 16, height: 16, viewBox: '0 0 16 16', fill: 'none', stroke: 'currentColor', strokeWidth: 1.5, strokeLinecap: 'round', strokeLinejoin: 'round' };
@@ -142,7 +121,7 @@ function StatusChip({ config }) {
   );
 }
 
-function ProgressBar({ progress, detail }) {
+function ProgressBar({ progress, detail, en = false }) {
   return (
     <div style={{ marginTop: 10, paddingTop: 8, borderTop: `0.5px solid ${t.border}` }}>
       <div style={{ height: 4, background: 'rgba(255,255,255,0.06)', borderRadius: 2, overflow: 'hidden' }}>
@@ -157,13 +136,13 @@ function ProgressBar({ progress, detail }) {
         />
       </div>
       <p style={{ fontSize: 11, color: t.accentLight, margin: '6px 0 0', fontWeight: 500 }}>
-        {detail || 'Extrayendo datos'} · {progress}%
+        {detail || (en ? 'Extracting data' : 'Extrayendo datos')} · {progress}%
       </p>
     </div>
   );
 }
 
-function ExtractedTags({ tags, onViewDetail }) {
+function ExtractedTags({ tags, onViewDetail, en = false }) {
   const visible = tags.slice(0, 4);
   const remaining = tags.length - visible.length;
 
@@ -194,7 +173,7 @@ function ExtractedTags({ tags, onViewDetail }) {
         </span>
       ))}
       {remaining > 0 && (
-        <span style={{ fontSize: 11, color: t.textDim }}>+{remaining} más</span>
+        <span style={{ fontSize: 11, color: t.textDim }}>+{remaining} {en ? 'more' : 'más'}</span>
       )}
       {onViewDetail && (
         <button
@@ -211,16 +190,16 @@ function ExtractedTags({ tags, onViewDetail }) {
             padding: 0,
           }}
         >
-          Ver detalle →
+          {en ? 'View detail →' : 'Ver detalle →'}
         </button>
       )}
     </div>
   );
 }
 
-function FileUpload({ value, placeholder, onChange, inputRef }) {
+function FileUpload({ value, placeholder, onChange, inputRef, en = false }) {
   const fileCount = Array.isArray(value) ? value.length : 0;
-  const label = fileCount > 0 ? `${fileCount} ${fileCount === 1 ? 'imagen subida' : 'imágenes subidas'}` : placeholder;
+  const label = fileCount > 0 ? `${fileCount} ${fileCount === 1 ? (en ? 'image uploaded' : 'imagen subida') : (en ? 'images uploaded' : 'imágenes subidas')}` : placeholder;
 
   return (
     <>
@@ -267,8 +246,9 @@ export default function SourceCard({
   onToggle,
   onAnalyze,
   onViewDetail,
+  en = false,
 }) {
-  const config = SOURCE_CONFIG[type];
+  const config = getSourceConfig(en)[type];
   const fileInputRef = useRef(null);
 
   if (!config) {
@@ -276,7 +256,7 @@ export default function SourceCard({
     return null;
   }
 
-  const chip = STATUS_CHIP[state];
+  const chip = getStatusChip(en)[state];
   const isFeatured = featured && state !== 'complete';
 
   return (
@@ -332,6 +312,7 @@ export default function SourceCard({
               placeholder={config.placeholder}
               onChange={onChange}
               inputRef={fileInputRef}
+              en={en}
             />
           ) : (
             <input
@@ -365,10 +346,10 @@ export default function SourceCard({
         <StatusChip config={chip} />
       </div>
 
-      {state === 'analyzing' && <ProgressBar progress={progress} detail={progressDetail} />}
+      {state === 'analyzing' && <ProgressBar progress={progress} detail={progressDetail} en={en} />}
 
       {state === 'complete' && extractedTags.length > 0 && (
-        <ExtractedTags tags={extractedTags} onViewDetail={onViewDetail} />
+        <ExtractedTags tags={extractedTags} onViewDetail={onViewDetail} en={en} />
       )}
 
       {state === 'ready' && onAnalyze && (
@@ -387,7 +368,7 @@ export default function SourceCard({
               cursor: 'pointer',
             }}
           >
-            Analizar esta fuente
+            {en ? 'Analyze this source' : 'Analizar esta fuente'}
           </button>
         </div>
       )}

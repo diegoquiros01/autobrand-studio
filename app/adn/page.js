@@ -418,6 +418,7 @@ function ADNContent() {
 
             {/* Stepper */}
             <SectionStepper
+              en={en}
               steps={STEPS.map((s, i) => ({
                 label: s.title,
                 progress: stepProgress[i],
@@ -467,6 +468,7 @@ function ADNContent() {
                   <SourceCard
                     key={type}
                     type={type}
+                    en={en}
                     state={sourceStates[type].state}
                     value={type === 'screenshots' ? screenshots : profile[{instagram:'instagramUrl',tiktok:'tiktokUrl',web:'webUrl',canva:'canvaUrl'}[type]]}
                     enabled={sourceStates[type].enabled}
@@ -563,6 +565,7 @@ function ADNContent() {
                   <div style={{ fontSize: 12, color: D.text2, marginBottom: 8 }}>{en ? "Main language" : "Idioma principal"}</div>
                   <ChipSelector
                     mode="single"
+                    en={en}
                     options={idiomas.map(i => ({ id: i, label: i }))}
                     value={profile.idioma}
                     onChange={v => setProfile(p => ({...p, idioma: v}))}
@@ -574,6 +577,7 @@ function ADNContent() {
                   <ChipSelector
                     mode="multi"
                     max={2}
+                    en={en}
                     options={tonos.map(t => ({ id: t, label: t }))}
                     value={Array.isArray(profile.tono) ? profile.tono : (profile.tono ? [profile.tono] : [])}
                     onChange={v => setProfile(p => ({...p, tono: v}))}
@@ -586,6 +590,7 @@ function ADNContent() {
                 <div style={{ fontSize: 15, fontWeight: 700, color: D.text, marginBottom: 16 }}>{en ? "Content categories" : "Categorías de contenido"}</div>
                 <ChipSelector
                   mode="multi"
+                  en={en}
                   options={[...cats, ...(profile.categorias.filter(c => !cats.includes(c)))].map(c => ({ id: c, label: c }))}
                   value={profile.categorias}
                   onChange={v => setProfile(p => ({...p, categorias: v}))}
@@ -614,6 +619,7 @@ function ADNContent() {
               <div style={{ ...card, marginBottom: 24 }}>
                 <div style={{ fontSize: 15, fontWeight: 700, color: D.text, marginBottom: 16 }}>{en ? "Brand palette" : "Paleta de marca"}</div>
                 <ExtractedPalette
+                  en={en}
                   extractedColors={profile.coloresMarca.filter((_, i) => i < (aiOriginal.colores_marca?.length || 0))}
                   userColors={profile.coloresMarca.filter((_, i) => i >= (aiOriginal.colores_marca?.length || 0))}
                   onChange={({ extracted, user }) => setProfile(p => ({...p, coloresMarca: [...extracted, ...user]}))}
@@ -649,6 +655,7 @@ function ADNContent() {
                 {profile.ejemplosCopy.map((ej, i) => (
                   <CopyExampleCard
                     key={i}
+                    en={en}
                     text={ej}
                     accepted={!!ej.trim()}
                     onAccept={(text) => { const arr = [...profile.ejemplosCopy]; arr[i] = text; setProfile(p => ({...p, ejemplosCopy: arr})); }}

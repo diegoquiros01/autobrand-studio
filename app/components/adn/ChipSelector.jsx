@@ -47,6 +47,7 @@ export default function ChipSelector({
   max,
   showCounter = true,
   size = 'md',
+  en = false,
 }) {
   const selectedIds = mode === 'multi'
     ? (Array.isArray(value) ? value : [])
@@ -79,7 +80,7 @@ export default function ChipSelector({
           marginBottom: 6,
           textAlign: 'right',
         }}>
-          {selectedIds.length} de {max}{atMax ? ' · máximo alcanzado' : ''}
+          {selectedIds.length} {en ? 'of' : 'de'} {max}{atMax ? (en ? ' · max reached' : ' · máximo alcanzado') : ''}
         </div>
       )}
 

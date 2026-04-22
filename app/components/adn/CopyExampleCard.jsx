@@ -49,8 +49,10 @@ export default function CopyExampleCard({
   accepted = false,
   onAccept,
   onDismiss,
-  placeholder = 'Pega una caption que amas...',
+  placeholder,
+  en = false,
 }) {
+  if (!placeholder) placeholder = en ? 'Paste a caption you love...' : 'Pega una caption que amas...';
   const [editing, setEditing] = useState(!text && !source);
   const [draft, setDraft] = useState(text);
 
@@ -113,7 +115,7 @@ export default function CopyExampleCard({
                 fontWeight: 500,
               }}
             >
-              Guardar
+              {en ? 'Save' : 'Guardar'}
             </button>
             {text && (
               <button
@@ -129,7 +131,7 @@ export default function CopyExampleCard({
                   cursor: 'pointer',
                 }}
               >
-                Cancelar
+                {en ? 'Cancel' : 'Cancelar'}
               </button>
             )}
           </div>
@@ -194,7 +196,7 @@ export default function CopyExampleCard({
                   fontWeight: 500,
                 }}
               >
-                Usar este
+                {en ? 'Use this' : 'Usar este'}
               </button>
               <button
                 type="button"
@@ -209,7 +211,7 @@ export default function CopyExampleCard({
                   cursor: 'pointer',
                 }}
               >
-                Editar
+                {en ? 'Edit' : 'Editar'}
               </button>
               <button
                 type="button"
@@ -224,14 +226,14 @@ export default function CopyExampleCard({
                   cursor: 'pointer',
                 }}
               >
-                Descartar
+                {en ? 'Dismiss' : 'Descartar'}
               </button>
             </div>
           )}
 
           {accepted && (
             <p style={{ fontSize: 10, color: t.success, margin: '6px 0 0', fontWeight: 500 }}>
-              ✓ Guardado en tu ADN
+              {en ? '✓ Saved to your DNA' : '✓ Guardado en tu ADN'}
             </p>
           )}
         </>

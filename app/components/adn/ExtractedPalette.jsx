@@ -19,7 +19,7 @@ import { adnTheme as t } from './adn-theme';
  *   />
  */
 
-function Swatch({ color, isExtracted, onRemove }) {
+function Swatch({ color, isExtracted, onRemove, en = false }) {
   const [hover, setHover] = useState(false);
 
   return (
@@ -57,7 +57,7 @@ function Swatch({ color, isExtracted, onRemove }) {
             justifyContent: 'center',
             lineHeight: 1,
           }}
-          title="Extraído de tus fuentes"
+          title={en ? "Extracted from your sources" : "Extraído de tus fuentes"}
         >
           ✓
         </span>
@@ -83,7 +83,7 @@ function Swatch({ color, isExtracted, onRemove }) {
             justifyContent: 'center',
             padding: 0,
           }}
-          title="Quitar"
+          title={en ? "Remove" : "Quitar"}
         >
           ×
         </button>
@@ -98,6 +98,7 @@ export default function ExtractedPalette({
   onChange,
   attribution,
   maxTotal = 10,
+  en = false,
 }) {
   const [adding, setAdding] = useState(false);
   const [newHex, setNewHex] = useState('');
@@ -143,7 +144,7 @@ export default function ExtractedPalette({
           gap: 6,
         }}>
           <span style={{ color: t.accent }}>✦</span>
-          {attribution} — confirma o ajusta
+          {attribution} {en ? '— confirm or adjust' : '— confirma o ajusta'}
         </p>
       )}
 
@@ -154,6 +155,7 @@ export default function ExtractedPalette({
             color={color}
             isExtracted={true}
             onRemove={() => removeExtracted(idx)}
+            en={en}
           />
         ))}
         {userColors.map((color, idx) => (
@@ -162,6 +164,7 @@ export default function ExtractedPalette({
             color={color}
             isExtracted={false}
             onRemove={() => removeUser(idx)}
+            en={en}
           />
         ))}
 
@@ -171,7 +174,7 @@ export default function ExtractedPalette({
               <input type="color" value="#7F77DD" onChange={(e) => addFromPicker(e.target.value)} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer' }} />
               <div style={{ width: 36, height: 36, borderRadius: '50%', border: `1px dashed ${t.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: t.textDim, fontSize: 18 }}>+</div>
             </label>
-            <button type="button" onClick={() => setAdding(true)} style={{ fontSize: 11, color: t.textMuted, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+            <button type="button" onClick={() => setAdding(true)} style={{ fontSize: 11, color: t.textMuted, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }} title={en ? "Add color" : "Agregar color"}>
               #hex
             </button>
           </div>
@@ -215,7 +218,7 @@ export default function ExtractedPalette({
                 fontWeight: 500,
               }}
             >
-              Agregar
+              {en ? 'Add' : 'Agregar'}
             </button>
           </div>
         )}
@@ -223,7 +226,7 @@ export default function ExtractedPalette({
 
       {extractedColors.length > 0 && (
         <p style={{ fontSize: 10, color: t.textDim, margin: '10px 0 0' }}>
-          ✓ = extraído del análisis · hover para quitar
+          {en ? '✓ = extracted from analysis · hover to remove' : '✓ = extraído del análisis · hover para quitar'}
         </p>
       )}
     </div>
