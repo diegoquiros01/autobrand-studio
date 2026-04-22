@@ -4,6 +4,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "../../lib/supabase";
 import { saveImage } from "../../lib/imageStore";
 import AppLayout from "../components/AppLayout";
+import ADNContextPanel from '../components/adn/ADNContextPanel';
+import ChipSelector from '../components/adn/ChipSelector';
 
 const TIPOS = ["Comercial","Branding","Educativo","Storytelling","Promocional","Posicionamiento"];
 const FORMATOS = [
@@ -76,6 +78,15 @@ function CrearContent() {
     return () => window.removeEventListener("storage", handler);
   }, []);
   const en = lang === "en";
+
+  const TIPO_OPTIONS = [
+    { id: "Comercial", label: en ? "Comercial · Sells" : "Comercial · Vende" },
+    { id: "Branding", label: en ? "Branding · Builds" : "Branding · Construye" },
+    { id: "Educativo", label: en ? "Educativo · Teaches" : "Educativo · Enseña" },
+    { id: "Storytelling", label: en ? "Storytelling · Connects" : "Storytelling · Conecta" },
+    { id: "Promocional", label: en ? "Promocional · Offers" : "Promocional · Ofrece" },
+    { id: "Posicionamiento", label: en ? "Posicionamiento · Positions" : "Posicionamiento · Posiciona" },
+  ];
 
   const dataToProfile = (data) => ({
     id: data.id, nombre: data.nombre, descripcion: data.descripcion,
@@ -380,63 +391,7 @@ function CrearContent() {
     </div>
   );
 
-  // Instagram preview component
   const selectedCopy = copies.find(c => c.id === copySeleccionado);
-  const hasImage = versiones.length > 0;
-  const currentImage = hasImage ? versiones[versionActiva] : null;
-
-  const InstagramPreview = () => (
-    <div style={{ width:"100%", maxWidth:380, background:"#fff", borderRadius:10, boxShadow:"0 20px 60px rgba(0,0,0,0.7)", overflow:"hidden" }}>
-      {/* IG Header */}
-      <div style={{ display:"flex", alignItems:"center", gap:8, padding:"10px 14px" }}>
-        <div style={{ width:28, height:28, borderRadius:"50%", background:"linear-gradient(135deg,#7950F2,#A78BFA)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:9, fontWeight:800, color:"#fff" }}>
-          {(brandProfile?.nombre || "M").charAt(0).toUpperCase()}
-        </div>
-        <div>
-          <div style={{ fontSize:12, fontWeight:600, color:"#000" }}>{brandProfile?.nombre || "tu_marca"}</div>
-          <div style={{ fontSize:10, color:"#999" }}>{tipo}</div>
-        </div>
-      </div>
-      {/* Image */}
-      <div style={{ width:"100%", aspectRatio:"1", background:"#f0f0f0", position:"relative", overflow:"hidden" }}>
-        {generatingImg ? (
-          <div style={{ position:"absolute", inset:0, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", background:"linear-gradient(135deg,#f8f0ff,#fff0f5)" }}>
-            <div style={{ position:"absolute", inset:0, background:"linear-gradient(90deg, transparent, rgba(121,80,242,0.15), transparent)", animation:"shimmer 1.5s infinite" }} />
-            <div style={{ fontSize:11, color:"#7950F2", fontWeight:600, zIndex:1 }}>{genMsg}</div>
-            <div style={{ fontSize:10, color:"#999", marginTop:4, zIndex:1 }}>{Math.round(Math.min(genProgress,95))}%</div>
-          </div>
-        ) : currentImage ? (
-          <img src={"data:" + currentImage.mimeType + ";base64," + currentImage.image} alt="" style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
-        ) : (
-          <div style={{ position:"absolute", inset:0, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", background:"linear-gradient(135deg,#f8f0ff,#fff0f5)" }}>
-            <div style={{ fontSize:40, opacity:0.15, marginBottom:4 }}>✦</div>
-            <div style={{ fontSize:11, color:"#bbb" }}>Vista previa</div>
-          </div>
-        )}
-      </div>
-      {/* Copy */}
-      <div style={{ padding:"12px 14px" }}>
-        {selectedCopy ? (
-          <div>
-            <div style={{ fontSize:12, color:"#000", lineHeight:1.5 }}>
-              <span style={{ fontWeight:600 }}>{brandProfile?.nombre || "tu_marca"}</span>{" "}
-              {selectedCopy.hook}
-            </div>
-            <div style={{ fontSize:12, color:"#333", lineHeight:1.5, marginTop:4 }}>{selectedCopy.copy}</div>
-            <div style={{ fontSize:12, color:"#7950F2", fontWeight:600, marginTop:4 }}>{selectedCopy.cta}</div>
-            {selectedCopy.hashtags && <div style={{ fontSize:11, color:"#999", marginTop:4 }}>{selectedCopy.hashtags}</div>}
-          </div>
-        ) : (
-          <div>
-            <div style={{ fontSize:12, color:"#ccc", lineHeight:1.5 }}>
-              <span style={{ fontWeight:600, color:"#bbb" }}>{brandProfile?.nombre || "tu_marca"}</span>{" "}
-              {prompt ? prompt.substring(0, 80) + "..." : "Tu copy aparecerá aquí..."}
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
 
   return (
     <AppLayout>
@@ -484,42 +439,40 @@ function CrearContent() {
               <textarea className="input-focus" rows={4} value={prompt} onChange={e => setPrompt(e.target.value)}
                 placeholder={placeholders[phIdx]}
                 style={{ width:"100%", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:9, padding:"11px 13px", fontSize:13, color:D.text, outline:"none", resize:"none" }} />
-              <div style={{ fontSize:12, color:D.text3, marginTop:12, marginBottom:8 }}>{en ? "What type of piece is it?" : "¿Qué tipo de pieza es?"}</div>
-              <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:6 }}>
-                {TIPOS.map(t => (
-                  <button key={t} onClick={() => setTipo(t)}
-                    style={{ padding:"8px 6px", borderRadius:8, fontSize:11.5, border: tipo===t ? "1.5px solid " + D.purple : "1px solid rgba(255,255,255,0.1)", background: tipo===t ? "rgba(121,80,242,0.12)" : "transparent", color: tipo===t ? D.purpleLight : D.text2, fontWeight: tipo===t ? 500 : 400, cursor:"pointer" }}>
-                    {t}
-                  </button>
-                ))}
-              </div>
+              <div style={{ fontSize:12, color:D.text3, marginTop:12, marginBottom:8 }}>{en ? "What type of piece?" : "¿Qué tipo de pieza es?"}</div>
+              <ChipSelector
+                mode="single"
+                options={TIPO_OPTIONS}
+                value={tipo}
+                onChange={setTipo}
+                showCounter={false}
+              />
               <div style={{ fontSize:12, color:D.text3, marginTop:12, marginBottom:8 }}>{en ? "Format" : "Formato"}</div>
-              <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:6 }}>
-                {FORMATOS.map(f => (
-                  <button key={f.key} onClick={() => setFormato(f.key)}
-                    style={{ padding:"8px 6px", borderRadius:8, fontSize:11.5, border: formato===f.key ? "1.5px solid " + D.purple : "1px solid rgba(255,255,255,0.1)", background: formato===f.key ? "rgba(121,80,242,0.12)" : "transparent", color: formato===f.key ? D.purpleLight : D.text2, fontWeight: formato===f.key ? 500 : 400, cursor:"pointer", textAlign:"center" }}>
-                    <div>{f.label}</div>
-                    <div style={{ fontSize:9, opacity:0.6, marginTop:2 }}>{f.desc}</div>
-                  </button>
-                ))}
-              </div>
+              <ChipSelector
+                mode="single"
+                options={FORMATOS.map(f => ({ id: f.key, label: f.label + " · " + f.desc }))}
+                value={formato}
+                onChange={setFormato}
+                showCounter={false}
+              />
             </div>
               <div style={{ marginTop:14, marginBottom:14 }}>
-                <div style={{ fontSize:12, color:D.text3, marginBottom:8 }}>{en ? "Language for this piece" : "Idioma de esta pieza"}</div>
-                <div style={{ display:"flex", gap:6 }}>
-                  {[
-                    { key:"ADN", label:en ? "From my DNA" : "Según mi ADN", desc: brandProfile?.idioma || "Auto" },
-                    { key:"Español", label:"Español" },
-                    { key:"Inglés", label:"English" },
-                    { key:"Spanglish", label:"Spanglish" },
-                  ].map(op => (
-                    <button key={op.key} onClick={() => setIdiomaPieza(op.key)}
-                      style={{ padding:"7px 12px", borderRadius:8, fontSize:11.5, border: idiomapieza===op.key ? "1.5px solid " + D.purple : "1px solid rgba(255,255,255,0.1)", background: idiomapieza===op.key ? "rgba(121,80,242,0.12)" : "transparent", color: idiomapieza===op.key ? D.purpleLight : D.text2, fontWeight: idiomapieza===op.key ? 500 : 400, cursor:"pointer", textAlign:"center" }}>
-                      <div>{op.label}</div>
-                      {op.desc && <div style={{ fontSize:9, opacity:0.6, marginTop:1 }}>{op.desc}</div>}
-                    </button>
-                  ))}
+                <div style={{ fontSize:12, color:D.text3, marginBottom:8 }}>
+                  {en ? "Language for this piece" : "Idioma de esta pieza"}
+                  {brandProfile?.idioma && <span style={{ fontSize:10, color:D.purpleLight, marginLeft:8 }}>ADN: {brandProfile.idioma}</span>}
                 </div>
+                <ChipSelector
+                  mode="single"
+                  options={[
+                    { id: "ADN", label: en ? "From DNA" : "Según ADN" },
+                    { id: "Español", label: "Español" },
+                    { id: "Inglés", label: "English" },
+                    { id: "Spanglish", label: "Spanglish" },
+                  ]}
+                  value={idiomapieza}
+                  onChange={setIdiomaPieza}
+                  showCounter={false}
+                />
               </div>
 
             {/* Collapsible: Visual References (optional) */}
@@ -905,31 +858,19 @@ function CrearContent() {
           {/* Ambient glow */}
           <div style={{ position:"absolute", top:"20%", left:"30%", width:300, height:300, background:"radial-gradient(circle, rgba(121,80,242,0.06) 0%, transparent 60%)", filter:"blur(60px)", pointerEvents:"none" }} />
 
-          {step === 1 && !hasImage && (
-            <div style={{ textAlign:"center" }}>
-              <InstagramPreview />
-              <div style={{ marginTop:16, fontSize:11, color:"rgba(255,255,255,0.2)" }}>{en ? "Real-time preview" : "Vista previa en tiempo real"}</div>
-            </div>
-          )}
-
-          {step >= 2 && (
-            <div style={{ textAlign:"center" }}>
-              <InstagramPreview />
-              {versiones.length > 1 && (
-                <div style={{ display:"flex", gap:6, justifyContent:"center", marginTop:14 }}>
-                  {versiones.map((v,i) => (
-                    <div key={i} onClick={() => setVersionActiva(i)}
-                      style={{ width:40, height:40, borderRadius:8, overflow:"hidden", cursor:"pointer", border: versionActiva === i ? "2px solid #7950F2" : "1px solid rgba(255,255,255,0.1)", flexShrink:0 }}>
-                      <img src={"data:" + v.mimeType + ";base64," + v.image} alt="" style={{ width:"100%", height:"100%", objectFit:"cover" }} />
-                    </div>
-                  ))}
-                </div>
-              )}
-              <div style={{ marginTop:12, fontSize:11, color:"rgba(255,255,255,0.2)" }}>
-                {step === 3 && savedFinal ? (en ? "Saved to your library" : "Guardado en tu biblioteca") : versiones.length > 0 ? "v" + (versionActiva + 1) + (en ? " of " : " de ") + versiones.length : ""}
-              </div>
-            </div>
-          )}
+          <ADNContextPanel
+            adn={{
+              voz: brandProfile ? (Array.isArray(brandProfile.tono) ? brandProfile.tono.join(' + ') : brandProfile.tono || '') : '',
+              idioma: brandProfile?.idioma || '',
+              audiencia: brandProfile?.audiencia || '',
+              paleta: brandProfile?.coloresMarca || [],
+            }}
+            previewState={generatingImg ? "generating" : versiones.length > 0 ? "ready" : "empty"}
+            generatedImageUrl={versiones.length > 0 ? "data:" + versiones[versionActiva].mimeType + ";base64," + versiones[versionActiva].image : null}
+            generatedCopy={selectedCopy ? selectedCopy.hook + " " + selectedCopy.copy : null}
+            brandName={brandProfile?.nombre || "Tu marca"}
+            pieceType={tipo}
+          />
         </div>
       </div>
     </AppLayout>

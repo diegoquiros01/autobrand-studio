@@ -76,6 +76,8 @@ Analiza en profundidad:
 - Personalidad de marca: voz, actitud, manera de comunicar
 - Si hay contenido de la web, usa esa información para enriquecer la descripción y propuesta de valor
 
+Also extract the 5 dominant brand colors as hex codes from the visual content. Return them in a field called 'coloresMarca' as an array of hex strings (e.g., ['#D4537E', '#7F77DD', '#F0997B', '#2C3E50', '#E8D5B7']). If no visual content is available, infer brand colors from the brand's industry, tone, and personality.
+
 Responde SOLO JSON puro sin backticks:
 {
   "profile": {
@@ -87,7 +89,7 @@ Responde SOLO JSON puro sin backticks:
     "categorias": ["categoria1", "categoria2"],
     "propuestaValor": "propuesta de valor unica en una oracion",
     "personalidad": "descripcion detallada de como habla la marca, que evita, frases tipicas, actitud (2-3 oraciones)",
-    "coloresMarca": ["#hex1", "#hex2", "#hex3"],
+    "coloresMarca": ["#hex1", "#hex2", "#hex3", "#hex4", "#hex5"],
     "estiloVisual": "descripcion del estilo visual: composicion, filtros, estetica (1-2 oraciones)",
     "ejemplosCopy": ["ejemplo de texto tipico 1", "ejemplo de texto tipico 2", "ejemplo de texto tipico 3"]
   }
