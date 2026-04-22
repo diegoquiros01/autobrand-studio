@@ -115,12 +115,20 @@ export default function ExtractedPalette({
   };
 
   const commitAdd = () => {
-    const hex = newHex.trim().startsWith('#') ? newHex.trim() : '#' + newHex.trim();
+    let hex = newHex.trim().startsWith('#') ? newHex.trim() : '#' + newHex.trim();
+    // Accept 3 or 6 char hex
+    if (/^#[0-9a-fA-F]{3}$/.test(hex)) {
+      hex = '#' + hex[1] + hex[1] + hex[2] + hex[2] + hex[3] + hex[3]; // expand #abc → #aabbcc
+    }
     if (/^#[0-9a-fA-F]{6}$/.test(hex)) {
       onChange?.({ extracted: extractedColors, user: [...userColors, hex] });
       setNewHex('');
       setAdding(false);
     }
+  };
+
+  const addFromPicker = (hex) => {
+    onChange?.({ extracted: extractedColors, user: [...userColors, hex] });
   };
 
   return (
@@ -158,27 +166,15 @@ export default function ExtractedPalette({
         ))}
 
         {canAdd && !adding && (
-          <button
-            type="button"
-            onClick={() => setAdding(true)}
-            style={{
-              width: 36,
-              height: 36,
-              borderRadius: '50%',
-              background: 'transparent',
-              border: `1px dashed ${t.border}`,
-              color: t.textDim,
-              fontSize: 18,
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: 0,
-            }}
-            title="Agregar color"
-          >
-            +
-          </button>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            <label style={{ position: 'relative', width: 36, height: 36, cursor: 'pointer' }}>
+              <input type="color" value="#7F77DD" onChange={(e) => addFromPicker(e.target.value)} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer' }} />
+              <div style={{ width: 36, height: 36, borderRadius: '50%', border: `1px dashed ${t.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: t.textDim, fontSize: 18 }}>+</div>
+            </label>
+            <button type="button" onClick={() => setAdding(true)} style={{ fontSize: 11, color: t.textMuted, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+              #hex
+            </button>
+          </div>
         )}
 
         {adding && (
