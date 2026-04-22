@@ -37,6 +37,8 @@ function CrearContent() {
   const [formato, setFormato] = useState("square");
   const [skipRefs, setSkipRefs] = useState(false);
   const [skipTalent, setSkipTalent] = useState(false);
+  const [showRefs, setShowRefs] = useState(false);
+  const [showTalent, setShowTalent] = useState(false);
 
   const [referencias, setReferencias] = useState([]);
   const refInput = useRef(null);
@@ -309,11 +311,12 @@ function CrearContent() {
   const resetAll = () => {
     setStep(1); setMaxStep(1); setPrompt(""); setTipo("Comercial"); setFormato("square"); setIdiomaPieza("ADN");
     setReferencias([]); setTalentos([]); setSkipRefs(false); setSkipTalent(false);
+    setShowRefs(false); setShowTalent(false);
     setVersiones([]); setCopies([]); setCopySeleccionado(null); setImgAprobada(false);
     setSavedFinal(false); setFeedback(""); setError("");
   };
 
-  const steps = [{n:1,l:"Describe"},{n:2,l:en ? "References" : "Referencias"},{n:3,l:en ? "Talent" : "Talento"},{n:4,l:en ? "Image" : "Imagen"},{n:5,l:"Copy"},{n:6,l:en ? "Final art" : "Arte final"}];
+  const steps = [{n:1,l:"Describe"},{n:2,l:en ? "Image + Copy" : "Imagen + Copy"},{n:3,l:"Final"}];
 
   const StepBar = () => (
     <div style={{ display:"flex", alignItems:"center", marginBottom:24, gap:0 }}>
@@ -518,9 +521,96 @@ function CrearContent() {
                   ))}
                 </div>
               </div>
-            <button className="btn-primary" onClick={() => prompt.trim() && goToStep(2)}
-              style={{ ...NB, background: !prompt.trim() ? "rgba(121,80,242,0.3)" : "linear-gradient(135deg,#7950F2,#4C6EF5)", cursor: !prompt.trim() ? "not-allowed" : "pointer" }}>
-              {en ? "Continue → Add visual references" : "Continuar → Agregar referencias visuales"}
+
+            {/* Collapsible: Visual References (optional) */}
+            <div style={{ marginTop:16 }}>
+              <button onClick={() => setShowRefs(!showRefs)} style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"10px 14px", background:D.bg3, border:"1px solid " + D.border, borderRadius:10, color:D.text2, fontSize:13, fontWeight:500, cursor:"pointer" }}>
+                <span>{en ? "Visual References (optional)" : "Referencias visuales (opcional)"} {referencias.length > 0 ? "(" + referencias.length + ")" : ""}</span>
+                <span style={{ fontSize:11 }}>{showRefs ? "\u25B2" : "\u25BC"}</span>
+              </button>
+              {showRefs && (
+                <div style={{ marginTop:10, background:D.bg3, border:"1px solid " + D.border, borderRadius:12, padding:16 }}>
+                  <div style={{ fontSize:12, color:D.text2, marginBottom:12, lineHeight:1.6 }}>
+                    {en ? "Upload photos that inspire your piece's style — they can be photos of you, your product, your visual style or designs you like. Up to 3 images." : "Sube fotos que inspiren el estilo de tu pieza — pueden ser fotos tuyas, de tu producto, de tu estilo visual o de diseños que te gustan. Hasta 3 imágenes."}
+                  </div>
+                  <input ref={refInput} type="file" accept="image/*" multiple style={{ display:"none" }} onChange={e => { const arr = Array.from(e.target.files).slice(0,3).map(f => ({ file:f, url:URL.createObjectURL(f) })); setReferencias(arr); }} />
+                  {referencias.length > 0 ? (
+                    <div>
+                      <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:8, marginBottom:10 }}>
+                        {referencias.map((r,i) => (
+                          <div key={i} style={{ position:"relative" }}>
+                            <img src={r.url} alt="" style={{ width:"100%", aspectRatio:"1", objectFit:"cover", borderRadius:9, display:"block", border:"1.5px solid rgba(121,80,242,0.4)" }} />
+                            <button onClick={() => setReferencias(prev => prev.filter((_,j) => j!==i))} style={{ position:"absolute", top:4, right:4, width:20, height:20, borderRadius:"50%", background:"#DC2626", border:"none", color:"#fff", fontSize:10, cursor:"pointer" }}>x</button>
+                          </div>
+                        ))}
+                        {referencias.length < 3 && (
+                          <div onClick={() => refInput.current.click()}
+                            style={{ aspectRatio:"1", border:"2px dashed rgba(121,80,242,0.3)", borderRadius:9, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", cursor:"pointer", gap:6, background:"rgba(121,80,242,0.04)" }}>
+                            <span style={{ fontSize:24, color:D.purpleLight, opacity:0.5 }}>+</span>
+                            <span style={{ fontSize:10, color:D.text3 }}>{en ? "Add photo" : "Agregar foto"}</span>
+                          </div>
+                        )}
+                      </div>
+                      <div style={{ fontSize:11, color:D.text3 }}>{referencias.length}/3 {en ? "references uploaded" : "referencias subidas"}</div>
+                    </div>
+                  ) : (
+                    <UploadZone onClick={() => refInput.current.click()}>
+                      <div style={{ fontSize:32, marginBottom:10, opacity:0.4 }}>🖼</div>
+                      <div style={{ fontSize:13, color:D.text, fontWeight:500, marginBottom:4 }}>{en ? "Tap here to upload reference photos" : "Toca aquí para subir fotos de referencia"}</div>
+                      <div style={{ fontSize:12, color:D.text3, lineHeight:1.5 }}>{en ? "Select up to 3 images from your computer or phone" : "Selecciona hasta 3 imágenes desde tu computadora o celular"}<br/>JPG, PNG · {en ? "Max." : "Máx."} 10MB</div>
+                    </UploadZone>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Collapsible: Talent Photos (optional) */}
+            <div style={{ marginTop:10 }}>
+              <button onClick={() => setShowTalent(!showTalent)} style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"10px 14px", background:D.bg3, border:"1px solid " + D.border, borderRadius:10, color:D.text2, fontSize:13, fontWeight:500, cursor:"pointer" }}>
+                <span>{en ? "Talent Photos (optional)" : "Fotos de talento (opcional)"} {talentos.length > 0 ? "(" + talentos.length + ")" : ""}</span>
+                <span style={{ fontSize:11 }}>{showTalent ? "\u25B2" : "\u25BC"}</span>
+              </button>
+              {showTalent && (
+                <div style={{ marginTop:10, background:D.bg3, border:"1px solid " + D.border, borderRadius:12, padding:16 }}>
+                  <div style={{ fontSize:12, color:D.text2, marginBottom:12, lineHeight:1.6 }}>
+                    {en ? "Upload photos of people you want to include in the image — it can be a photo of you, your team or models. The AI will naturally incorporate them into the composition. Up to 3 photos." : "Sube fotos de personas que quieres incluir en la imagen — puede ser una foto tuya, de tu equipo o de modelos. La IA las incorporará naturalmente en la composición. Hasta 3 fotos."}
+                  </div>
+                  <input ref={talentInput} type="file" accept="image/*" multiple style={{ display:"none" }} onChange={e => { const arr = Array.from(e.target.files).slice(0,3).map(f => ({ file:f, url:URL.createObjectURL(f) })); setTalentos(prev => [...prev,...arr].slice(0,3)); }} />
+                  {talentos.length > 0 ? (
+                    <div>
+                      <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:8, marginBottom:10 }}>
+                        {talentos.map((t,i) => (
+                          <div key={i} style={{ position:"relative" }}>
+                            <img src={t.url} alt="" style={{ width:"100%", aspectRatio:"1", objectFit:"cover", borderRadius:9, display:"block", border:"1.5px solid rgba(121,80,242,0.4)" }} />
+                            <button onClick={() => setTalentos(prev => prev.filter((_,j) => j!==i))} style={{ position:"absolute", top:4, right:4, width:20, height:20, borderRadius:"50%", background:"#DC2626", border:"none", color:"#fff", fontSize:10, cursor:"pointer" }}>x</button>
+                          </div>
+                        ))}
+                        {talentos.length < 3 && (
+                          <div onClick={() => talentInput.current.click()}
+                            style={{ aspectRatio:"1", border:"2px dashed rgba(121,80,242,0.3)", borderRadius:9, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", cursor:"pointer", gap:6, background:"rgba(121,80,242,0.04)" }}>
+                            <span style={{ fontSize:24, color:D.purpleLight, opacity:0.5 }}>+</span>
+                            <span style={{ fontSize:10, color:D.text3 }}>{en ? "Add photo" : "Agregar foto"}</span>
+                          </div>
+                        )}
+                      </div>
+                      <div style={{ fontSize:11, color:D.text3 }}>{talentos.length}/3 {en ? "talent photos" : "fotos de talento"}</div>
+                    </div>
+                  ) : (
+                    <UploadZone onClick={() => talentInput.current.click()}>
+                      <div style={{ fontSize:32, marginBottom:10, opacity:0.4 }}>🧑‍🤝‍🧑</div>
+                      <div style={{ fontSize:13, color:D.text, fontWeight:500, marginBottom:4 }}>{en ? "Tap here to upload photos of people" : "Toca aquí para subir fotos de personas"}</div>
+                      <div style={{ fontSize:12, color:D.text3, lineHeight:1.5 }}>{en ? "Photos of you, your team or models" : "Fotos tuyas, de tu equipo o modelos"}<br/>{en ? "The AI will include them in the final image" : "La IA las incluirá en la imagen final"}</div>
+                    </UploadZone>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {error && <div style={{ marginTop:10, background:"rgba(220,38,38,0.1)", border:"1px solid rgba(220,38,38,0.2)", borderRadius:8, padding:10, fontSize:11, color:"#FCA5A5" }}>{error}</div>}
+
+            <button className="btn-primary" onClick={() => { if (!prompt.trim()) return; if (!brandProfile) { setError(en ? "You need to create a Brand DNA first" : "Necesitas crear un ADN de marca primero"); return; } goToStep(2); generarImagen(); }}
+              style={{ ...NB, marginTop:18, background: !prompt.trim() ? "rgba(121,80,242,0.3)" : "linear-gradient(135deg,#E64980,#7950F2)", cursor: !prompt.trim() ? "not-allowed" : "pointer" }}>
+              {en ? "Generate with AI \u2192" : "Generar con IA \u2192"}
             </button>
           </div>
         )}
@@ -528,97 +618,11 @@ function CrearContent() {
         {step === 2 && (
           <div>
             <BackBtn toStep={1} />
-            <div style={{ background:D.bg3, border:"1px solid " + D.border, borderRadius:16, padding:20, marginBottom:14 }}>
-              <div style={{ fontSize:14, fontWeight:500, color:D.text, marginBottom:4 }}>{en ? "Visual references" : "Referencias visuales"}</div>
-              <div style={{ fontSize:12, color:D.text2, marginBottom:16, lineHeight:1.6 }}>
-                {en ? "Upload photos that inspire your piece's style — they can be photos of you, your product, your visual style or designs you like. Up to 3 images." : "Sube fotos que inspiren el estilo de tu pieza — pueden ser fotos tuyas, de tu producto, de tu estilo visual o de diseños que te gustan. Hasta 3 imágenes."}
-              </div>
-              <input ref={refInput} type="file" accept="image/*" multiple style={{ display:"none" }} onChange={e => { const arr = Array.from(e.target.files).slice(0,3).map(f => ({ file:f, url:URL.createObjectURL(f) })); setReferencias(arr); }} />
-              {referencias.length > 0 ? (
-                <div>
-                  <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:8, marginBottom:10 }}>
-                    {referencias.map((r,i) => (
-                      <div key={i} style={{ position:"relative" }}>
-                        <img src={r.url} alt="" style={{ width:"100%", aspectRatio:"1", objectFit:"cover", borderRadius:9, display:"block", border:"1.5px solid rgba(121,80,242,0.4)" }} />
-                        <button onClick={() => setReferencias(prev => prev.filter((_,j) => j!==i))} style={{ position:"absolute", top:4, right:4, width:20, height:20, borderRadius:"50%", background:"#DC2626", border:"none", color:"#fff", fontSize:10, cursor:"pointer" }}>x</button>
-                      </div>
-                    ))}
-                    {referencias.length < 3 && (
-                      <div onClick={() => refInput.current.click()}
-                        style={{ aspectRatio:"1", border:"2px dashed rgba(121,80,242,0.3)", borderRadius:9, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", cursor:"pointer", gap:6, background:"rgba(121,80,242,0.04)" }}>
-                        <span style={{ fontSize:24, color:D.purpleLight, opacity:0.5 }}>+</span>
-                        <span style={{ fontSize:10, color:D.text3 }}>{en ? "Add photo" : "Agregar foto"}</span>
-                      </div>
-                    )}
-                  </div>
-                  <div style={{ fontSize:11, color:D.text3 }}>{referencias.length}/3 {en ? "references uploaded" : "referencias subidas"}</div>
-                </div>
-              ) : (
-                <UploadZone onClick={() => refInput.current.click()}>
-                  <div style={{ fontSize:32, marginBottom:10, opacity:0.4 }}>🖼</div>
-                  <div style={{ fontSize:13, color:D.text, fontWeight:500, marginBottom:4 }}>{en ? "Tap here to upload reference photos" : "Toca aquí para subir fotos de referencia"}</div>
-                  <div style={{ fontSize:12, color:D.text3, lineHeight:1.5 }}>{en ? "Select up to 3 images from your computer or phone" : "Selecciona hasta 3 imágenes desde tu computadora o celular"}<br/>JPG, PNG · {en ? "Max." : "Máx."} 10MB</div>
-                </UploadZone>
-              )}
-            </div>
-            <button className="btn-primary" onClick={() => goToStep(3)} style={NB}>{en ? "Continue → Add talent photo" : "Continuar → Agregar foto de talento"}</button>
-            <button onClick={() => { setReferencias([]); setSkipRefs(true); goToStep(3); }} style={SB}>{en ? "Skip — continue without references" : "Saltar — continuar sin referencias"}</button>
-          </div>
-        )}
-
-        {step === 3 && (
-          <div>
-            <BackBtn toStep={2} />
-            <div style={{ background:D.bg3, border:"1px solid " + D.border, borderRadius:16, padding:20, marginBottom:14 }}>
-              <div style={{ fontSize:14, fontWeight:500, color:D.text, marginBottom:4 }}>{en ? "Talent photo" : "Foto de talento"}</div>
-              <div style={{ fontSize:12, color:D.text2, marginBottom:16, lineHeight:1.6 }}>
-                {en ? "Upload photos of people you want to include in the image — it can be a photo of you, your team or models. The AI will naturally incorporate them into the composition. Up to 3 photos." : "Sube fotos de personas que quieres incluir en la imagen — puede ser una foto tuya, de tu equipo o de modelos. La IA las incorporará naturalmente en la composición. Hasta 3 fotos."}
-              </div>
-              <input ref={talentInput} type="file" accept="image/*" multiple style={{ display:"none" }} onChange={e => { const arr = Array.from(e.target.files).slice(0,3).map(f => ({ file:f, url:URL.createObjectURL(f) })); setTalentos(prev => [...prev,...arr].slice(0,3)); }} />
-              {talentos.length > 0 ? (
-                <div>
-                  <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:8, marginBottom:10 }}>
-                    {talentos.map((t,i) => (
-                      <div key={i} style={{ position:"relative" }}>
-                        <img src={t.url} alt="" style={{ width:"100%", aspectRatio:"1", objectFit:"cover", borderRadius:9, display:"block", border:"1.5px solid rgba(121,80,242,0.4)" }} />
-                        <button onClick={() => setTalentos(prev => prev.filter((_,j) => j!==i))} style={{ position:"absolute", top:4, right:4, width:20, height:20, borderRadius:"50%", background:"#DC2626", border:"none", color:"#fff", fontSize:10, cursor:"pointer" }}>x</button>
-                      </div>
-                    ))}
-                    {talentos.length < 3 && (
-                      <div onClick={() => talentInput.current.click()}
-                        style={{ aspectRatio:"1", border:"2px dashed rgba(121,80,242,0.3)", borderRadius:9, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", cursor:"pointer", gap:6, background:"rgba(121,80,242,0.04)" }}>
-                        <span style={{ fontSize:24, color:D.purpleLight, opacity:0.5 }}>+</span>
-                        <span style={{ fontSize:10, color:D.text3 }}>{en ? "Add photo" : "Agregar foto"}</span>
-                      </div>
-                    )}
-                  </div>
-                  <div style={{ fontSize:11, color:D.text3 }}>{talentos.length}/3 {en ? "talent photos" : "fotos de talento"}</div>
-                </div>
-              ) : (
-                <UploadZone onClick={() => talentInput.current.click()}>
-                  <div style={{ fontSize:32, marginBottom:10, opacity:0.4 }}>🧑‍🤝‍🧑</div>
-                  <div style={{ fontSize:13, color:D.text, fontWeight:500, marginBottom:4 }}>{en ? "Tap here to upload photos of people" : "Toca aquí para subir fotos de personas"}</div>
-                  <div style={{ fontSize:12, color:D.text3, lineHeight:1.5 }}>{en ? "Photos of you, your team or models" : "Fotos tuyas, de tu equipo o modelos"}<br/>{en ? "The AI will include them in the final image" : "La IA las incluirá en la imagen final"}</div>
-                </UploadZone>
-              )}
-            </div>
-            <button className="btn-primary" onClick={() => { if (!brandProfile) { setError(en ? "You need to create a Brand DNA first" : "Necesitas crear un ADN de marca primero"); return; } goToStep(4); generarImagen(); }} style={{ ...NB, background:"linear-gradient(135deg,#E64980,#7950F2)" }}>
-              {en ? "Generate image with AI →" : "Generar imagen con IA →"}
-            </button>
-            <button onClick={() => { if (!brandProfile) { setError(en ? "You need to create a Brand DNA first" : "Necesitas crear un ADN de marca primero"); return; } setTalentos([]); setSkipTalent(true); goToStep(4); generarImagen(); }} style={SB}>
-              {en ? "Generate without talent" : "Generar sin talento"}
-            </button>
-          </div>
-        )}
-
-        {step === 4 && (
-          <div>
-            <BackBtn toStep={3} />
             <div style={{ display:"flex", gap:6, marginBottom:12, flexWrap:"wrap" }}>
               <span style={{ fontSize:10, padding:"3px 10px", borderRadius:12, background:"rgba(121,80,242,0.1)", border:"1px solid rgba(121,80,242,0.2)", color:D.purpleLight }}>{tipo}</span>
               <span style={{ fontSize:10, padding:"3px 10px", borderRadius:12, background:"rgba(121,80,242,0.1)", border:"1px solid rgba(121,80,242,0.2)", color:D.purpleLight }}>{FORMATOS.find(f => f.key === formato)?.label || "Post cuadrado"}</span>
-              {skipRefs && <span style={{ fontSize:10, padding:"3px 10px", borderRadius:12, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", color:D.text3 }}>{en ? "No refs" : "Sin refs"}</span>}
-              {skipTalent && <span style={{ fontSize:10, padding:"3px 10px", borderRadius:12, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", color:D.text3 }}>{en ? "No talent" : "Sin talento"}</span>}
+              {referencias.length === 0 && <span style={{ fontSize:10, padding:"3px 10px", borderRadius:12, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", color:D.text3 }}>{en ? "No refs" : "Sin refs"}</span>}
+              {talentos.length === 0 && <span style={{ fontSize:10, padding:"3px 10px", borderRadius:12, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", color:D.text3 }}>{en ? "No talent" : "Sin talento"}</span>}
             </div>
             <div>
               {/* Image area */}
@@ -662,6 +666,7 @@ function CrearContent() {
               )}
 
               {/* Feedback + actions — stacked below */}
+              {!imgAprobada && (
               <div style={{ background:D.bg3, border:"1px solid " + D.border, borderRadius:10, padding:14 }}>
                 <div style={{ fontSize:12, fontWeight:600, color:D.text, marginBottom:4 }}>{en ? "What do you want to change?" : "¿Qué quieres cambiar?"}</div>
                 <div style={{ fontSize:11, color:D.text3, marginBottom:8 }}>{en ? "Describe what to adjust and regenerate a new version" : "Describe qué ajustar y regenera una nueva versión"}</div>
@@ -671,16 +676,17 @@ function CrearContent() {
                 <div style={{ display:"flex", gap:8 }}>
                   <button onClick={() => { if (!generatingImg && feedback.trim()) generarImagen(feedback); }} disabled={generatingImg || !feedback.trim()}
                     style={{ flex:1, padding:9, background: generatingImg || !feedback.trim() ? "rgba(121,80,242,0.3)" : "linear-gradient(135deg,#7950F2,#4C6EF5)", color:"#fff", border:"none", borderRadius:8, fontSize:12, fontWeight:600, cursor: generatingImg || !feedback.trim() ? "not-allowed" : "pointer" }}>
-                    {generatingImg ? (en ? "Generating..." : "Generando...") : "↺ " + (en ? "Regenerate" : "Regenerar")}
+                    {generatingImg ? (en ? "Generating..." : "Generando...") : "\u21BA " + (en ? "Regenerate" : "Regenerar")}
                   </button>
                   {versiones.length > 0 && !generatingImg && (
-                    <button onClick={() => { setImgAprobada(true); generarCopies(); goToStep(5); }}
+                    <button onClick={() => { setImgAprobada(true); generarCopies(); }}
                       style={{ flex:1, padding:9, background:"rgba(64,192,87,0.12)", border:"1px solid rgba(64,192,87,0.3)", color:"#86EFAC", borderRadius:8, fontSize:12, fontWeight:600, cursor:"pointer" }}>
-                      {en ? "✓ Approve → Copy" : "✓ Aprobar → Copy"}
+                      {en ? "\u2713 Approve" : "\u2713 Aprobar"}
                     </button>
                   )}
                 </div>
               </div>
+              )}
 
               {/* References + talent thumbs */}
               {(referencias.length > 0 || talentos.length > 0) && (
@@ -706,86 +712,88 @@ function CrearContent() {
 
               {error && <div style={{ marginTop:10, background:"rgba(220,38,38,0.1)", border:"1px solid rgba(220,38,38,0.2)", borderRadius:8, padding:10, fontSize:11, color:"#FCA5A5" }}>{error}</div>}
             </div>
-          </div>
-        )}
 
-        {step === 5 && (
-          <div>
-            <BackBtn toStep={4} />
-            {generatingCopy ? (
-              <div style={{ textAlign:"center", padding:"48px 0" }}>
-                <div style={{ fontSize:14, color:D.text2, marginBottom:12 }}>{en ? "Generating copies with AI..." : "Generando copies con IA..."}</div>
-                <div style={{ height:4, background:"rgba(255,255,255,0.06)", borderRadius:4, overflow:"hidden", maxWidth:200, margin:"0 auto" }}>
-                  <div style={{ height:"100%", width:"70%", background:"linear-gradient(90deg,#7950F2,#4C6EF5)", borderRadius:4 }} />
-                </div>
-              </div>
-            ) : error === "LIMIT_REACHED" ? (
-              <div style={{ background:"rgba(121,80,242,0.1)", border:"1px solid rgba(121,80,242,0.25)", borderRadius:12, padding:20, textAlign:"center" }}>
-                <div style={{ fontSize:15, fontWeight:500, color:D.purpleLight, marginBottom:8 }}>{en ? "You reached your monthly limit" : "Alcanzaste tu límite mensual"}</div>
-                <div style={{ fontSize:13, color:D.text2, marginBottom:16 }}>{en ? "Upgrade your plan to continue generating." : "Actualiza tu plan para continuar generando."}</div>
-                <button onClick={() => router.push("/pricing")} style={{ padding:"10px 24px", background:D.purple, color:"#fff", border:"none", borderRadius:9, fontSize:13, fontWeight:500, cursor:"pointer" }}>{en ? "View plans →" : "Ver planes →"}</button>
-              </div>
-            ) : (
-              <div>
-                <div style={{ fontSize:13, color:D.text2, marginBottom:14 }}>{en ? "Select and edit your favorite copy" : "Selecciona y edita tu copy favorito"}</div>
-                {copies.map(c => (
-                  <div key={c.id} style={{ background: copySeleccionado===c.id ? "rgba(121,80,242,0.08)" : D.bg3, border: copySeleccionado===c.id ? "1.5px solid " + D.purple : "1px solid " + D.border, borderRadius:12, padding:"14px 16px", marginBottom:10 }}>
-                    {editingCopy === c.id ? (
-                      <div>
-                        <textarea value={editedText} onChange={e => setEditedText(e.target.value)} rows={7}
-                          style={{ width:"100%", background:"rgba(121,80,242,0.06)", border:"1px solid " + D.purple, borderRadius:8, padding:"10px 12px", fontSize:12, color:D.text, outline:"none", resize:"none", marginBottom:8 }} />
-                        <button onClick={() => { const updated = copies.map(x => x.id===c.id ? { ...x, hook: editedText.split("\n")[0], copy: editedText } : x); setCopies(updated); setEditingCopy(null); }}
-                          style={{ padding:"6px 14px", background:D.purple, color:"#fff", border:"none", borderRadius:7, fontSize:12, cursor:"pointer" }}>{en ? "Save edit" : "Guardar edición"}</button>
-                      </div>
-                    ) : (
-                      <div>
-                        <div style={{ fontSize:10, fontWeight:500, color:D.purpleLight, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:6 }}>{en ? "Option" : "Opción"} {c.id}</div>
-                        <div style={{ fontSize:13, fontWeight:500, color:D.text, marginBottom:5 }}>{c.hook}</div>
-                        <div style={{ fontSize:12, color:D.text2, lineHeight:1.65, marginBottom:5 }}>{c.copy}</div>
-                        <div style={{ fontSize:12, color:D.purpleLight, fontWeight:500, marginBottom:5 }}>{c.cta}</div>
-                        {c.hashtags && <div style={{ fontSize:11, color:"rgba(167,139,250,0.5)", marginBottom:10 }}>{c.hashtags}</div>}
-                        <div style={{ display:"flex", gap:6 }}>
-                          <button onClick={() => { setCopySeleccionado(c.id); setEditedText(c.hook + "\n\n" + c.copy + "\n\n" + c.cta + (c.hashtags ? "\n\n" + c.hashtags : "")); }}
-                            style={{ padding:"5px 12px", borderRadius:6, fontSize:11, fontWeight:500, background: copySeleccionado===c.id ? D.purple : "rgba(255,255,255,0.06)", color: copySeleccionado===c.id ? "#fff" : D.text2, border: copySeleccionado===c.id ? "none" : "1px solid rgba(255,255,255,0.1)", cursor:"pointer" }}>
-                            {copySeleccionado===c.id ? (en ? "✓ Selected" : "✓ Seleccionado") : (en ? "Select" : "Seleccionar")}
-                          </button>
-                          <button onClick={() => { setEditingCopy(c.id); setEditedText(c.hook + "\n\n" + c.copy + "\n\n" + c.cta + (c.hashtags ? "\n\n" + c.hashtags : "")); }}
-                            style={{ padding:"5px 12px", borderRadius:6, fontSize:11, background:"rgba(255,255,255,0.04)", color:D.text2, border:"1px solid rgba(255,255,255,0.1)", cursor:"pointer" }}>
-                            {en ? "✏ Edit" : "✏ Editar"}
-                          </button>
-                          <div style={{ position: "relative", display: "inline-block" }}>
-                            <button onClick={(e) => {
-                              const btn = e.currentTarget;
-                              const menu = btn.nextElementSibling;
-                              menu.style.display = menu.style.display === "block" ? "none" : "block";
-                            }}
-                              disabled={translatingCopy === c.id}
-                              style={{ padding:"5px 12px", borderRadius:6, fontSize:11, background:"rgba(255,255,255,0.04)", color: translatingCopy === c.id ? D.purpleLight : D.text2, border:"1px solid rgba(255,255,255,0.1)", cursor:"pointer" }}>
-                              {translatingCopy === c.id ? (en ? "Translating..." : "Traduciendo...") : (en ? "🌐 Translate" : "🌐 Traducir")}
-                            </button>
-                            <div style={{ display: "none", position: "absolute", bottom: "100%", left: 0, marginBottom: 4, background: "#16162d", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: 4, zIndex: 10, minWidth: 120 }}>
-                              <button onClick={() => translateCopy(c, "Español")} style={{ display: "block", width: "100%", padding: "6px 12px", background: "none", border: "none", color: "#fff", fontSize: 11, cursor: "pointer", textAlign: "left", borderRadius: 4 }}>Español</button>
-                              <button onClick={() => translateCopy(c, "English")} style={{ display: "block", width: "100%", padding: "6px 12px", background: "none", border: "none", color: "#fff", fontSize: 11, cursor: "pointer", textAlign: "left", borderRadius: 4 }}>English</button>
-                              <button onClick={() => translateCopy(c, "Spanglish")} style={{ display: "block", width: "100%", padding: "6px 12px", background: "none", border: "none", color: "#fff", fontSize: 11, cursor: "pointer", textAlign: "left", borderRadius: 4 }}>Spanglish</button>
+            {/* ─── Copy section (appears after image is approved) ─── */}
+            {imgAprobada && (
+              <div style={{ marginTop:20, borderTop:"1px solid " + D.border, paddingTop:20 }}>
+                <div style={{ fontSize:14, fontWeight:600, color:D.text, marginBottom:12 }}>{en ? "Copy" : "Copy"}</div>
+                {generatingCopy ? (
+                  <div style={{ textAlign:"center", padding:"48px 0" }}>
+                    <div style={{ fontSize:14, color:D.text2, marginBottom:12 }}>{en ? "Generating copies with AI..." : "Generando copies con IA..."}</div>
+                    <div style={{ height:4, background:"rgba(255,255,255,0.06)", borderRadius:4, overflow:"hidden", maxWidth:200, margin:"0 auto" }}>
+                      <div style={{ height:"100%", width:"70%", background:"linear-gradient(90deg,#7950F2,#4C6EF5)", borderRadius:4 }} />
+                    </div>
+                  </div>
+                ) : error === "LIMIT_REACHED" ? (
+                  <div style={{ background:"rgba(121,80,242,0.1)", border:"1px solid rgba(121,80,242,0.25)", borderRadius:12, padding:20, textAlign:"center" }}>
+                    <div style={{ fontSize:15, fontWeight:500, color:D.purpleLight, marginBottom:8 }}>{en ? "You reached your monthly limit" : "Alcanzaste tu límite mensual"}</div>
+                    <div style={{ fontSize:13, color:D.text2, marginBottom:16 }}>{en ? "Upgrade your plan to continue generating." : "Actualiza tu plan para continuar generando."}</div>
+                    <button onClick={() => router.push("/pricing")} style={{ padding:"10px 24px", background:D.purple, color:"#fff", border:"none", borderRadius:9, fontSize:13, fontWeight:500, cursor:"pointer" }}>{en ? "View plans \u2192" : "Ver planes \u2192"}</button>
+                  </div>
+                ) : (
+                  <div>
+                    <div style={{ fontSize:13, color:D.text2, marginBottom:14 }}>{en ? "Select and edit your favorite copy" : "Selecciona y edita tu copy favorito"}</div>
+                    {copies.map(c => (
+                      <div key={c.id} style={{ background: copySeleccionado===c.id ? "rgba(121,80,242,0.08)" : D.bg3, border: copySeleccionado===c.id ? "1.5px solid " + D.purple : "1px solid " + D.border, borderRadius:12, padding:"14px 16px", marginBottom:10 }}>
+                        {editingCopy === c.id ? (
+                          <div>
+                            <textarea value={editedText} onChange={e => setEditedText(e.target.value)} rows={7}
+                              style={{ width:"100%", background:"rgba(121,80,242,0.06)", border:"1px solid " + D.purple, borderRadius:8, padding:"10px 12px", fontSize:12, color:D.text, outline:"none", resize:"none", marginBottom:8 }} />
+                            <button onClick={() => { const updated = copies.map(x => x.id===c.id ? { ...x, hook: editedText.split("\n")[0], copy: editedText } : x); setCopies(updated); setEditingCopy(null); }}
+                              style={{ padding:"6px 14px", background:D.purple, color:"#fff", border:"none", borderRadius:7, fontSize:12, cursor:"pointer" }}>{en ? "Save edit" : "Guardar edición"}</button>
+                          </div>
+                        ) : (
+                          <div>
+                            <div style={{ fontSize:10, fontWeight:500, color:D.purpleLight, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:6 }}>{en ? "Option" : "Opción"} {c.id}</div>
+                            <div style={{ fontSize:13, fontWeight:500, color:D.text, marginBottom:5 }}>{c.hook}</div>
+                            <div style={{ fontSize:12, color:D.text2, lineHeight:1.65, marginBottom:5 }}>{c.copy}</div>
+                            <div style={{ fontSize:12, color:D.purpleLight, fontWeight:500, marginBottom:5 }}>{c.cta}</div>
+                            {c.hashtags && <div style={{ fontSize:11, color:"rgba(167,139,250,0.5)", marginBottom:10 }}>{c.hashtags}</div>}
+                            <div style={{ display:"flex", gap:6 }}>
+                              <button onClick={() => { setCopySeleccionado(c.id); setEditedText(c.hook + "\n\n" + c.copy + "\n\n" + c.cta + (c.hashtags ? "\n\n" + c.hashtags : "")); }}
+                                style={{ padding:"5px 12px", borderRadius:6, fontSize:11, fontWeight:500, background: copySeleccionado===c.id ? D.purple : "rgba(255,255,255,0.06)", color: copySeleccionado===c.id ? "#fff" : D.text2, border: copySeleccionado===c.id ? "none" : "1px solid rgba(255,255,255,0.1)", cursor:"pointer" }}>
+                                {copySeleccionado===c.id ? (en ? "\u2713 Selected" : "\u2713 Seleccionado") : (en ? "Select" : "Seleccionar")}
+                              </button>
+                              <button onClick={() => { setEditingCopy(c.id); setEditedText(c.hook + "\n\n" + c.copy + "\n\n" + c.cta + (c.hashtags ? "\n\n" + c.hashtags : "")); }}
+                                style={{ padding:"5px 12px", borderRadius:6, fontSize:11, background:"rgba(255,255,255,0.04)", color:D.text2, border:"1px solid rgba(255,255,255,0.1)", cursor:"pointer" }}>
+                                {en ? "\u270F Edit" : "\u270F Editar"}
+                              </button>
+                              <div style={{ position: "relative", display: "inline-block" }}>
+                                <button onClick={(e) => {
+                                  const btn = e.currentTarget;
+                                  const menu = btn.nextElementSibling;
+                                  menu.style.display = menu.style.display === "block" ? "none" : "block";
+                                }}
+                                  disabled={translatingCopy === c.id}
+                                  style={{ padding:"5px 12px", borderRadius:6, fontSize:11, background:"rgba(255,255,255,0.04)", color: translatingCopy === c.id ? D.purpleLight : D.text2, border:"1px solid rgba(255,255,255,0.1)", cursor:"pointer" }}>
+                                  {translatingCopy === c.id ? (en ? "Translating..." : "Traduciendo...") : (en ? "🌐 Translate" : "🌐 Traducir")}
+                                </button>
+                                <div style={{ display: "none", position: "absolute", bottom: "100%", left: 0, marginBottom: 4, background: "#16162d", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: 4, zIndex: 10, minWidth: 120 }}>
+                                  <button onClick={() => translateCopy(c, "Español")} style={{ display: "block", width: "100%", padding: "6px 12px", background: "none", border: "none", color: "#fff", fontSize: 11, cursor: "pointer", textAlign: "left", borderRadius: 4 }}>Español</button>
+                                  <button onClick={() => translateCopy(c, "English")} style={{ display: "block", width: "100%", padding: "6px 12px", background: "none", border: "none", color: "#fff", fontSize: 11, cursor: "pointer", textAlign: "left", borderRadius: 4 }}>English</button>
+                                  <button onClick={() => translateCopy(c, "Spanglish")} style={{ display: "block", width: "100%", padding: "6px 12px", background: "none", border: "none", color: "#fff", fontSize: 11, cursor: "pointer", textAlign: "left", borderRadius: 4 }}>Spanglish</button>
+                                </div>
+                              </div>
                             </div>
                           </div>
-                        </div>
+                        )}
                       </div>
-                    )}
+                    ))}
+                    <button onClick={() => { guardarFinal(); goToStep(3); }} disabled={savingFinal || !copySeleccionado}
+                      style={{ width:"100%", padding:13, background: (savingFinal || !copySeleccionado) ? "rgba(64,192,87,0.3)" : "linear-gradient(135deg,#40C057,#2F9E44)", color:"#fff", border:"none", borderRadius:10, fontSize:14, fontWeight:500, cursor: (savingFinal || !copySeleccionado) ? "not-allowed" : "pointer", marginTop:6, opacity: !copySeleccionado ? 0.5 : 1 }}>
+                      {savingFinal ? (en ? "Saving..." : "Guardando...") : (en ? "Save final art \u2192" : "Guardar arte final \u2192")}
+                    </button>
+                    {error && <div style={{ background:"rgba(220,38,38,0.1)", border:"1px solid rgba(220,38,38,0.2)", borderRadius:8, padding:10, fontSize:11, color:"#FCA5A5", marginTop:8 }}>{error}</div>}
                   </div>
-                ))}
-                <button onClick={() => { guardarFinal(); goToStep(6); }} disabled={savingFinal || !copySeleccionado}
-                  style={{ width:"100%", padding:13, background: (savingFinal || !copySeleccionado) ? "rgba(64,192,87,0.3)" : "linear-gradient(135deg,#40C057,#2F9E44)", color:"#fff", border:"none", borderRadius:10, fontSize:14, fontWeight:500, cursor: (savingFinal || !copySeleccionado) ? "not-allowed" : "pointer", marginTop:6, opacity: !copySeleccionado ? 0.5 : 1 }}>
-                  {savingFinal ? (en ? "Saving..." : "Guardando...") : (en ? "Save final art →" : "Guardar arte final →")}
-                </button>
-                {error && <div style={{ background:"rgba(220,38,38,0.1)", border:"1px solid rgba(220,38,38,0.2)", borderRadius:8, padding:10, fontSize:11, color:"#FCA5A5", marginTop:8 }}>{error}</div>}
+                )}
               </div>
             )}
           </div>
         )}
 
-        {step === 6 && (
+        {step === 3 && (
           <div>
+            <BackBtn toStep={2} />
             {savedFinal && (
               <div style={{ background:"rgba(64,192,87,0.1)", border:"1px solid rgba(64,192,87,0.3)", borderRadius:10, padding:"12px 16px", marginBottom:16, display:"flex", alignItems:"center", gap:10 }}>
                 <div style={{ width:24, height:24, background:"#40C057", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:12, color:"#fff", flexShrink:0 }}>✓</div>
@@ -897,14 +905,14 @@ function CrearContent() {
           {/* Ambient glow */}
           <div style={{ position:"absolute", top:"20%", left:"30%", width:300, height:300, background:"radial-gradient(circle, rgba(121,80,242,0.06) 0%, transparent 60%)", filter:"blur(60px)", pointerEvents:"none" }} />
 
-          {step <= 3 && !hasImage && (
+          {step === 1 && !hasImage && (
             <div style={{ textAlign:"center" }}>
               <InstagramPreview />
-              <div style={{ marginTop:16, fontSize:11, color:"rgba(255,255,255,0.2)" }}>Vista previa en tiempo real</div>
+              <div style={{ marginTop:16, fontSize:11, color:"rgba(255,255,255,0.2)" }}>{en ? "Real-time preview" : "Vista previa en tiempo real"}</div>
             </div>
           )}
 
-          {step >= 4 && (
+          {step >= 2 && (
             <div style={{ textAlign:"center" }}>
               <InstagramPreview />
               {versiones.length > 1 && (
@@ -918,7 +926,7 @@ function CrearContent() {
                 </div>
               )}
               <div style={{ marginTop:12, fontSize:11, color:"rgba(255,255,255,0.2)" }}>
-                {step === 6 && savedFinal ? (en ? "Saved to your library" : "Guardado en tu biblioteca") : versiones.length > 0 ? "v" + (versionActiva + 1) + (en ? " of " : " de ") + versiones.length : ""}
+                {step === 3 && savedFinal ? (en ? "Saved to your library" : "Guardado en tu biblioteca") : versiones.length > 0 ? "v" + (versionActiva + 1) + (en ? " of " : " de ") + versiones.length : ""}
               </div>
             </div>
           )}
