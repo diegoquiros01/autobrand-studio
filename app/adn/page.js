@@ -248,6 +248,17 @@ function ADNContent() {
   const filledCount = progressFields.filter(f => f.done).length;
   const pct = Math.round((filledCount / progressFields.length) * 100);
 
+  // Per-step progress
+  const step1Fields = ["instagramUrl"];
+  const step2Fields = ["nombre", "descripcion", "audiencia", "tono", "idioma", "propuestaValor"];
+  const step3Fields = ["personalidad", "coloresMarca", "ejemplosCopy"];
+  const stepPct = (keys) => {
+    const fields = progressFields.filter(f => keys.includes(f.key));
+    if (fields.length === 0) return 0;
+    return Math.round((fields.filter(f => f.done).length / fields.length) * 100);
+  };
+  const stepProgress = [stepPct(step1Fields), stepPct(step2Fields), stepPct(step3Fields)];
+
   // Confetti
   useEffect(() => {
     if (pct === 100 && !showConfetti) {
@@ -372,16 +383,19 @@ function ADNContent() {
               {STEPS.map((s, i) => (
                 <div key={s.n} style={{ display: "flex", alignItems: "center", flex: i < STEPS.length - 1 ? 1 : "none" }}>
                   <button onClick={() => setStep(s.n)} style={{ display: "flex", alignItems: "center", gap: 10, background: "none", border: "none", cursor: "pointer", padding: 0 }}>
-                    <div style={{
-                      width: 32, height: 32, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center",
-                      fontSize: 13, fontWeight: 700, transition: "all 0.3s ease",
-                      background: step === s.n ? D.purple : step > s.n ? "rgba(64,192,87,0.2)" : "rgba(255,255,255,0.06)",
-                      color: step === s.n ? "#fff" : step > s.n ? "#40C057" : D.text3,
-                      border: step === s.n ? "2px solid " + D.purpleLight : step > s.n ? "2px solid rgba(64,192,87,0.4)" : "2px solid rgba(255,255,255,0.08)",
-                    }}>
-                      {step > s.n ? "✓" : s.n}
+                    <div style={{ position: "relative", width: 32, height: 32, flexShrink: 0 }}>
+                      <svg width="32" height="32" style={{ transform: "rotate(-90deg)", position: "absolute", inset: 0 }}>
+                        <circle cx="16" cy="16" r="13" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="3" />
+                        <circle cx="16" cy="16" r="13" fill="none" stroke={stepProgress[i] === 100 ? "#40C057" : D.purple} strokeWidth="3" strokeDasharray={2 * Math.PI * 13} strokeDashoffset={2 * Math.PI * 13 * (1 - stepProgress[i] / 100)} strokeLinecap="round" style={{ transition: "stroke-dashoffset 0.6s ease" }} />
+                      </svg>
+                      <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: step === s.n ? "#fff" : stepProgress[i] === 100 ? "#40C057" : D.text3 }}>
+                        {stepProgress[i] === 100 ? "✓" : s.n}
+                      </div>
                     </div>
-                    <span style={{ fontSize: 13, fontWeight: step === s.n ? 600 : 400, color: step === s.n ? D.text : D.text3, letterSpacing: "-0.02em", whiteSpace: "nowrap", transition: "all 0.3s ease" }}>{s.title}</span>
+                    <div>
+                      <div style={{ fontSize: 13, fontWeight: step === s.n ? 600 : 400, color: step === s.n ? D.text : D.text3, letterSpacing: "-0.02em", whiteSpace: "nowrap", transition: "all 0.3s ease", textAlign: "left" }}>{s.title}</div>
+                      <div style={{ fontSize: 10, color: stepProgress[i] === 100 ? "#40C057" : D.text3, transition: "all 0.3s ease" }}>{stepProgress[i]}%</div>
+                    </div>
                   </button>
                   {i < STEPS.length - 1 && (
                     <div style={{ flex: 1, height: 2, margin: "0 12px", background: step > s.n ? "rgba(64,192,87,0.3)" : "rgba(255,255,255,0.06)", borderRadius: 2, transition: "background 0.3s ease" }} />
