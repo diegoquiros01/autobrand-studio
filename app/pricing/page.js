@@ -170,7 +170,7 @@ export default function Pricing() {
 
       <footer style={{ padding:"24px 32px", marginTop:40, borderTop:"1px solid rgba(255,255,255,0.06)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
         <div style={{ display:"flex", alignItems:"center", gap:9 }}>
-          <div style={{ width:24, height:24, background:"#7950F2", borderRadius:6, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:9, fontWeight:800 }}>Ai</div>
+          <img src="/logo.svg" alt="" style={{ height: 16 }} />
           <span style={{ fontSize:12, color:"rgba(255,255,255,0.25)" }}>AiStudioBrand</span>
         </div>
         <div style={{ fontSize:12, color:"rgba(255,255,255,0.2)" }}>© 2025 AiStudioBrand.</div>

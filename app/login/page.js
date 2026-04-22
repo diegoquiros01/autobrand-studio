@@ -81,8 +81,7 @@ function LoginContent() {
       `}</style>
       <nav style={{ position:"relative", zIndex:1, display:"flex", alignItems:"center", padding:"0 28px", height:60, borderBottom:"1px solid rgba(255,255,255,0.1)", background:"rgba(17,17,34,0.5)", backdropFilter:"blur(10px)" }}>
         <div style={{ display:"flex", alignItems:"center", gap:10, cursor:"pointer" }} onClick={() => router.push("/")}>
-          <div style={{ width:32, height:32, background:"linear-gradient(135deg,#7950F2,#4C6EF5)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:500, fontSize:13 }}>Ai</div>
-          <span style={{ fontSize:16, fontWeight:500, color:"#fff" }}>Ai<span style={{ color:"#7950F2" }}>Studio</span>Brand</span>
+          <img src="/logo.svg" alt="AiStudioBrand" style={{ height: 24 }} />
         </div>
         <div style={{ marginLeft: "auto", display: "flex", background: "rgba(255,255,255,0.08)", borderRadius: 8, padding: 3, gap: 2 }}>
           <button onClick={() => { setLang("es"); localStorage.setItem("lang", "es"); }} style={{ padding: "4px 10px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", background: lang === "es" ? "#fff" : "transparent", border: "none", color: lang === "es" ? "#0A0A0A" : "rgba(255,255,255,0.4)" }}>ES</button>
@@ -92,8 +91,7 @@ function LoginContent() {
       <div style={{ position:"relative", zIndex:1, display:"flex", alignItems:"center", justifyContent:"center", minHeight:"calc(100vh - 60px)", padding:20 }}>
         <div style={{ background:"rgba(22,22,45,0.85)", backdropFilter:"blur(20px)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:20, padding:"36px 32px", width:"100%", maxWidth:380, boxShadow:"0 8px 40px rgba(0,0,0,0.3)" }}>
           <div style={{ textAlign:"center", marginBottom:24 }}>
-            <div style={{ width:44, height:44, background:"linear-gradient(135deg,#7950F2,#4C6EF5)", borderRadius:12, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:500, fontSize:18, margin:"0 auto 10px" }}>Ai</div>
-            <div style={{ fontSize:20, fontWeight:500, color:"#fff", marginBottom:4 }}>Ai<span style={{ color:"#7950F2" }}>Studio</span>Brand</div>
+            <img src="/logo.svg" alt="AiStudioBrand" style={{ height: 36, margin: "0 auto 10px", display: "block" }} />
             <div style={{ fontSize:13.5, color:"rgba(255,255,255,0.7)" }}>{en ? "Content that sounds like you" : "Contenido que suena como tú"}</div>
           </div>
           <div style={{ display:"flex", background:"rgba(255,255,255,0.06)", borderRadius:10, padding:3, marginBottom:20, gap:3 }}>

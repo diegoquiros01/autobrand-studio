@@ -215,8 +215,8 @@ export default function Contacto() {
 
       <footer style={{ padding:"24px 32px", borderTop:"1px solid rgba(255,255,255,0.06)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
         <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-          <div style={{ width:22, height:22, background:"#7950F2", borderRadius:6, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:9, fontWeight:800 }}>Ai</div>
-          <span style={{ fontSize:12, color:"rgba(255,255,255,0.25)" }}>AiStudioBrand · {lang === "es" ? "Contenido que suena como tú" : "Content that sounds like you"}</span>
+          <img src="/logo.svg" alt="" style={{ height: 16 }} />
+          <span style={{ fontSize:12, color:"rgba(255,255,255,0.25)" }}>{lang === "es" ? "Contenido que suena como tú" : "Content that sounds like you"}</span>
         </div>
         <div style={{ display:"flex", gap:16 }}>
           <button onClick={() => router.push("/terminos")} style={{ fontSize:11, color:"rgba(255,255,255,0.2)", background:"none", border:"none", cursor:"pointer" }}>{lang === "es" ? "Términos" : "Terms"}</button>

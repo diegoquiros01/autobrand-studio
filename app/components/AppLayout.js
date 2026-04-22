@@ -160,8 +160,7 @@ export default function AppLayout({ children }) {
             ☰
           </button>
           <div style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }} onClick={() => router.push("/")}>
-            <div style={{ width: 34, height: 34, background: "linear-gradient(135deg,#7950F2,#A78BFA)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 12, boxShadow: "0 2px 12px rgba(121,80,242,0.4)" }}>Ai</div>
-            <span style={{ fontSize: 17, fontWeight: 700, color: "#fff", letterSpacing: "-0.03em" }}>Ai<span style={{ color: "#A78BFA" }}>Studio</span>Brand</span>
+            <img src="/logo.svg" alt="AiStudioBrand" style={{ height: 28 }} />
           </div>
         </div>
 

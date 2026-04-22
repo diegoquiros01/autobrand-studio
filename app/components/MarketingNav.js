@@ -15,8 +15,7 @@ export default function MarketingNav({ lang, setLang, activePage }) {
     <nav style={navStyle}>
       {/* Logo */}
       <div style={{ display:"flex", alignItems:"center", gap:10, cursor:"pointer" }} onClick={() => router.push("/")}>
-        <div style={logoIcon}>Ai</div>
-        <span style={logoText}>Ai<span style={{ color:"#A78BFA" }}>Studio</span>Brand</span>
+        <img src="/logo.svg" alt="AiStudioBrand" style={{ height: 28 }} />
       </div>
 
       {/* Center links */}
@@ -51,14 +50,6 @@ const navStyle = {
   background:"rgba(10,10,26,0.85)", backdropFilter:"blur(20px)", WebkitBackdropFilter:"blur(20px)",
   borderBottom:"1px solid rgba(255,255,255,0.06)",
 };
-
-const logoIcon = {
-  width:30, height:30, background:"linear-gradient(135deg,#7950F2,#A78BFA)",
-  borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center",
-  fontSize:11, fontWeight:800, color:"#fff",
-};
-
-const logoText = { fontSize:15, fontWeight:700, letterSpacing:"-0.03em", color:"#fff" };
 
 const linkDefault = {
   padding:"7px 16px", borderRadius:8, fontSize:14, fontWeight:500,

@@ -264,8 +264,8 @@ export default function Landing() {
       {/* ═══ FOOTER ═══ */}
       <footer style={s.footer}>
         <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-          <div style={{ width:22, height:22, background:"#7950F2", borderRadius:6, display:"flex", alignItems:"center", justifyContent:"center", fontSize:9, fontWeight:800, color:"#fff" }}>Ai</div>
-          <span style={{ fontSize:12, color:"rgba(255,255,255,0.25)" }}>AiStudioBrand · {en ? "Content that sounds like you" : "Contenido que suena como tú"}</span>
+          <img src="/logo.svg" alt="" style={{ height: 16 }} />
+          <span style={{ fontSize:12, color:"rgba(255,255,255,0.25)" }}>{en ? "Content that sounds like you" : "Contenido que suena como tú"}</span>
         </div>
         <div style={{ display:"flex", gap:16 }}>
           <button onClick={() => router.push("/terminos")} style={s.footerLink}>{en ? "Terms" : "Términos"}</button>
