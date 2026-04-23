@@ -332,9 +332,11 @@ function ADNContent() {
   // Don't show 100% for steps the user hasn't visited yet — cap at 95% until they go there
   const stepProgress = rawStepProgress.map((p, i) => (p === 100 && step < i + 1) ? 95 : p);
 
-  // Confetti
+  // Confetti + ADN saved celebration
+  const [showDnaSaved, setShowDnaSaved] = useState(false);
   useEffect(() => {
     if (pct === 100 && !showConfetti) {
+      setShowDnaSaved(true);
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 4000);
     }
@@ -415,6 +417,29 @@ function ADNContent() {
   return (
     <AppLayout>
       {showConfetti && <ConfettiEffect />}
+
+      {/* ADN Saved celebration overlay */}
+      {showDnaSaved && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 9998, background: "rgba(10,10,20,0.85)", display: "flex", alignItems: "center", justifyContent: "center", backdropFilter: "blur(8px)" }}>
+          <div style={{ background: "#10101C", border: "0.5px solid rgba(255,255,255,0.1)", borderRadius: 16, padding: "40px 48px", textAlign: "center", maxWidth: 440, width: "90%", boxShadow: "0 20px 60px rgba(0,0,0,0.5)" }}>
+            <div style={{ width: 56, height: 56, borderRadius: "50%", background: "rgba(64,192,87,0.15)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", fontSize: 24 }}>✓</div>
+            <h2 style={{ fontSize: 20, fontWeight: 600, color: "#fff", marginBottom: 8 }}>{en ? "Your brand DNA is saved!" : "¡Tu ADN de marca está guardado!"}</h2>
+            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", lineHeight: 1.6, marginBottom: 24 }}>
+              {en ? "Every piece you create will use this DNA — your tone, audience, colors, and personality will be applied automatically." : "Cada pieza que crees usará este ADN — tu tono, audiencia, colores y personalidad se aplicarán automáticamente."}
+            </p>
+            <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
+              <button onClick={() => { setShowDnaSaved(false); router.push("/crear"); }}
+                style={{ padding: "10px 24px", background: "#7950F2", color: "#fff", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 500, cursor: "pointer" }}>
+                {en ? "Create my first piece →" : "Crear mi primera pieza →"}
+              </button>
+              <button onClick={() => setShowDnaSaved(false)}
+                style={{ padding: "10px 24px", background: "transparent", color: "rgba(255,255,255,0.6)", border: "0.5px solid rgba(255,255,255,0.1)", borderRadius: 8, fontSize: 13, fontWeight: 500, cursor: "pointer" }}>
+                {en ? "Keep editing" : "Seguir editando"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div style={{ background: D.bg, minHeight: "calc(100vh - 64px)", paddingBottom: 100 }}>
         {/* Header */}
