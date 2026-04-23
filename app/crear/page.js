@@ -236,22 +236,21 @@ function CrearContent() {
   const translateCopy = async (copyItem, targetLang) => {
     setTranslatingCopy(copyItem.id);
     try {
-      const text = copyItem.hook + "\n\n" + copyItem.copy + "\n\n" + copyItem.cta + (copyItem.hashtags ? "\n\n" + copyItem.hashtags : "");
-      const res = await fetch("/api/generate", {
+      const res = await fetch("/api/translate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          prompt: "Translate this Instagram post to " + targetLang + ". Keep the same tone, style, and formatting. Return ONLY the translation, nothing else:\n\n" + text,
-          tipo: "translation",
-          brandProfile,
-          userId: user?.id || "",
-          idiomapieza: targetLang,
+          hook: copyItem.hook,
+          copy: copyItem.copy,
+          cta: copyItem.cta,
+          hashtags: copyItem.hashtags,
+          targetLang,
         }),
       });
       const data = await res.json();
-      if (data.propuestas && data.propuestas.length > 0) {
-        const translated = data.propuestas[0];
-        setCopies(prev => prev.map(c => c.id === copyItem.id ? { ...c, hook: translated.hook || c.hook, copy: translated.copy || c.copy, cta: translated.cta || c.cta, hashtags: translated.hashtags || c.hashtags } : c));
+      if (data.translated) {
+        const t = data.translated;
+        setCopies(prev => prev.map(c => c.id === copyItem.id ? { ...c, hook: t.hook || c.hook, copy: t.copy || c.copy, cta: t.cta || c.cta, hashtags: t.hashtags || c.hashtags } : c));
       }
     } catch(e) { console.warn("Translation error:", e); }
     setTranslatingCopy(null);
