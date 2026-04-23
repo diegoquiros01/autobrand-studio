@@ -291,7 +291,8 @@ function ADNContent() {
   };
   const rawStepProgress = [stepPct(step1Fields), stepPct(step2Fields), stepPct(step3Fields)];
   // Don't show 100% for steps the user hasn't visited yet — cap at 95% until they go there
-  const stepProgress = rawStepProgress.map((p, i) => (p === 100 && maxStep <= i + 1 && step !== i + 1) ? 95 : p);
+  // Don't show 100% for steps the user hasn't visited yet — cap at 95% until they go there
+  const stepProgress = rawStepProgress.map((p, i) => (p === 100 && step < i + 1) ? 95 : p);
 
   // Confetti
   useEffect(() => {
