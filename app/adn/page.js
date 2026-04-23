@@ -84,6 +84,7 @@ function ADNContent() {
   const STEPS = getSteps(en);
 
   const [step, setStep] = useState(1);
+  const [visitedSteps, setVisitedSteps] = useState(new Set([1]));
   const [user, setUser] = useState(null);
   const [brandId, setBrandId] = useState(null); // current brand profile ID
   const [profile, setProfile] = useState({ ...BLANK_PROFILE });
@@ -194,13 +195,24 @@ function ADNContent() {
     const u = userRef.current;
     const p = profileRef.current;
     const currentBrandId = brandIdRef.current;
-    // Get userId from auth or fallback to fetching it
+    // Get userId from auth, retry, or fallback to brand's user_id
     let userId = u?.id;
     if (!userId) {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (user) { userId = user.id; setUser(user); }
       } catch(e) {}
+    }
+    if (!userId) {
+      // Last resort: get userId from the active brand
+      const bid = brandIdRef.current || localStorage.getItem("activeBrandId");
+      if (bid) {
+        try {
+          const res = await fetch("/api/brands?brandId=" + bid);
+          const json = await res.json();
+          if (json.brand?.user_id) userId = json.brand.user_id;
+        } catch(e) {}
+      }
     }
     if (!userId) return;
     // Don't save empty profiles — prevents overwriting real data
