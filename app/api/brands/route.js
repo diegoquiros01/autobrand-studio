@@ -85,3 +85,18 @@ export async function POST(request) {
     return Response.json({ error: e.message, stack: e.stack?.split('\n')[0] }, { status: 500 });
   }
 }
+
+// DELETE: remove a brand profile
+export async function DELETE(request) {
+  try {
+    const url = new URL(request.url);
+    const brandId = url.searchParams.get("brandId");
+    if (!brandId) return Response.json({ error: "missing brandId" }, { status: 400 });
+
+    const { error } = await supabase.from("brand_profiles").delete().eq("id", brandId);
+    if (error) return Response.json({ error: error.message }, { status: 500 });
+    return Response.json({ success: true });
+  } catch(e) {
+    return Response.json({ error: e.message }, { status: 500 });
+  }
+}

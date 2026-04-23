@@ -119,6 +119,28 @@ export default function AppLayout({ children }) {
     { icon: "◈", label: en ? "Library" : "Biblioteca", path: "/biblioteca" },
   ];
 
+  const deleteBrand = async (brand) => {
+    if (!confirm(en ? `Delete "${brand.nombre}"? This cannot be undone.` : `¿Eliminar "${brand.nombre}"? No se puede deshacer.`)) return;
+    try {
+      const res = await fetch("/api/brands?brandId=" + brand.id, { method: "DELETE" });
+      const json = await res.json();
+      if (json.success) {
+        setBrands(prev => prev.filter(b => b.id !== brand.id));
+        if (activeBrand?.id === brand.id) {
+          const remaining = brands.filter(b => b.id !== brand.id);
+          if (remaining.length > 0) {
+            setActiveBrand(remaining[0]);
+            localStorage.setItem("activeBrandId", remaining[0].id);
+          } else {
+            setActiveBrand(null);
+            localStorage.removeItem("activeBrandId");
+            localStorage.removeItem("brandProfile");
+          }
+        }
+      }
+    } catch(e) { console.warn("Delete error:", e); }
+  };
+
   const handleLogout = async () => {
     localStorage.removeItem("brandProfile");
     localStorage.removeItem("activeBrandId");
@@ -199,31 +221,38 @@ export default function AppLayout({ children }) {
                 {brands.map(b => {
                   const isActive = b.id === activeBrand?.id;
                   return (
-                    <button key={b.id} onClick={() => { switchBrand(b); router.push("/adn?brand=" + b.id); setSidebarOpen(false); }}
-                      style={{
-                        width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "10px 14px",
-                        borderRadius: 8, cursor: "pointer", textAlign: "left",
-                        background: isActive ? "rgba(121,80,242,0.1)" : "transparent",
-                        border: "none", transition: "all 0.2s",
-                      }}>
-                      <div style={{
-                        width: 26, height: 26, borderRadius: 7, flexShrink: 0,
-                        background: isActive ? "linear-gradient(135deg,#7950F2,#A78BFA)" : "rgba(255,255,255,0.08)",
-                        display: "flex", alignItems: "center", justifyContent: "center",
-                        fontSize: 10, fontWeight: 800, color: "#fff",
-                      }}>
-                        {(b.nombre || "M").charAt(0).toUpperCase()}
-                      </div>
-                      <div style={{ overflow: "hidden", flex: 1 }}>
-                        <div style={{ fontSize: 13, fontWeight: isActive ? 600 : 400, color: isActive ? "#fff" : "rgba(255,255,255,0.5)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                          {b.nombre || (en ? "Unnamed" : "Sin nombre")}
+                    <div key={b.id} style={{ display: "flex", alignItems: "center", gap: 0 }}>
+                      <button onClick={() => { switchBrand(b); router.push("/adn?brand=" + b.id); setSidebarOpen(false); }}
+                        style={{
+                          flex: 1, display: "flex", alignItems: "center", gap: 10, padding: "10px 14px",
+                          borderRadius: 8, cursor: "pointer", textAlign: "left",
+                          background: isActive ? "rgba(121,80,242,0.1)" : "transparent",
+                          border: "none", transition: "all 0.2s",
+                        }}>
+                        <div style={{
+                          width: 26, height: 26, borderRadius: 7, flexShrink: 0,
+                          background: isActive ? "linear-gradient(135deg,#7950F2,#A78BFA)" : "rgba(255,255,255,0.08)",
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          fontSize: 10, fontWeight: 800, color: "#fff",
+                        }}>
+                          {(b.nombre || "M").charAt(0).toUpperCase()}
                         </div>
-                        <div style={{ fontSize: 10, color: "rgba(255,255,255,0.25)", marginTop: 1 }}>
-                          {en ? "View & edit" : "Ver y editar"}
+                        <div style={{ overflow: "hidden", flex: 1 }}>
+                          <div style={{ fontSize: 13, fontWeight: isActive ? 600 : 400, color: isActive ? "#fff" : "rgba(255,255,255,0.5)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                            {b.nombre || (en ? "Unnamed" : "Sin nombre")}
+                          </div>
+                          <div style={{ fontSize: 10, color: "rgba(255,255,255,0.25)", marginTop: 1 }}>
+                            {en ? "View & edit" : "Ver y editar"}
+                          </div>
                         </div>
-                      </div>
-                      {isActive && <span style={{ fontSize: 8, color: "#A78BFA" }}>●</span>}
-                    </button>
+                        {isActive && <span style={{ fontSize: 8, color: "#A78BFA" }}>●</span>}
+                      </button>
+                      {brands.length > 1 && (
+                        <button onClick={(e) => { e.stopPropagation(); deleteBrand(b); }}
+                          style={{ background: "none", border: "none", cursor: "pointer", padding: "6px 8px", color: "rgba(255,255,255,0.15)", fontSize: 14, borderRadius: 6, flexShrink: 0 }}
+                          title={en ? "Delete" : "Eliminar"}>×</button>
+                      )}
+                    </div>
                   );
                 })}
                 <button onClick={() => { router.push("/adn?new=true"); setSidebarOpen(false); }}
