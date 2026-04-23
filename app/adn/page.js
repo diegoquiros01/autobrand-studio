@@ -124,8 +124,21 @@ function ADNContent() {
   // --- Load ---
   useEffect(() => {
     const init = async () => {
+      // Get user from auth
       const { data: { user } } = await supabase.auth.getUser();
       if (user) setUser(user);
+
+      // Fallback: get userId from active brand if auth failed
+      if (!user) {
+        const bid = localStorage.getItem("activeBrandId");
+        if (bid) {
+          try {
+            const res = await fetch("/api/brands?brandId=" + bid);
+            const json = await res.json();
+            if (json.brand?.user_id) setUser({ id: json.brand.user_id });
+          } catch(e) {}
+        }
+      }
 
       // New brand → blank profile, no load
       if (isNewBrand) {
