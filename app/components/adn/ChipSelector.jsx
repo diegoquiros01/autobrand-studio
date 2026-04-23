@@ -68,15 +68,15 @@ export default function ChipSelector({
     }
   };
 
-  const chipPadding = size === 'sm' ? '3px 9px' : '5px 12px';
-  const chipFontSize = size === 'sm' ? 11 : 12;
+  const chipPadding = size === 'sm' ? '3px 9px' : '5px 11px';
+  const chipFontSize = size === 'sm' ? 11 : 11.5;
 
   return (
     <div>
       {showCounter && typeof max === 'number' && (
         <div style={{
           fontSize: 10,
-          color: atMax ? t.warn : t.textMuted,
+          color: atMax ? t.warn.solid : t.textMuted,
           marginBottom: 6,
           textAlign: 'right',
         }}>
@@ -99,9 +99,9 @@ export default function ChipSelector({
                 fontSize: chipFontSize,
                 padding: chipPadding,
                 borderRadius: 14,
-                border: `0.5px solid ${isSelected ? t.borderActive : t.border}`,
-                background: isSelected ? t.accentBg : 'transparent',
-                color: isSelected ? t.accentLight : t.textMuted,
+                border: `0.5px solid ${isSelected ? 'rgba(121,80,242,0.35)' : 'rgba(255,255,255,0.1)'}`,
+                background: isSelected ? 'rgba(121,80,242,0.12)' : 'transparent',
+                color: isSelected ? '#A78BFA' : t.text.secondary,
                 cursor: isDisabled ? 'not-allowed' : 'pointer',
                 opacity: isDisabled ? 0.35 : 1,
                 fontFamily: 'inherit',

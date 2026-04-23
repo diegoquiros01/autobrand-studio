@@ -88,7 +88,7 @@ function ReadyPreview({ imageUrl, copy, brandName, pieceType }) {
       background: t.bgCard,
       borderRadius: t.radiusSm,
       overflow: 'hidden',
-      border: `0.5px solid ${t.border}`,
+      border: `0.5px solid ${t.border.subtle}`,
     }}>
       <div style={{ aspectRatio: '1', background: '#000' }}>
         {imageUrl && (
@@ -99,19 +99,19 @@ function ReadyPreview({ imageUrl, copy, brandName, pieceType }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
           <div style={{
             width: 20, height: 20, borderRadius: '50%',
-            background: t.accent, color: '#fff',
+            background: t.accent.solid, color: '#fff',
             display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
             fontSize: 9, fontWeight: 500,
           }}>
             {brandName?.[0] || 'B'}
           </div>
           <div style={{ lineHeight: 1.2 }}>
-            <div style={{ fontSize: 11, fontWeight: 500, color: t.text }}>{brandName}</div>
+            <div style={{ fontSize: 11, fontWeight: 500, color: t.text.primary }}>{brandName}</div>
             {pieceType && <div style={{ fontSize: 9, color: t.textMuted }}>{pieceType}</div>}
           </div>
         </div>
         {copy && (
-          <p style={{ fontSize: 11, color: t.text, margin: 0, lineHeight: 1.4 }}>
+          <p style={{ fontSize: 11, color: t.text.primary, margin: 0, lineHeight: 1.4 }}>
             {copy.length > 100 ? copy.slice(0, 100) + '…' : copy}
           </p>
         )}
@@ -143,15 +143,15 @@ export default function ADNContextPanel({
   return (
     <div style={{
       background: t.bgStepper,
-      border: `0.5px solid ${t.border}`,
-      borderRadius: t.radiusMd,
+      border: `0.5px solid ${t.border.subtle}`,
+      borderRadius: t.radius.lg,
       padding: 14,
     }}>
       <p style={sectionHead}>{en ? 'This DNA will be applied' : 'Se aplicará este ADN'}</p>
 
       <div style={{
         background: t.bgCard,
-        border: `0.5px solid ${t.border}`,
+        border: `0.5px solid ${t.border.subtle}`,
         borderRadius: t.radiusSm,
         padding: 10,
         marginBottom: 14,
@@ -159,7 +159,7 @@ export default function ADNContextPanel({
         {voz && (
           <div style={{ marginBottom: 7 }}>
             <div style={{ fontSize: 9, color: t.textMuted, textTransform: 'uppercase', letterSpacing: 0.3, marginBottom: 2 }}>{en ? 'Voice' : 'Voz'}</div>
-            <div style={{ fontSize: 11, color: t.text, lineHeight: 1.4 }}>
+            <div style={{ fontSize: 11, color: t.text.primary, lineHeight: 1.4 }}>
               {voz}{idioma && `${en ? ', in ' : ', en '}${idioma.toLowerCase()}`}
             </div>
           </div>
@@ -168,7 +168,7 @@ export default function ADNContextPanel({
         {audiencia && (
           <div style={{ marginBottom: paleta.length > 0 ? 7 : 0 }}>
             <div style={{ fontSize: 9, color: t.textMuted, textTransform: 'uppercase', letterSpacing: 0.3, marginBottom: 2 }}>{en ? 'Audience' : 'Audiencia'}</div>
-            <div style={{ fontSize: 11, color: t.text, lineHeight: 1.4 }}>{audiencia}</div>
+            <div style={{ fontSize: 11, color: t.text.primary, lineHeight: 1.4 }}>{audiencia}</div>
           </div>
         )}
 
@@ -179,7 +179,7 @@ export default function ADNContextPanel({
               {paleta.slice(0, 6).map((color, i) => (
                 <div
                   key={i}
-                  style={{ width: 16, height: 16, borderRadius: '50%', background: color, border: `0.5px solid ${t.border}` }}
+                  style={{ width: 16, height: 16, borderRadius: '50%', background: color, border: `0.5px solid ${t.border.subtle}` }}
                   title={color}
                 />
               ))}

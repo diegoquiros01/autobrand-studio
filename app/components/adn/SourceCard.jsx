@@ -38,10 +38,10 @@ const getSourceConfig = (en) => ({
 });
 
 const getStatusChip = (en) => ({
-  empty:     { label: en ? 'Not connected' : 'Sin conectar',  bg: 'transparent',  color: t.textDim,     border: t.border },
+  empty:     { label: en ? 'Not connected' : 'Sin conectar',  bg: 'transparent',  color: t.textDim,     border: t.border.default },
   ready:     { label: en ? 'Ready' : 'Listo',                 bg: t.accentBg,     color: t.accentLight, border: 'transparent' },
   analyzing: { label: en ? 'Analyzing' : 'Analizando',        bg: t.accentBg,     color: t.accentLight, border: 'transparent' },
-  complete:  { label: en ? 'Complete' : 'Completo',            bg: t.successBg,    color: t.success,     border: 'transparent' },
+  complete:  { label: en ? 'Complete' : 'Completo',            bg: t.successBg,    color: t.success.solid, border: 'transparent' },
 });
 
 function SourceIcon({ type }) {
@@ -73,7 +73,7 @@ function Toggle({ enabled, disabled, onChange }) {
         width: 34,
         height: 20,
         borderRadius: 10,
-        background: enabled ? t.accent : 'rgba(255,255,255,0.1)',
+        background: enabled ? t.accent.solid : 'rgba(255,255,255,0.1)',
         border: 'none',
         position: 'relative',
         cursor: disabled ? 'not-allowed' : 'pointer',
@@ -123,13 +123,13 @@ function StatusChip({ config }) {
 
 function ProgressBar({ progress, detail, en = false }) {
   return (
-    <div style={{ marginTop: 10, paddingTop: 8, borderTop: `0.5px solid ${t.border}` }}>
+    <div style={{ marginTop: 10, paddingTop: 8, borderTop: `0.5px solid ${t.border.default}` }}>
       <div style={{ height: 4, background: 'rgba(255,255,255,0.06)', borderRadius: 2, overflow: 'hidden' }}>
         <div
           style={{
             height: '100%',
             width: `${progress}%`,
-            background: t.accent,
+            background: t.accent.solid,
             borderRadius: 2,
             transition: 'width 0.3s ease',
           }}
@@ -151,7 +151,7 @@ function ExtractedTags({ tags, onViewDetail, en = false }) {
       style={{
         marginTop: 10,
         paddingTop: 8,
-        borderTop: `0.5px solid ${t.border}`,
+        borderTop: `0.5px solid ${t.border.default}`,
         display: 'flex',
         alignItems: 'center',
         gap: 6,
@@ -210,11 +210,11 @@ function FileUpload({ value, placeholder, onChange, inputRef, en = false }) {
           width: '100%',
           textAlign: 'left',
           background: t.bgInput,
-          border: `0.5px solid ${t.border}`,
+          border: `0.5px solid ${t.border.default}`,
           borderRadius: t.radiusSm,
           padding: '7px 10px',
           fontSize: 13,
-          color: fileCount > 0 ? t.text : t.textDim,
+          color: fileCount > 0 ? t.text.primary : t.textDim,
           cursor: 'pointer',
           fontFamily: 'inherit',
         }}
@@ -263,7 +263,7 @@ export default function SourceCard({
     <div
       style={{
         background: isFeatured ? t.bgCardFeatured : t.bgCard,
-        border: `0.5px solid ${isFeatured ? t.borderFeatured : t.border}`,
+        border: `0.5px solid ${isFeatured ? t.borderFeatured : t.border.subtle}`,
         borderRadius: t.radiusMd,
         padding: '12px 14px',
         marginBottom: 8,
@@ -277,7 +277,7 @@ export default function SourceCard({
             height: 32,
             borderRadius: 7,
             background: state === 'empty' ? 'rgba(255,255,255,0.04)' : t.accentBg,
-            color: state === 'empty' ? t.textMuted : t.accentLight,
+            color: state === 'empty' ? t.text.muted : t.accentLight,
             display: 'inline-flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -289,7 +289,7 @@ export default function SourceCard({
 
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5 }}>
-            <span style={{ fontSize: 13, fontWeight: 500, color: t.text }}>{config.label}</span>
+            <span style={{ fontSize: 13, fontWeight: 500, color: t.text.primary }}>{config.label}</span>
             {featured && (
               <span
                 style={{
@@ -297,7 +297,7 @@ export default function SourceCard({
                   fontWeight: 500,
                   padding: '2px 7px',
                   borderRadius: 5,
-                  background: t.accent,
+                  background: t.accent.solid,
                   color: '#fff',
                 }}
               >
@@ -323,16 +323,16 @@ export default function SourceCard({
               style={{
                 width: '100%',
                 background: t.bgInput,
-                border: `0.5px solid ${t.border}`,
+                border: `0.5px solid ${t.border.default}`,
                 borderRadius: t.radiusSm,
                 padding: '7px 10px',
                 fontSize: 13,
-                color: t.text,
+                color: t.text.primary,
                 fontFamily: 'inherit',
                 outline: 'none',
               }}
               onFocus={(e) => (e.target.style.borderColor = t.borderActive)}
-              onBlur={(e) => (e.target.style.borderColor = t.border)}
+              onBlur={(e) => (e.target.style.borderColor = t.border.default)}
             />
           )}
         </div>
@@ -353,12 +353,12 @@ export default function SourceCard({
       )}
 
       {state === 'ready' && onAnalyze && (
-        <div style={{ marginTop: 10, paddingTop: 8, borderTop: `0.5px solid ${t.border}`, display: 'flex', justifyContent: 'flex-end' }}>
+        <div style={{ marginTop: 10, paddingTop: 8, borderTop: `0.5px solid ${t.border.default}`, display: 'flex', justifyContent: 'flex-end' }}>
           <button
             type="button"
             onClick={onAnalyze}
             style={{
-              background: t.accent,
+              background: t.accent.solid,
               color: '#fff',
               border: 'none',
               borderRadius: t.radiusSm,

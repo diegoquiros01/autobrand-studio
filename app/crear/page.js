@@ -15,8 +15,8 @@ const FORMATOS_DATA = [
 ];
 
 const D = {
-  bg3:"#16162d", border:"rgba(255,255,255,0.1)",
-  text:"#fff", text2:"rgba(255,255,255,0.7)", text3:"rgba(255,255,255,0.4)",
+  bg3:"#10101C", border:"rgba(255,255,255,0.08)",
+  text:"#fff", text2:"rgba(255,255,255,0.65)", text3:"rgba(255,255,255,0.4)",
   purple:"#7950F2", purpleLight:"#A78BFA",
 };
 
@@ -336,7 +336,7 @@ function CrearContent() {
         <div key={s.n} style={{ display:"flex", alignItems:"center" }}>
           <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:3 }}>
             <div onClick={() => s.n <= maxStep && setStep(s.n)}
-              style={{ width:26, height:26, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:10, fontWeight:600, background: step > s.n ? D.purple : step === s.n ? D.purple : "rgba(255,255,255,0.08)", color: step >= s.n ? "#fff" : D.text3, boxShadow: step === s.n ? "0 0 0 3px rgba(121,80,242,0.2)" : "none", cursor: s.n <= maxStep ? "pointer" : "default", opacity: s.n <= maxStep ? 1 : 0.5 }}>
+              style={{ width:26, height:26, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:500, background: step > s.n ? "rgba(93,202,165,0.14)" : step === s.n ? "rgba(121,80,242,0.18)" : "rgba(255,255,255,0.04)", color: step > s.n ? "#5DCAA5" : step === s.n ? "#A78BFA" : "rgba(255,255,255,0.35)", boxShadow: step === s.n ? "0 0 0 2px rgba(121,80,242,0.12)" : "none", cursor: s.n <= maxStep ? "pointer" : "default", opacity: s.n <= maxStep ? 1 : 0.5 }}>
               {step > s.n ? "✓" : s.n}
             </div>
             <span style={{ fontSize:10, color: step >= s.n ? D.purpleLight : D.text3, whiteSpace:"nowrap" }}>{s.l}</span>
@@ -360,8 +360,8 @@ function CrearContent() {
     </div>
   );
 
-  const NB = { width:"100%", padding:12, background:"linear-gradient(135deg,#7950F2,#4C6EF5)", color:"#fff", border:"none", borderRadius:9, fontSize:13, fontWeight:500, cursor:"pointer", marginBottom:8, boxShadow:"0 4px 14px rgba(121,80,242,0.4)" };
-  const SB = { width:"100%", padding:11, background:"rgba(255,255,255,0.04)", color:D.text2, border:"1px solid rgba(255,255,255,0.1)", borderRadius:9, fontSize:13, cursor:"pointer" };
+  const NB = { width:"100%", padding:12, background:"#7950F2", color:"#fff", border:"none", borderRadius:8, fontSize:12.5, fontWeight:500, cursor:"pointer", marginBottom:8, boxShadow:"0 4px 14px rgba(121,80,242,0.4)" };
+  const SB = { width:"100%", padding:11, background:"rgba(255,255,255,0.04)", color:D.text2, border:"0.5px solid rgba(255,255,255,0.1)", borderRadius:8, fontSize:12.5, cursor:"pointer" };
 
   // Typing placeholder effect
   const placeholders = en ? [
@@ -416,7 +416,7 @@ function CrearContent() {
       `}</style>
       <div className="crear-grid" style={{ display:"grid", gridTemplateColumns:"minmax(340px, 480px) 1fr", height:"calc(100vh - 56px)" }}>
         {/* ═══ LEFT: EDITOR PANEL ═══ */}
-        <div style={{ padding:"28px 24px", borderRight:"1px solid rgba(255,255,255,0.06)", overflowY:"auto", background:"#0D0D1F" }}>
+        <div style={{ padding:"28px 24px", borderRight:"0.5px solid rgba(255,255,255,0.06)", overflowY:"auto", background:"#0A0A14" }}>
           <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:16 }}>
             <h1 style={{ fontSize:18, fontWeight:700, color:D.text, letterSpacing:"-0.03em" }}>{en ? "New piece" : "Nueva pieza"}</h1>
             {brandProfile && (
@@ -427,7 +427,7 @@ function CrearContent() {
                   {allBrands.length > 1 && <span style={{ fontSize:8, color:"rgba(255,255,255,0.3)" }}>▼</span>}
                 </div>
                 {brandDropdownOpen && allBrands.length > 1 && (
-                  <div style={{ position:"absolute", top:"100%", right:0, marginTop:6, background:"#16162d", border:"1px solid rgba(255,255,255,0.12)", borderRadius:10, padding:4, zIndex:100, boxShadow:"0 8px 30px rgba(0,0,0,0.5)", minWidth:180 }}>
+                  <div style={{ position:"absolute", top:"100%", right:0, marginTop:6, background:"#10101C", border:"0.5px solid rgba(255,255,255,0.06)", borderRadius:12, padding:4, zIndex:100, boxShadow:"0 8px 30px rgba(0,0,0,0.5)", minWidth:180 }}>
                     {allBrands.map(b => (
                       <div key={b.id} onClick={() => switchBrandInCrear(b)} style={{
                         display:"flex", alignItems:"center", gap:8, padding:"8px 10px", borderRadius:6, cursor:"pointer",
@@ -447,11 +447,11 @@ function CrearContent() {
 
         {step === 1 && (
           <div>
-            <div className="card-hover" style={{ background:D.bg3, border:"1px solid " + D.border, borderRadius:16, padding:20, marginBottom:14 }}>
+            <div className="card-hover" style={{ background:"#10101C", border:"0.5px solid rgba(255,255,255,0.06)", borderRadius:12, padding:"18px 20px", marginBottom:14 }}>
               <label style={{ fontSize:13, color:D.text2, display:"block", marginBottom:8, fontWeight:500 }}>{en ? "What do you want to communicate today?" : "¿Qué quieres comunicar hoy?"}</label>
               <textarea className="input-focus" rows={4} value={prompt} onChange={e => setPrompt(e.target.value)}
                 placeholder={placeholders[phIdx]}
-                style={{ width:"100%", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:9, padding:"11px 13px", fontSize:13, color:D.text, outline:"none", resize:"none" }} />
+                style={{ width:"100%", background:"rgba(255,255,255,0.02)", border:"0.5px solid rgba(255,255,255,0.08)", borderRadius:7, padding:"9px 11px", fontSize:12.5, color:D.text, outline:"none", resize:"none" }} />
               <div style={{ fontSize:12, color:D.text3, marginTop:12, marginBottom:8 }}>{en ? "What type of piece?" : "¿Qué tipo de pieza es?"}</div>
               <ChipSelector
                 mode="single"
@@ -517,12 +517,12 @@ function CrearContent() {
 
             {/* Collapsible: Visual References (optional) */}
             <div style={{ marginTop:16 }}>
-              <button onClick={() => setShowRefs(!showRefs)} style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"10px 14px", background:D.bg3, border:"1px solid " + D.border, borderRadius:10, color:D.text2, fontSize:13, fontWeight:500, cursor:"pointer" }}>
+              <button onClick={() => setShowRefs(!showRefs)} style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"10px 14px", background:"#10101C", border:"0.5px solid rgba(255,255,255,0.06)", borderRadius:12, color:D.text2, fontSize:12.5, fontWeight:500, cursor:"pointer" }}>
                 <span>{en ? "Visual References (optional)" : "Referencias visuales (opcional)"} {referencias.length > 0 ? "(" + referencias.length + ")" : ""}</span>
                 <span style={{ fontSize:11 }}>{showRefs ? "\u25B2" : "\u25BC"}</span>
               </button>
               {showRefs && (
-                <div style={{ marginTop:10, background:D.bg3, border:"1px solid " + D.border, borderRadius:12, padding:16 }}>
+                <div style={{ marginTop:10, background:"#10101C", border:"0.5px solid rgba(255,255,255,0.06)", borderRadius:12, padding:16 }}>
                   <div style={{ fontSize:12, color:D.text2, marginBottom:12, lineHeight:1.6 }}>
                     {en ? "Upload photos that inspire your piece's style — they can be photos of you, your product, your visual style or designs you like. Up to 3 images." : "Sube fotos que inspiren el estilo de tu pieza — pueden ser fotos tuyas, de tu producto, de tu estilo visual o de diseños que te gustan. Hasta 3 imágenes."}
                   </div>
@@ -559,12 +559,12 @@ function CrearContent() {
 
             {/* Collapsible: Talent Photos (optional) */}
             <div style={{ marginTop:10 }}>
-              <button onClick={() => setShowTalent(!showTalent)} style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"10px 14px", background:D.bg3, border:"1px solid " + D.border, borderRadius:10, color:D.text2, fontSize:13, fontWeight:500, cursor:"pointer" }}>
+              <button onClick={() => setShowTalent(!showTalent)} style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"10px 14px", background:"#10101C", border:"0.5px solid rgba(255,255,255,0.06)", borderRadius:12, color:D.text2, fontSize:12.5, fontWeight:500, cursor:"pointer" }}>
                 <span>{en ? "Talent Photos (optional)" : "Fotos de talento (opcional)"} {talentos.length > 0 ? "(" + talentos.length + ")" : ""}</span>
                 <span style={{ fontSize:11 }}>{showTalent ? "\u25B2" : "\u25BC"}</span>
               </button>
               {showTalent && (
-                <div style={{ marginTop:10, background:D.bg3, border:"1px solid " + D.border, borderRadius:12, padding:16 }}>
+                <div style={{ marginTop:10, background:"#10101C", border:"0.5px solid rgba(255,255,255,0.06)", borderRadius:12, padding:16 }}>
                   <div style={{ fontSize:12, color:D.text2, marginBottom:12, lineHeight:1.6 }}>
                     {en ? "Upload photos of people you want to include in the image — it can be a photo of you, your team or models. The AI will naturally incorporate them into the composition. Up to 3 photos." : "Sube fotos de personas que quieres incluir en la imagen — puede ser una foto tuya, de tu equipo o de modelos. La IA las incorporará naturalmente en la composición. Hasta 3 fotos."}
                   </div>
@@ -619,7 +619,7 @@ function CrearContent() {
             </div>
             <div>
               {/* Image area */}
-              <div style={{ background:"linear-gradient(180deg, #1a0a2e 0%, #0f0f24 50%, #0D0D1F 100%)", borderRadius:14, minHeight:280, display:"flex", alignItems:"center", justifyContent:"center", marginBottom:12, position:"relative", overflow:"hidden", border:"1px solid rgba(121,80,242,0.15)" }}>
+              <div style={{ background:"linear-gradient(180deg, #1a0a2e 0%, #0f0f1c 50%, #0A0A14 100%)", borderRadius:12, minHeight:280, display:"flex", alignItems:"center", justifyContent:"center", marginBottom:12, position:"relative", overflow:"hidden", border:"0.5px solid rgba(121,80,242,0.15)" }}>
                 {/* Background orbs */}
                 <div style={{ position:"absolute", top:"-20%", left:"20%", width:"60%", height:"60%", borderRadius:"50%", background:"radial-gradient(circle, rgba(121,80,242,0.25) 0%, transparent 70%)", filter:"blur(40px)", pointerEvents:"none" }} />
                 <div style={{ position:"absolute", bottom:"-10%", right:"10%", width:"40%", height:"40%", borderRadius:"50%", background:"radial-gradient(circle, rgba(230,73,128,0.15) 0%, transparent 70%)", filter:"blur(40px)", pointerEvents:"none" }} />
@@ -660,15 +660,15 @@ function CrearContent() {
 
               {/* Feedback + actions — stacked below */}
               {!imgAprobada && (
-              <div style={{ background:D.bg3, border:"1px solid " + D.border, borderRadius:10, padding:14 }}>
-                <div style={{ fontSize:12, fontWeight:600, color:D.text, marginBottom:4 }}>{en ? "What do you want to change?" : "¿Qué quieres cambiar?"}</div>
+              <div style={{ background:"#10101C", border:"0.5px solid rgba(255,255,255,0.06)", borderRadius:12, padding:14 }}>
+                <div style={{ fontSize:12, fontWeight:500, color:D.text, marginBottom:4 }}>{en ? "What do you want to change?" : "¿Qué quieres cambiar?"}</div>
                 <div style={{ fontSize:11, color:D.text3, marginBottom:8 }}>{en ? "Describe what to adjust and regenerate a new version" : "Describe qué ajustar y regenera una nueva versión"}</div>
                 <textarea className="input-focus" value={feedback} onChange={e => setFeedback(e.target.value)} rows={2}
                   placeholder={en ? "E.g.: Make it more colorful. Change the background..." : "Ej: Hazla más colorida. Cambia el fondo..."}
-                  style={{ width:"100%", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, padding:"8px 10px", fontSize:12, color:D.text, outline:"none", resize:"none", marginBottom:8 }} />
+                  style={{ width:"100%", background:"rgba(255,255,255,0.02)", border:"0.5px solid rgba(255,255,255,0.08)", borderRadius:7, padding:"9px 11px", fontSize:12.5, color:D.text, outline:"none", resize:"none", marginBottom:8 }} />
                 <div style={{ display:"flex", gap:8 }}>
                   <button onClick={() => { if (!generatingImg && feedback.trim()) generarImagen(feedback); }} disabled={generatingImg || !feedback.trim()}
-                    style={{ flex:1, padding:9, background: generatingImg || !feedback.trim() ? "rgba(121,80,242,0.3)" : "linear-gradient(135deg,#7950F2,#4C6EF5)", color:"#fff", border:"none", borderRadius:8, fontSize:12, fontWeight:600, cursor: generatingImg || !feedback.trim() ? "not-allowed" : "pointer" }}>
+                    style={{ flex:1, padding:9, background: generatingImg || !feedback.trim() ? "rgba(121,80,242,0.3)" : "#7950F2", color:"#fff", border:"none", borderRadius:8, fontSize:12.5, fontWeight:500, cursor: generatingImg || !feedback.trim() ? "not-allowed" : "pointer" }}>
                     {generatingImg ? (en ? "Generating..." : "Generando...") : "\u21BA " + (en ? "Regenerate" : "Regenerar")}
                   </button>
                   {versiones.length > 0 && !generatingImg && (
@@ -685,7 +685,7 @@ function CrearContent() {
               {(referencias.length > 0 || talentos.length > 0) && (
                 <div style={{ display:"flex", gap:10, marginTop:12 }}>
                   {referencias.length > 0 && (
-                    <div style={{ flex:1, background:D.bg3, border:"1px solid " + D.border, borderRadius:10, padding:10 }}>
+                    <div style={{ flex:1, background:"#10101C", border:"0.5px solid rgba(255,255,255,0.06)", borderRadius:12, padding:10 }}>
                       <div style={{ fontSize:10, color:D.text3, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:6 }}>{en ? "References" : "Referencias"}</div>
                       <div style={{ display:"flex", gap:4 }}>
                         {referencias.map((r,i) => <img key={i} src={r.url} alt="" style={{ width:36, height:36, objectFit:"cover", borderRadius:6, display:"block" }} />)}
@@ -693,7 +693,7 @@ function CrearContent() {
                     </div>
                   )}
                   {talentos.length > 0 && (
-                    <div style={{ flex:1, background:D.bg3, border:"1px solid " + D.border, borderRadius:10, padding:10 }}>
+                    <div style={{ flex:1, background:"#10101C", border:"0.5px solid rgba(255,255,255,0.06)", borderRadius:12, padding:10 }}>
                       <div style={{ fontSize:10, color:D.text3, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:6 }}>{en ? "Talent" : "Talento"}</div>
                       <div style={{ display:"flex", gap:4 }}>
                         {talentos.map((t,i) => <img key={i} src={t.url} alt="" style={{ width:36, height:36, objectFit:"cover", borderRadius:6, display:"block" }} />)}
@@ -762,7 +762,7 @@ function CrearContent() {
                                   style={{ padding:"5px 12px", borderRadius:6, fontSize:11, background:"rgba(255,255,255,0.04)", color: translatingCopy === c.id ? D.purpleLight : D.text2, border:"1px solid rgba(255,255,255,0.1)", cursor:"pointer" }}>
                                   {translatingCopy === c.id ? (en ? "Translating..." : "Traduciendo...") : (en ? "🌐 Translate" : "🌐 Traducir")}
                                 </button>
-                                <div style={{ display: "none", position: "absolute", bottom: "100%", left: 0, marginBottom: 4, background: "#16162d", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: 4, zIndex: 10, minWidth: 120 }}>
+                                <div style={{ display: "none", position: "absolute", bottom: "100%", left: 0, marginBottom: 4, background: "#10101C", border: "0.5px solid rgba(255,255,255,0.06)", borderRadius: 8, padding: 4, zIndex: 10, minWidth: 120 }}>
                                   <button onClick={() => translateCopy(c, "Español")} style={{ display: "block", width: "100%", padding: "6px 12px", background: "none", border: "none", color: "#fff", fontSize: 11, cursor: "pointer", textAlign: "left", borderRadius: 4 }}>Español</button>
                                   <button onClick={() => translateCopy(c, "English")} style={{ display: "block", width: "100%", padding: "6px 12px", background: "none", border: "none", color: "#fff", fontSize: 11, cursor: "pointer", textAlign: "left", borderRadius: 4 }}>English</button>
                                   <button onClick={() => translateCopy(c, "Spanglish")} style={{ display: "block", width: "100%", padding: "6px 12px", background: "none", border: "none", color: "#fff", fontSize: 11, cursor: "pointer", textAlign: "left", borderRadius: 4 }}>Spanglish</button>
@@ -823,7 +823,7 @@ function CrearContent() {
                 {copies.find(c => c.id === copySeleccionado) && (() => {
                   const copy = copies.find(c => c.id === copySeleccionado);
                   return (
-                    <div style={{ background:D.bg3, border:"1px solid " + D.border, borderRadius:16, padding:16, height:"100%" }}>
+                    <div style={{ background:"#10101C", border:"0.5px solid rgba(255,255,255,0.06)", borderRadius:12, padding:"18px 20px", height:"100%" }}>
                       <div style={{ fontSize:10, fontWeight:500, color:D.purpleLight, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:10 }}>{en ? "Final copy" : "Copy final"}</div>
                       <div style={{ fontSize:14, fontWeight:500, color:D.text, marginBottom:8, lineHeight:1.4 }}>{copy.hook}</div>
                       <div style={{ fontSize:12, color:D.text2, lineHeight:1.7, marginBottom:8 }}>{copy.copy}</div>

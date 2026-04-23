@@ -52,7 +52,7 @@ export default function AIField({
   const isUntouched = hasAI && value === originalAIValue;
 
   const badge = isEdited
-    ? { label: '✓ editado', bg: t.successBg, color: t.success }
+    ? { label: '✓ editado', bg: t.successBg, color: t.success.solid }
     : isUntouched
       ? { label: '✨ sugerido por AI', bg: t.accentBg, color: t.accentLight }
       : null;
@@ -60,11 +60,11 @@ export default function AIField({
   const inputBase = {
     width: '100%',
     background: t.bgInput,
-    border: `0.5px solid ${t.border}`,
-    borderRadius: t.radiusSm,
-    padding: '8px 10px',
-    fontSize: 13,
-    color: t.text,
+    border: `0.5px solid ${t.border.default}`,
+    borderRadius: t.radiusMd,
+    padding: '9px 11px',
+    fontSize: 12.5,
+    color: t.text.primary,
     fontFamily: 'inherit',
     outline: 'none',
     boxSizing: 'border-box',
@@ -75,14 +75,14 @@ export default function AIField({
   return (
     <div style={{ marginBottom: 12 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 5 }}>
-        <span style={{ fontSize: 12, color: t.textMuted }}>{label}</span>
+        <span style={{ fontSize: 11, color: t.textMuted }}>{label}</span>
         {badge && (
           <span
             style={{
-              fontSize: 10,
+              fontSize: 9.5,
               fontWeight: 500,
               padding: '2px 7px',
-              borderRadius: 8,
+              borderRadius: 6,
               background: badge.bg,
               color: badge.color,
               whiteSpace: 'nowrap',
@@ -103,7 +103,7 @@ export default function AIField({
           disabled={disabled}
           style={inputBase}
           onFocus={(e) => (e.target.style.borderColor = t.borderActive)}
-          onBlur={(e) => (e.target.style.borderColor = t.border)}
+          onBlur={(e) => (e.target.style.borderColor = t.border.default)}
         />
       ) : (
         <input
@@ -114,7 +114,7 @@ export default function AIField({
           disabled={disabled}
           style={inputBase}
           onFocus={(e) => (e.target.style.borderColor = t.borderActive)}
-          onBlur={(e) => (e.target.style.borderColor = t.border)}
+          onBlur={(e) => (e.target.style.borderColor = t.border.default)}
         />
       )}
     </div>

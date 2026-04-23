@@ -22,8 +22,8 @@ export default function Biblioteca() {
   const en = lang === "en";
 
   const D = {
-    bg3:"#16162d", border:"rgba(255,255,255,0.1)",
-    text:"#fff", text2:"rgba(255,255,255,0.7)", text3:"rgba(255,255,255,0.4)",
+    bg3:"#10101C", border:"rgba(255,255,255,0.08)",
+    text:"#fff", text2:"rgba(255,255,255,0.65)", text3:"rgba(255,255,255,0.4)",
     purple:"#7950F2", purpleLight:"#A78BFA",
   };
 
@@ -83,11 +83,11 @@ export default function Biblioteca() {
       <div style={{ padding:"32px 28px" }}>
         <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:20 }}>
           <div>
-            <h1 style={{ fontSize:22, fontWeight:500, color:D.text, marginBottom:4, letterSpacing:"-0.02em" }}>{en ? "My library" : "Mi biblioteca"}</h1>
+            <h1 style={{ fontSize:22, fontWeight:500, color:D.text, marginBottom:4, letterSpacing:"-0.4px" }}>{en ? "My library" : "Mi biblioteca"}</h1>
             <p style={{ fontSize:13, color:D.text2 }}>{en ? "Your saved pieces — editable and reusable anytime" : "Tus piezas guardadas — editables y reutilizables en cualquier momento"}</p>
           </div>
           <button className="btn-primary" onClick={() => router.push("/crear")}
-            style={{ padding:"9px 18px", background:D.purple, color:"#fff", border:"none", borderRadius:9, fontSize:13, fontWeight:500, cursor:"pointer" }}>
+            style={{ padding:"9px 18px", background:D.purple, color:"#fff", border:"none", borderRadius:8, fontSize:12.5, fontWeight:500, cursor:"pointer" }}>
             {en ? "+ New piece" : "+ Nueva pieza"}
           </button>
         </div>
@@ -103,10 +103,10 @@ export default function Biblioteca() {
               placeholder={en ? "Search by prompt, copy, or hashtags..." : "Buscar por prompt, copy o hashtags..."}
               style={{
                 width: "100%", maxWidth: 400,
-                background: "rgba(255,255,255,0.04)",
+                background: "rgba(255,255,255,0.02)",
                 border: "0.5px solid rgba(255,255,255,0.08)",
-                borderRadius: 10, padding: "10px 14px 10px 36px",
-                fontSize: 13, color: "#fff", outline: "none",
+                borderRadius: 7, padding: "9px 11px 9px 36px",
+                fontSize: 12.5, color: "#fff", outline: "none",
                 fontFamily: "inherit",
               }}
               onFocus={e => e.target.style.borderColor = "#7950F2"}
@@ -118,7 +118,7 @@ export default function Biblioteca() {
         <div style={{ display:"flex", gap:6, marginBottom:20, flexWrap:"wrap" }}>
           {TIPOS.map(t => (
             <button key={t} onClick={() => { setFilter(t); setPage(1); }}
-              style={{ padding:"5px 12px", borderRadius:20, fontSize:11.5, border: filter===t ? "1.5px solid " + D.purple : "1px solid rgba(255,255,255,0.1)", background: filter===t ? "rgba(121,80,242,0.12)" : "transparent", color: filter===t ? D.purpleLight : D.text3, fontWeight: filter===t ? 500 : 400, cursor:"pointer" }}>
+              style={{ padding:"5px 11px", borderRadius:14, fontSize:11.5, border: filter===t ? "0.5px solid rgba(121,80,242,0.35)" : "0.5px solid rgba(255,255,255,0.1)", background: filter===t ? "rgba(121,80,242,0.12)" : "transparent", color: filter===t ? "#A78BFA" : D.text3, fontWeight: filter===t ? 500 : 400, cursor:"pointer" }}>
               {t === "todas" ? (en ? "All" : "Todas") + " (" + searchFiltered.length + ")" : t + " (" + searchFiltered.filter(g => g.tipo === t).length + ")"}
             </button>
           ))}
@@ -131,7 +131,7 @@ export default function Biblioteca() {
             <div style={{ fontSize: 14, color: "rgba(255,255,255,0.4)" }}>{en ? "Loading your library..." : "Cargando tu biblioteca..."}</div>
           </div>
         ) : filtered.length === 0 ? (
-          <div style={{ background:D.bg3, border:"1px solid " + D.border, borderRadius:14, padding:"60px 24px", textAlign:"center" }}>
+          <div style={{ background:"#10101C", border:"0.5px solid rgba(255,255,255,0.06)", borderRadius:12, padding:"60px 24px", textAlign:"center" }}>
             <div style={{ fontSize:40, opacity:0.1, marginBottom:12 }}>◉</div>
             <div style={{ fontSize:15, color:D.text2, fontWeight:500, marginBottom:8 }}>
               {searchQuery.trim()
@@ -147,12 +147,12 @@ export default function Biblioteca() {
             </div>
             {searchQuery.trim() ? (
               <button onClick={() => { setSearchQuery(""); setPage(1); }}
-                style={{ padding:"11px 24px", background:"rgba(255,255,255,0.06)", color:D.text2, border:"1px solid " + D.border, borderRadius:9, fontSize:14, fontWeight:500, cursor:"pointer" }}>
+                style={{ padding:"11px 24px", background:"rgba(255,255,255,0.06)", color:D.text2, border:"0.5px solid rgba(255,255,255,0.08)", borderRadius:8, fontSize:12.5, fontWeight:500, cursor:"pointer" }}>
                 {en ? "Clear search" : "Limpiar búsqueda"}
               </button>
             ) : (
               <button onClick={() => router.push("/crear")}
-                style={{ padding:"11px 24px", background:D.purple, color:"#fff", border:"none", borderRadius:9, fontSize:14, fontWeight:500, cursor:"pointer" }}>
+                style={{ padding:"11px 24px", background:D.purple, color:"#fff", border:"none", borderRadius:8, fontSize:12.5, fontWeight:500, cursor:"pointer" }}>
                 {en ? "Create my first piece →" : "Crear mi primera pieza →"}
               </button>
             )}
@@ -162,9 +162,9 @@ export default function Biblioteca() {
             <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(175px,1fr))", gap:12 }}>
               {filtered.map((g, idx) => (
                 <div key={g.id} className="card-hover" onClick={() => setSelected(selected?.id === g.id ? null : g)}
-                  style={{ background: selected?.id===g.id ? "rgba(121,80,242,0.08)" : D.bg3, border: selected?.id===g.id ? "1.5px solid " + D.purple : "1px solid " + D.border, borderRadius:16, overflow:"hidden", cursor:"pointer", transition:"all 0.15s" }}
-                  onMouseEnter={e => { if (selected?.id !== g.id) e.currentTarget.style.borderColor="rgba(121,80,242,0.3)"; }}
-                  onMouseLeave={e => { if (selected?.id !== g.id) e.currentTarget.style.borderColor=D.border; }}>
+                  style={{ background: selected?.id===g.id ? "rgba(121,80,242,0.08)" : "#10101C", border: selected?.id===g.id ? "1.5px solid " + D.purple : "0.5px solid rgba(255,255,255,0.06)", borderRadius:12, overflow:"hidden", cursor:"pointer", transition:"all 0.15s" }}
+                  onMouseEnter={e => { if (selected?.id !== g.id) e.currentTarget.style.borderColor="rgba(121,80,242,0.35)"; }}
+                  onMouseLeave={e => { if (selected?.id !== g.id) e.currentTarget.style.borderColor="rgba(255,255,255,0.06)"; }}>
                   {g.url ? (
                     <img src={g.url} alt="" style={{ width:"100%", aspectRatio:"1", objectFit:"cover", display:"block" }} />
                   ) : (
@@ -180,12 +180,12 @@ export default function Biblioteca() {
               {totalPages > 1 && (
                 <div style={{ gridColumn:"1 / -1", display:"flex", alignItems:"center", justifyContent:"center", gap:8, paddingTop:12 }}>
                   <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
-                    style={{ padding:"6px 14px", borderRadius:7, fontSize:11, background: page===1 ? "rgba(255,255,255,0.02)" : "rgba(255,255,255,0.06)", color: page===1 ? D.text3 : D.text2, border:"1px solid " + D.border, cursor: page===1 ? "default" : "pointer" }}>
+                    style={{ padding:"6px 14px", borderRadius:8, fontSize:12.5, background: page===1 ? "rgba(255,255,255,0.02)" : "rgba(255,255,255,0.06)", color: page===1 ? D.text3 : D.text2, border:"0.5px solid rgba(255,255,255,0.08)", cursor: page===1 ? "default" : "pointer" }}>
                     {en ? "← Previous" : "← Anterior"}
                   </button>
                   <span style={{ fontSize:11, color:D.text3 }}>{page} / {totalPages}</span>
                   <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}
-                    style={{ padding:"6px 14px", borderRadius:7, fontSize:11, background: page===totalPages ? "rgba(255,255,255,0.02)" : "rgba(255,255,255,0.06)", color: page===totalPages ? D.text3 : D.text2, border:"1px solid " + D.border, cursor: page===totalPages ? "default" : "pointer" }}>
+                    style={{ padding:"6px 14px", borderRadius:8, fontSize:12.5, background: page===totalPages ? "rgba(255,255,255,0.02)" : "rgba(255,255,255,0.06)", color: page===totalPages ? D.text3 : D.text2, border:"0.5px solid rgba(255,255,255,0.08)", cursor: page===totalPages ? "default" : "pointer" }}>
                     {en ? "Next →" : "Siguiente →"}
                   </button>
                 </div>
@@ -193,7 +193,7 @@ export default function Biblioteca() {
             </div>
 
             {selected && (
-              <div style={{ background:D.bg3, border:"1px solid " + D.border, borderRadius:14, padding:20, position:"sticky", top:20 }}>
+              <div style={{ background:"#10101C", border:"0.5px solid rgba(255,255,255,0.06)", borderRadius:12, padding:"18px 20px", position:"sticky", top:20 }}>
                 <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:14 }}>
                   <div style={{ fontSize:11, fontWeight:500, color:D.purpleLight, textTransform:"uppercase", letterSpacing:"0.08em" }}>{selected.tipo}</div>
                   <div style={{ display:"flex", gap:6 }}>
@@ -209,16 +209,16 @@ export default function Biblioteca() {
                 </div>
 
                 {selected.url && (
-                  <img src={selected.url} alt="" style={{ width:"100%", borderRadius:10, display:"block", marginBottom:14, border:"1px solid " + D.border }} />
+                  <img src={selected.url} alt="" style={{ width:"100%", borderRadius:10, display:"block", marginBottom:14, border:"0.5px solid rgba(255,255,255,0.06)" }} />
                 )}
 
-                <div style={{ background:"rgba(255,255,255,0.03)", border:"1px solid " + D.border, borderRadius:8, padding:"8px 12px", marginBottom:10 }}>
+                <div style={{ background:"rgba(255,255,255,0.02)", border:"0.5px solid rgba(255,255,255,0.08)", borderRadius:7, padding:"8px 12px", marginBottom:10 }}>
                   <div style={{ fontSize:10, color:D.text3, marginBottom:4 }}>Prompt</div>
                   <div style={{ fontSize:12, color:D.text2, lineHeight:1.5 }}>{selected.prompt}</div>
                 </div>
 
                 {selected.propuestas && selected.propuestas.length > 0 && (
-                  <div style={{ background:"rgba(255,255,255,0.03)", border:"1px solid " + D.border, borderRadius:8, padding:"10px 12px", marginBottom:14 }}>
+                  <div style={{ background:"rgba(255,255,255,0.02)", border:"0.5px solid rgba(255,255,255,0.08)", borderRadius:7, padding:"10px 12px", marginBottom:14 }}>
                     <div style={{ fontSize:10, fontWeight:500, color:D.text3, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:8 }}>Copy</div>
                     <div style={{ fontSize:13, fontWeight:500, color:D.text, marginBottom:4 }}>{selected?.propuestas?.[0]?.hook}</div>
                     <div style={{ fontSize:12, color:D.text2, lineHeight:1.6, marginBottom:4 }}>{selected?.propuestas?.[0]?.copy}</div>
@@ -232,16 +232,16 @@ export default function Biblioteca() {
                 <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
                   {selected.url && (
                     <button onClick={() => { const a = document.createElement("a"); a.href = selected.url; a.download = "aistudiobrand-" + Date.now() + ".png"; a.click(); }}
-                      style={{ width:"100%", padding:10, background:"rgba(255,255,255,0.06)", color:D.text2, border:"1px solid " + D.border, borderRadius:8, fontSize:12, fontWeight:500, cursor:"pointer" }}>
+                      style={{ width:"100%", padding:10, background:"rgba(255,255,255,0.06)", color:D.text2, border:"0.5px solid rgba(255,255,255,0.08)", borderRadius:8, fontSize:12.5, fontWeight:500, cursor:"pointer" }}>
                       {en ? "⬇ Download image" : "⬇ Descargar imagen"}
                     </button>
                   )}
                   <button onClick={() => { navigator.clipboard.writeText((selected.propuestas?.[0]?.hook || "") + "\n\n" + (selected.propuestas?.[0]?.copy || "") + "\n\n" + (selected.propuestas?.[0]?.cta || "") + "\n\n" + (selected.propuestas?.[0]?.hashtags || "")); alert(en ? "Text copied!" : "¡Copy copiado!"); }}
-                    style={{ width:"100%", padding:10, background:"rgba(255,255,255,0.06)", color:D.text2, border:"1px solid " + D.border, borderRadius:8, fontSize:12, fontWeight:500, cursor:"pointer" }}>
+                    style={{ width:"100%", padding:10, background:"rgba(255,255,255,0.06)", color:D.text2, border:"0.5px solid rgba(255,255,255,0.08)", borderRadius:8, fontSize:12.5, fontWeight:500, cursor:"pointer" }}>
                     {en ? "⎘ Copy text" : "⎘ Copiar texto"}
                   </button>
                   <button className="btn-primary" onClick={() => router.push("/crear?prompt=" + encodeURIComponent(selected.prompt || "") + "&tipo=" + encodeURIComponent(selected.tipo || "Comercial"))}
-                    style={{ width:"100%", padding:10, background:D.purple, color:"#fff", border:"none", borderRadius:8, fontSize:12, fontWeight:500, cursor:"pointer" }}>
+                    style={{ width:"100%", padding:10, background:D.purple, color:"#fff", border:"none", borderRadius:8, fontSize:12.5, fontWeight:500, cursor:"pointer" }}>
                     {en ? "✦ Create similar piece" : "✦ Crear pieza similar"}
                   </button>
                 </div>

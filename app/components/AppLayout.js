@@ -2,8 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { supabase } from "../../lib/supabase";
-
-const SIDEBAR_W = 260;
+import { theme } from './adn/adn-theme';
 
 const fullToCache = (full) => ({
   id: full.id, nombre: full.nombre || "", descripcion: full.descripcion || "",
@@ -17,6 +16,26 @@ const fullToCache = (full) => ({
   ejemplosCopy: full.ejemplos_copy || [], competidores: full.competidores || [],
 });
 
+/* ── Inline SVG icons for nav ── */
+const IconDna = ({ color, size = 15 }) => (
+  <svg width={size} height={size} viewBox="0 0 16 16" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeDasharray="2.5 2">
+    <circle cx="8" cy="8" r="6" />
+  </svg>
+);
+const IconSparkle = ({ color, size = 15 }) => (
+  <svg width={size} height={size} viewBox="0 0 16 16" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M8 1v14M1 8h14M3.5 3.5l9 9M12.5 3.5l-9 9" />
+  </svg>
+);
+const IconGrid = ({ color, size = 15 }) => (
+  <svg width={size} height={size} viewBox="0 0 16 16" fill={color}>
+    <rect x="1" y="1" width="6" height="6" rx="1.5" />
+    <rect x="9" y="1" width="6" height="6" rx="1.5" />
+    <rect x="1" y="9" width="6" height="6" rx="1.5" />
+    <rect x="9" y="9" width="6" height="6" rx="1.5" />
+  </svg>
+);
+
 export default function AppLayout({ children }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -26,15 +45,13 @@ export default function AppLayout({ children }) {
   const [lang, setLang] = useState("es");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [dnaSectionOpen, setDnaSectionOpen] = useState(true);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   useEffect(() => {
     const init = async () => {
-      // 1. Auth check (but don't block brand loading on it)
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) { router.push("/login"); return; }
       setUser(session.user);
-
-      // 2. Load brands — use activeBrandId first (always works), then try full list by userId
       await loadBrandsFromAny(session.user.id);
     };
     init();
@@ -52,10 +69,8 @@ export default function AppLayout({ children }) {
     return () => window.removeEventListener("brandChanged", handleBrandChanged);
   }, []);
 
-  // Single function that loads brands — no auth dependency
   const loadBrandsFromAny = async (userId) => {
     try {
-      // Step 1: Try loading active brand by ID (always works via server API)
       const bid = localStorage.getItem("activeBrandId");
       let activeBrandData = null;
       if (bid) {
@@ -63,11 +78,10 @@ export default function AppLayout({ children }) {
         const json = await res.json();
         if (json.brand) {
           activeBrandData = json.brand;
-          userId = userId || json.brand.user_id; // get userId from brand if we don't have it
+          userId = userId || json.brand.user_id;
         }
       }
 
-      // Step 2: Try loading all brands by userId
       let allBrands = [];
       if (userId) {
         const res = await fetch("/api/brands?userId=" + userId);
@@ -75,7 +89,6 @@ export default function AppLayout({ children }) {
         allBrands = json.data || [];
       }
 
-      // Step 3: If we got a list, use it. Otherwise use the single active brand.
       if (allBrands.length > 0) {
         setBrands(allBrands);
         const active = activeBrandData
@@ -89,7 +102,6 @@ export default function AppLayout({ children }) {
         setActiveBrand(item);
       }
 
-      // Step 4: Cache full profile of active brand
       if (activeBrandData) {
         localStorage.setItem("brandProfile", JSON.stringify(fullToCache(activeBrandData)));
       }
@@ -106,7 +118,6 @@ export default function AppLayout({ children }) {
         localStorage.setItem("brandProfile", JSON.stringify(fullToCache(json.brand)));
       }
     } catch(e) {}
-    // No dispatchEvent here — state is already updated locally
   };
 
   const setLanguage = (l) => { setLang(l); localStorage.setItem("lang", l); };
@@ -115,8 +126,8 @@ export default function AppLayout({ children }) {
   const tonoDisplay = (tono) => Array.isArray(tono) ? tono.join(", ") : tono || "";
 
   const navItems = [
-    { icon: "✦", label: en ? "New piece" : "Nueva pieza", path: "/crear" },
-    { icon: "◈", label: en ? "Library" : "Biblioteca", path: "/biblioteca" },
+    { icon: "sparkle", label: en ? "New piece" : "Nueva pieza", path: "/crear" },
+    { icon: "grid", label: en ? "Library" : "Biblioteca", path: "/biblioteca" },
   ];
 
   const deleteBrand = async (brand) => {
@@ -148,14 +159,31 @@ export default function AppLayout({ children }) {
     router.push("/");
   };
 
-  return (
-    <div style={{ minHeight: "100vh", background: "#0A0A1A", display: "flex", flexDirection: "column" }}>
+  // Breadcrumb helper
+  const pageName = (() => {
+    if (pathname === "/adn") return en ? "Brand DNA" : "ADN de marca";
+    if (pathname === "/crear") return en ? "New piece" : "Nueva pieza";
+    if (pathname === "/biblioteca") return en ? "Library" : "Biblioteca";
+    if (pathname === "/cuenta") return en ? "Account" : "Mi cuenta";
+    if (pathname === "/pricing") return en ? "Pricing" : "Precios";
+    if (pathname === "/contacto") return en ? "Contact" : "Contacto";
+    return "";
+  })();
 
-      {/* ═══ HEADER ═══ */}
+  const renderNavIcon = (iconName, color) => {
+    if (iconName === "sparkle") return <IconSparkle color={color} size={theme.sidebar.navItem.iconSize} />;
+    if (iconName === "grid") return <IconGrid color={color} size={theme.sidebar.navItem.iconSize} />;
+    return null;
+  };
+
+  return (
+    <div style={{ minHeight: "100vh", background: theme.bg.canvas, display: "flex", flexDirection: "column" }}>
+
+      {/* --- TOPBAR --- */}
       <nav style={{
-        display: "flex", alignItems: "center", padding: "0 28px", height: 64,
-        borderBottom: "1px solid rgba(255,255,255,0.1)",
-        background: "rgba(10,10,26,0.92)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
+        display: "flex", alignItems: "center", padding: theme.topbar.padding, height: 64,
+        borderBottom: theme.topbar.borderBottom,
+        background: theme.bg.sidebar, backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
         position: "fixed", top: 0, left: 0, right: 0, zIndex: 50,
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
@@ -163,8 +191,15 @@ export default function AppLayout({ children }) {
             style={{ display: "none", background: "none", border: "none", color: "#fff", fontSize: 22, cursor: "pointer", padding: 4 }}>
             ☰
           </button>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }} onClick={() => router.push("/")}>
-            <img src="/logo.svg" alt="AiStudioBrand" style={{ height: 38 }} />
+          {/* Breadcrumb */}
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <span style={{ ...theme.topbar.crumb, cursor: "pointer" }} onClick={() => router.push("/")}>AiStudioBrand</span>
+            {pageName && (
+              <>
+                <span style={{ ...theme.topbar.crumbSep, fontSize: 10 }}>/</span>
+                <span style={{ ...theme.topbar.crumb, ...theme.topbar.crumbActive }}>{pageName}</span>
+              </>
+            )}
           </div>
         </div>
 
@@ -175,77 +210,95 @@ export default function AppLayout({ children }) {
           <button onClick={() => router.push("/contacto")} style={{ padding: "8px 16px", background: "none", border: "none", color: "rgba(255,255,255,0.6)", fontSize: 14, fontWeight: 500, cursor: "pointer", borderRadius: 8, transition: "color 0.2s" }}>
             {en ? "Contact" : "Contacto"}
           </button>
-          <div style={{ display: "flex", background: "rgba(255,255,255,0.08)", borderRadius: 8, padding: 3, gap: 2, marginLeft: 4 }}>
-            <button onClick={() => setLanguage("es")} style={{ padding: "5px 11px", borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: "pointer", background: lang === "es" ? "#fff" : "transparent", border: "none", color: lang === "es" ? "#0A0A0A" : "rgba(255,255,255,0.4)", transition: "all 0.2s" }}>ES</button>
-            <button onClick={() => setLanguage("en")} style={{ padding: "5px 11px", borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: "pointer", background: lang === "en" ? "#fff" : "transparent", border: "none", color: lang === "en" ? "#0A0A0A" : "rgba(255,255,255,0.4)", transition: "all 0.2s" }}>EN</button>
-          </div>
-          <div style={{ width: 1, height: 24, background: "rgba(255,255,255,0.1)", margin: "0 6px" }} />
-          <div style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", maxWidth: 150, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user?.email}</div>
-          <div onClick={() => router.push("/cuenta")}
-            style={{ width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg,#7950F2,#A78BFA)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, color: "#fff", fontWeight: 700, cursor: "pointer", flexShrink: 0, boxShadow: "0 2px 10px rgba(121,80,242,0.3)" }}>
-            {user?.email?.charAt(0).toUpperCase()}
+          {/* Language toggle - smaller, theme tokens */}
+          <div style={{ display: "flex", background: theme.topbar.langToggle.bg, border: theme.topbar.langToggle.border, borderRadius: theme.topbar.langToggle.radius, padding: theme.topbar.langToggle.padding, gap: 1, marginLeft: 4 }}>
+            <button onClick={() => setLanguage("es")} style={{ padding: theme.topbar.langOpt.padding, borderRadius: theme.topbar.langOpt.radius, fontSize: theme.topbar.langOpt.fontSize, fontWeight: 600, cursor: "pointer", background: lang === "es" ? theme.topbar.langOptOn.bg : "transparent", border: "none", color: lang === "es" ? theme.topbar.langOptOn.color : theme.topbar.langOpt.color, transition: "all 0.2s" }}>ES</button>
+            <button onClick={() => setLanguage("en")} style={{ padding: theme.topbar.langOpt.padding, borderRadius: theme.topbar.langOpt.radius, fontSize: theme.topbar.langOpt.fontSize, fontWeight: 600, cursor: "pointer", background: lang === "en" ? theme.topbar.langOptOn.bg : "transparent", border: "none", color: lang === "en" ? theme.topbar.langOptOn.color : theme.topbar.langOpt.color, transition: "all 0.2s" }}>EN</button>
           </div>
         </div>
       </nav>
 
-      {/* ═══ BODY ═══ */}
+      {/* --- BODY --- */}
       <div style={{ display: "flex", flex: 1, marginTop: 64, position: "relative", zIndex: 1 }}>
         {sidebarOpen && <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 39, display: "none" }} />}
 
-        {/* ═══ SIDEBAR ═══ */}
+        {/* --- SIDEBAR --- */}
         <aside className={sidebarOpen ? "sidebar-open" : ""} style={{
-          width: SIDEBAR_W, background: "#0E0E1E",
-          borderRight: "1px solid rgba(255,255,255,0.1)",
-          padding: "24px 16px", display: "flex", flexDirection: "column",
+          width: theme.sidebar.width, background: theme.bg.sidebar,
+          borderRight: `0.5px solid ${theme.border.subtle}`,
+          padding: theme.sidebar.padding, display: "flex", flexDirection: "column",
           position: "fixed", top: 64, bottom: 0, left: 0, zIndex: 40,
           overflowY: "auto", transition: "transform 0.3s ease",
         }}>
+          {/* Logo */}
+          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "0 8px", marginBottom: 20 }} onClick={() => router.push("/")} >
+            <div style={{
+              width: theme.sidebar.brandMark.size, height: theme.sidebar.brandMark.size,
+              borderRadius: theme.sidebar.brandMark.radius, background: theme.sidebar.brandMark.bg,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: theme.sidebar.brandMark.fontSize, color: "#fff", fontWeight: 700, flexShrink: 0,
+              cursor: "pointer",
+            }}>Ai</div>
+            <span style={{ fontSize: theme.sidebar.brandName.fontSize, fontWeight: theme.sidebar.brandName.fontWeight, color: "#fff", letterSpacing: theme.sidebar.brandName.letterSpacing, cursor: "pointer" }}>AiStudioBrand</span>
+          </div>
+
+          {/* Section label: MARCA */}
+          <div style={{ ...theme.sidebar.sectionLabel, marginTop: 4 }}>{en ? "BRAND" : "MARCA"}</div>
+
           {/* Brand DNA section */}
           <div style={{ marginBottom: 4 }}>
             <button onClick={() => setDnaSectionOpen(!dnaSectionOpen)}
               style={{
-                display: "flex", alignItems: "center", gap: 14, padding: "13px 18px",
-                borderRadius: 10, fontSize: 15, fontWeight: pathname === "/adn" ? 700 : 500,
-                color: pathname === "/adn" ? "#fff" : "rgba(255,255,255,0.5)",
-                background: pathname === "/adn" ? "rgba(121,80,242,0.15)" : "transparent",
-                border: pathname === "/adn" ? "1px solid rgba(121,80,242,0.25)" : "1px solid transparent",
+                display: "flex", alignItems: "center", gap: 10, padding: pathname === "/adn" ? `${theme.sidebar.navItem.padding.split(' ')[0]} ${theme.sidebar.navItem.padding.split(' ')[1]}` : theme.sidebar.navItem.padding,
+                borderRadius: pathname === "/adn" ? theme.sidebar.navItemActive.borderRadius : theme.sidebar.navItem.radius,
+                fontSize: theme.sidebar.navItem.fontSize,
+                fontWeight: pathname === "/adn" ? theme.sidebar.navItemActive.fontWeight : 400,
+                color: pathname === "/adn" ? theme.sidebar.navItemActive.color : theme.sidebar.navItem.color,
+                background: pathname === "/adn" ? theme.sidebar.navItemActive.background : "transparent",
+                boxShadow: pathname === "/adn" ? theme.sidebar.navItemActive.boxShadow : "none",
+                paddingLeft: pathname === "/adn" ? theme.sidebar.navItemActive.paddingLeft : undefined,
+                marginLeft: pathname === "/adn" ? theme.sidebar.navItemActive.marginLeft : 0,
+                border: "none",
                 cursor: "pointer", textAlign: "left", width: "100%", transition: "all 0.2s",
               }}>
-              <span style={{ fontSize: 17, color: pathname === "/adn" ? "#A78BFA" : "rgba(255,255,255,0.35)" }}>◉</span>
+              <IconDna color={pathname === "/adn" ? theme.accent.light : theme.text.dim} size={theme.sidebar.navItem.iconSize} />
               <span style={{ flex: 1 }}>{en ? "Brand DNA" : "ADN de marca"}</span>
-              <span style={{ fontSize: 9, color: "rgba(255,255,255,0.25)", transition: "transform 0.2s", transform: dnaSectionOpen ? "rotate(180deg)" : "rotate(0deg)" }}>▼</span>
+              <span style={{ fontSize: 9, color: theme.text.dim, transition: "transform 0.2s", transform: dnaSectionOpen ? "rotate(180deg)" : "rotate(0deg)" }}>▼</span>
             </button>
 
             {dnaSectionOpen && (
-              <div style={{ paddingLeft: 18, paddingTop: 4, display: "flex", flexDirection: "column", gap: 2 }}>
+              <div style={{ paddingLeft: 12, paddingTop: 4, display: "flex", flexDirection: "column", gap: 2 }}>
                 {brands.map(b => {
                   const isActive = b.id === activeBrand?.id;
                   return (
                     <div key={b.id} style={{ display: "flex", alignItems: "center", gap: 0 }}>
                       <button onClick={() => { switchBrand(b); router.push("/adn?brand=" + b.id); setSidebarOpen(false); }}
                         style={{
-                          flex: 1, display: "flex", alignItems: "center", gap: 10, padding: "10px 14px",
-                          borderRadius: 8, cursor: "pointer", textAlign: "left",
-                          background: isActive ? "rgba(121,80,242,0.1)" : "transparent",
+                          flex: 1, display: "flex", alignItems: "center", gap: 8, padding: theme.sidebar.subItem.padding,
+                          borderRadius: theme.sidebar.subItem.radius, cursor: "pointer", textAlign: "left",
+                          background: isActive ? theme.sidebar.subItemActive.background : "transparent",
                           border: "none", transition: "all 0.2s",
                         }}>
                         <div style={{
-                          width: 26, height: 26, borderRadius: 7, flexShrink: 0,
+                          width: theme.sidebar.subAvatar.size, height: theme.sidebar.subAvatar.size,
+                          borderRadius: theme.sidebar.subAvatar.radius, flexShrink: 0,
                           background: isActive ? "linear-gradient(135deg,#7950F2,#A78BFA)" : "rgba(255,255,255,0.08)",
                           display: "flex", alignItems: "center", justifyContent: "center",
-                          fontSize: 10, fontWeight: 800, color: "#fff",
+                          fontSize: theme.sidebar.subAvatar.fontSize, fontWeight: theme.sidebar.subAvatar.fontWeight, color: "#fff",
                         }}>
                           {(b.nombre || "M").charAt(0).toUpperCase()}
                         </div>
                         <div style={{ overflow: "hidden", flex: 1 }}>
-                          <div style={{ fontSize: 13, fontWeight: isActive ? 600 : 400, color: isActive ? "#fff" : "rgba(255,255,255,0.5)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                            {b.nombre || (en ? "Unnamed" : "Sin nombre")}
+                          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                            <span style={{ fontSize: theme.sidebar.subItem.fontSize, fontWeight: isActive ? 500 : 400, color: isActive ? theme.sidebar.subItemActive.color : theme.sidebar.subItem.color, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                              {b.nombre || (en ? "Unnamed" : "Sin nombre")}
+                            </span>
+                            {isActive && <span style={{ width: theme.sidebar.statusDot.size, height: theme.sidebar.statusDot.size, borderRadius: "50%", background: theme.sidebar.statusDot.bg, flexShrink: 0, display: "inline-block" }} />}
                           </div>
-                          <div style={{ fontSize: 10, color: "rgba(255,255,255,0.25)", marginTop: 1 }}>
-                            {en ? "View & edit" : "Ver y editar"}
+                          <div style={{ fontSize: theme.sidebar.subMeta.fontSize, color: theme.sidebar.subMeta.color, marginTop: 1 }}>
+                            {isActive ? (en ? "60% DNA · active" : "60% ADN · activa") : (en ? "View & edit" : "Ver y editar")}
                           </div>
                         </div>
-                        {isActive && <span style={{ fontSize: 8, color: "#A78BFA" }}>●</span>}
                       </button>
                       {brands.length > 1 && (
                         <button onClick={(e) => { e.stopPropagation(); deleteBrand(b); }}
@@ -257,54 +310,108 @@ export default function AppLayout({ children }) {
                 })}
                 <button onClick={() => { router.push("/adn?new=true"); setSidebarOpen(false); }}
                   style={{
-                    display: "flex", alignItems: "center", gap: 10, padding: "9px 14px",
-                    borderRadius: 8, cursor: "pointer", textAlign: "left",
-                    background: "transparent", border: "none", transition: "all 0.2s",
+                    display: "flex", alignItems: "center", justifyContent: theme.sidebar.newBrandButton.justifyContent,
+                    gap: 8, padding: theme.sidebar.newBrandButton.padding,
+                    borderRadius: theme.sidebar.newBrandButton.radius, cursor: "pointer", textAlign: "left",
+                    background: "transparent", border: theme.sidebar.newBrandButton.border, transition: "all 0.2s",
                   }}>
-                  <div style={{ width: 24, height: 24, borderRadius: 7, border: "1px dashed rgba(121,80,242,0.4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "#A78BFA" }}>+</div>
-                  <span style={{ fontSize: 13, fontWeight: 500, color: "#A78BFA" }}>{en ? "New brand" : "Nueva marca"}</span>
+                  <span style={{ fontSize: 12, color: theme.sidebar.newBrandButton.color }}>+</span>
+                  <span style={{ fontSize: theme.sidebar.newBrandButton.fontSize, color: theme.sidebar.newBrandButton.color }}>{en ? "New brand" : "Nueva marca"}</span>
                 </button>
               </div>
             )}
           </div>
 
+          {/* Section label: TRABAJO */}
+          <div style={{ ...theme.sidebar.sectionLabel, marginTop: 12 }}>{en ? "WORK" : "TRABAJO"}</div>
+
           {/* Nav items */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
             {navItems.map(item => {
               const active = pathname === item.path;
+              const iconColor = active ? theme.accent.light : theme.text.dim;
               return (
                 <button key={item.path} onClick={() => { router.push(item.path); setSidebarOpen(false); }}
                   style={{
-                    display: "flex", alignItems: "center", gap: 14, padding: "13px 18px",
-                    borderRadius: 10, fontSize: 15, fontWeight: active ? 700 : 500,
-                    color: active ? "#fff" : "rgba(255,255,255,0.5)",
-                    background: active ? "rgba(121,80,242,0.15)" : "transparent",
-                    border: active ? "1px solid rgba(121,80,242,0.25)" : "1px solid transparent",
+                    display: "flex", alignItems: "center", gap: 10,
+                    padding: active ? `${theme.sidebar.navItem.padding.split(' ')[0]} ${theme.sidebar.navItem.padding.split(' ')[1]}` : theme.sidebar.navItem.padding,
+                    borderRadius: active ? theme.sidebar.navItemActive.borderRadius : theme.sidebar.navItem.radius,
+                    fontSize: theme.sidebar.navItem.fontSize,
+                    fontWeight: active ? theme.sidebar.navItemActive.fontWeight : 400,
+                    color: active ? theme.sidebar.navItemActive.color : theme.sidebar.navItem.color,
+                    background: active ? theme.sidebar.navItemActive.background : "transparent",
+                    boxShadow: active ? theme.sidebar.navItemActive.boxShadow : "none",
+                    paddingLeft: active ? theme.sidebar.navItemActive.paddingLeft : undefined,
+                    marginLeft: active ? theme.sidebar.navItemActive.marginLeft : 0,
+                    marginBottom: theme.sidebar.navItem.marginBottom,
+                    border: "none",
                     cursor: "pointer", textAlign: "left", width: "100%", transition: "all 0.2s",
                   }}>
-                  <span style={{ fontSize: 17, color: active ? "#A78BFA" : "rgba(255,255,255,0.35)" }}>{item.icon}</span>
+                  {renderNavIcon(item.icon, iconColor)}
                   {item.label}
                 </button>
               );
             })}
           </div>
 
-          {/* Bottom */}
+          {/* Bottom - user row */}
           <div style={{ marginTop: "auto", display: "flex", flexDirection: "column", gap: 2 }}>
-            <div style={{ height: 1, background: "rgba(255,255,255,0.08)", margin: "16px 0" }} />
-            <button onClick={() => router.push("/cuenta")}
-              style={{ display: "flex", alignItems: "center", gap: 14, padding: "12px 18px", borderRadius: 10, fontSize: 14, color: "rgba(255,255,255,0.45)", background: "transparent", border: "none", cursor: "pointer", textAlign: "left", width: "100%", transition: "all 0.2s" }}>
-              <span style={{ fontSize: 16 }}>◎</span> {en ? "My account" : "Mi cuenta"}
-            </button>
-            <button onClick={handleLogout}
-              style={{ display: "flex", alignItems: "center", gap: 14, padding: "12px 18px", borderRadius: 10, fontSize: 14, color: "rgba(255,100,100,0.6)", background: "transparent", border: "none", cursor: "pointer", textAlign: "left", width: "100%", transition: "all 0.2s" }}>
-              <span style={{ fontSize: 16 }}>→</span> {en ? "Log out" : "Salir"}
-            </button>
+            <div style={{ height: 1, background: theme.border.divider, margin: "16px 0" }} />
+            <div style={{ position: "relative" }}>
+              <button onClick={() => setUserMenuOpen(!userMenuOpen)}
+                style={{
+                  display: "flex", alignItems: "center", gap: 8, padding: theme.sidebar.userRow.padding,
+                  borderRadius: theme.sidebar.navItem.radius, cursor: "pointer", textAlign: "left",
+                  width: "100%", background: "transparent", border: "none", transition: "all 0.2s",
+                }}>
+                <div style={{
+                  width: theme.sidebar.userRow.avatarSize, height: theme.sidebar.userRow.avatarSize,
+                  borderRadius: "50%", background: theme.sidebar.userRow.avatarBg,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 11, color: "#fff", fontWeight: 700, flexShrink: 0,
+                }}>
+                  {user?.email?.charAt(0).toUpperCase()}
+                </div>
+                <div style={{ overflow: "hidden", flex: 1 }}>
+                  <div style={{ fontSize: theme.sidebar.userRow.emailFontSize, color: "#fff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    {user?.email}
+                  </div>
+                  <div style={{ fontSize: theme.sidebar.userRow.planFontSize, color: theme.sidebar.userRow.planColor }}>
+                    Free plan
+                  </div>
+                </div>
+                <span style={{ fontSize: 9, color: theme.text.dim, transform: userMenuOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>▲</span>
+              </button>
+
+              {/* Dropdown */}
+              {userMenuOpen && (
+                <div style={{
+                  position: "absolute", bottom: "100%", left: 0, right: 0,
+                  background: theme.bg.card, border: `0.5px solid ${theme.border.default}`,
+                  borderRadius: theme.radius.sm, padding: 4, marginBottom: 4,
+                  boxShadow: "0 4px 16px rgba(0,0,0,0.4)",
+                }}>
+                  <button onClick={() => { setUserMenuOpen(false); router.push("/cuenta"); }}
+                    style={{ display: "block", width: "100%", padding: "7px 10px", borderRadius: 4, fontSize: 12, color: theme.text.secondary, background: "transparent", border: "none", cursor: "pointer", textAlign: "left", transition: "all 0.15s" }}>
+                    {en ? "Account" : "Mi cuenta"}
+                  </button>
+                  <button onClick={() => { setUserMenuOpen(false); router.push("/pricing"); }}
+                    style={{ display: "block", width: "100%", padding: "7px 10px", borderRadius: 4, fontSize: 12, color: theme.text.secondary, background: "transparent", border: "none", cursor: "pointer", textAlign: "left", transition: "all 0.15s" }}>
+                    {en ? "Settings" : "Configuracion"}
+                  </button>
+                  <div style={{ height: 1, background: theme.border.divider, margin: "3px 0" }} />
+                  <button onClick={() => { setUserMenuOpen(false); handleLogout(); }}
+                    style={{ display: "block", width: "100%", padding: "7px 10px", borderRadius: 4, fontSize: 12, color: theme.danger.solid, background: "transparent", border: "none", cursor: "pointer", textAlign: "left", transition: "all 0.15s" }}>
+                    {en ? "Log out" : "Salir"}
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </aside>
 
-        {/* ═══ MAIN ═══ */}
-        <main className="app-main" style={{ flex: 1, marginLeft: SIDEBAR_W, minHeight: "calc(100vh - 64px)", position: "relative" }}>
+        {/* --- MAIN --- */}
+        <main className="app-main" style={{ flex: 1, marginLeft: theme.sidebar.width, minHeight: "calc(100vh - 64px)", position: "relative", background: theme.bg.canvas }}>
           {children}
         </main>
       </div>

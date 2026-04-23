@@ -34,7 +34,7 @@ function Swatch({ color, isExtracted, onRemove, en = false }) {
           height: 36,
           borderRadius: '50%',
           background: color,
-          border: `0.5px solid ${t.border}`,
+          border: `0.5px solid ${t.border.default}`,
           cursor: 'default',
         }}
         title={color}
@@ -48,7 +48,7 @@ function Swatch({ color, isExtracted, onRemove, en = false }) {
             width: 14,
             height: 14,
             borderRadius: '50%',
-            background: t.success,
+            background: t.success.solid,
             color: '#fff',
             fontSize: 9,
             fontWeight: 600,
@@ -143,7 +143,7 @@ export default function ExtractedPalette({
           alignItems: 'center',
           gap: 6,
         }}>
-          <span style={{ color: t.accent }}>✦</span>
+          <span style={{ color: t.accent.solid }}>✦</span>
           {attribution} {en ? '— confirm or adjust' : '— confirma o ajusta'}
         </p>
       )}
@@ -172,7 +172,7 @@ export default function ExtractedPalette({
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
             <label style={{ position: 'relative', width: 36, height: 36, cursor: 'pointer' }}>
               <input type="color" value="#7F77DD" onChange={(e) => addFromPicker(e.target.value)} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer' }} />
-              <div style={{ width: 36, height: 36, borderRadius: '50%', border: `1px dashed ${t.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: t.textDim, fontSize: 18 }}>+</div>
+              <div style={{ width: 36, height: 36, borderRadius: '50%', border: `1px dashed rgba(255,255,255,0.12)`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: t.textDim, fontSize: 18 }}>+</div>
             </label>
             <button type="button" onClick={() => setAdding(true)} style={{ fontSize: 11, color: t.textMuted, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }} title={en ? "Add color" : "Agregar color"}>
               #hex
@@ -195,11 +195,11 @@ export default function ExtractedPalette({
               style={{
                 width: 84,
                 background: t.bgInput,
-                border: `0.5px solid ${t.border}`,
+                border: `0.5px solid ${t.border.default}`,
                 borderRadius: t.radiusSm,
                 padding: '6px 8px',
                 fontSize: 12,
-                color: t.text,
+                color: t.text.primary,
                 fontFamily: 'inherit',
                 outline: 'none',
               }}
@@ -210,7 +210,7 @@ export default function ExtractedPalette({
               style={{
                 fontSize: 11,
                 padding: '6px 10px',
-                background: t.accent,
+                background: t.accent.solid,
                 color: '#fff',
                 border: 'none',
                 borderRadius: t.radiusSm,

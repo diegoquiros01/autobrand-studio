@@ -73,7 +73,7 @@ export default function CopyExampleCard({
     <div
       style={{
         background: accepted ? t.successBg : t.bgInput,
-        border: `0.5px solid ${accepted ? 'transparent' : t.border}`,
+        border: `0.5px solid ${accepted ? 'transparent' : t.border.default}`,
         borderRadius: t.radiusSm,
         padding: '10px 12px',
         marginBottom: 8,
@@ -91,7 +91,7 @@ export default function CopyExampleCard({
               width: '100%',
               background: 'transparent',
               border: 'none',
-              color: t.text,
+              color: t.text.primary,
               fontSize: 12,
               fontFamily: 'inherit',
               outline: 'none',
@@ -107,7 +107,7 @@ export default function CopyExampleCard({
               style={{
                 fontSize: 11,
                 padding: '4px 10px',
-                background: t.accent,
+                background: t.accent.solid,
                 color: '#fff',
                 border: 'none',
                 borderRadius: 4,
@@ -125,7 +125,7 @@ export default function CopyExampleCard({
                   fontSize: 11,
                   padding: '4px 10px',
                   background: 'transparent',
-                  border: `0.5px solid ${t.border}`,
+                  border: `0.5px solid ${t.border.default}`,
                   color: t.textMuted,
                   borderRadius: 4,
                   cursor: 'pointer',
@@ -159,7 +159,7 @@ export default function CopyExampleCard({
         <>
           <p style={{
             fontSize: 12,
-            color: t.text,
+            color: t.text.primary,
             margin: '0 0 6px',
             lineHeight: 1.5,
           }}>
@@ -188,7 +188,7 @@ export default function CopyExampleCard({
                 style={{
                   fontSize: 10,
                   padding: '3px 9px',
-                  background: t.accent,
+                  background: t.accent.solid,
                   color: '#fff',
                   border: 'none',
                   borderRadius: 4,
@@ -205,7 +205,7 @@ export default function CopyExampleCard({
                   fontSize: 10,
                   padding: '3px 9px',
                   background: 'transparent',
-                  border: `0.5px solid ${t.border}`,
+                  border: `0.5px solid ${t.border.default}`,
                   color: t.textMuted,
                   borderRadius: 4,
                   cursor: 'pointer',
@@ -220,7 +220,7 @@ export default function CopyExampleCard({
                   fontSize: 10,
                   padding: '3px 9px',
                   background: 'transparent',
-                  border: `0.5px solid ${t.border}`,
+                  border: `0.5px solid ${t.border.default}`,
                   color: t.textMuted,
                   borderRadius: 4,
                   cursor: 'pointer',
@@ -232,7 +232,7 @@ export default function CopyExampleCard({
           )}
 
           {accepted && (
-            <p style={{ fontSize: 10, color: t.success, margin: '6px 0 0', fontWeight: 500 }}>
+            <p style={{ fontSize: 10, color: t.success.solid, margin: '6px 0 0', fontWeight: 500 }}>
               {en ? '✓ Saved to your DNA' : '✓ Guardado en tu ADN'}
             </p>
           )}

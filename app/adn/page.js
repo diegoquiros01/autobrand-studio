@@ -11,11 +11,11 @@ import ExtractedPalette from '../components/adn/ExtractedPalette';
 import CopyExampleCard from '../components/adn/CopyExampleCard';
 
 const D = {
-  bg: "#0A0A1A", bg2: "#16162D",
-  bg3: "rgba(255,255,255,0.04)",
+  bg: "#0A0A14", bg2: "#10101C",
+  bg3: "rgba(255,255,255,0.02)",
   border: "rgba(255,255,255,0.08)",
-  text: "#fff", text2: "rgba(255,255,255,0.55)",
-  text3: "rgba(255,255,255,0.3)",
+  text: "#fff", text2: "rgba(255,255,255,0.65)",
+  text3: "rgba(255,255,255,0.4)",
   purple: "#7950F2", purpleLight: "#A78BFA",
 };
 
@@ -27,9 +27,9 @@ const cats = ["Coaching","Lifestyle","Moda","Belleza","Negocio","Motivación","E
 const MemoInput = memo(function MemoInput({ value, onChange, placeholder, style, type = "input", minHeight }) {
   const inpStyle = {
     width: "100%",
-    backgroundColor: value && value.toString().trim() ? "rgba(121,80,242,0.06)" : D.bg3,
-    border: "1px solid " + (value && value.toString().trim() ? "rgba(121,80,242,0.3)" : D.border),
-    borderRadius: 10, padding: "12px 16px", fontSize: 14, color: D.text,
+    backgroundColor: value && value.toString().trim() ? "rgba(121,80,242,0.06)" : "rgba(255,255,255,0.02)",
+    border: "0.5px solid " + (value && value.toString().trim() ? "rgba(121,80,242,0.3)" : "rgba(255,255,255,0.08)"),
+    borderRadius: 7, padding: "9px 11px", fontSize: 12.5, color: D.text,
     outline: "none", transition: "all 0.3s ease", fontFamily: "Inter, sans-serif",
     letterSpacing: "-0.02em", ...(style || {}),
   };
@@ -401,15 +401,15 @@ function ADNContent() {
   // --- Styles ---
   const inp = (value) => ({
     width: "100%",
-    backgroundColor: value && value.toString().trim() ? "rgba(121,80,242,0.06)" : D.bg3,
-    border: "1px solid " + (value && value.toString().trim() ? "rgba(121,80,242,0.3)" : D.border),
-    borderRadius: 10, padding: "12px 16px", fontSize: 14, color: D.text,
+    backgroundColor: value && value.toString().trim() ? "rgba(121,80,242,0.06)" : "rgba(255,255,255,0.02)",
+    border: "0.5px solid " + (value && value.toString().trim() ? "rgba(121,80,242,0.3)" : "rgba(255,255,255,0.08)"),
+    borderRadius: 7, padding: "9px 11px", fontSize: 12.5, color: D.text,
     outline: "none", transition: "all 0.3s ease", fontFamily: "Inter, sans-serif",
     letterSpacing: "-0.02em",
   });
 
-  const card = { background: D.bg2, border: "1px solid " + D.border, borderRadius: 16, padding: "24px", transition: "all 0.3s ease" };
-  const label = { fontSize: 13, color: D.text2, display: "block", marginBottom: 6, fontWeight: 500, letterSpacing: "-0.02em" };
+  const card = { background: "#10101C", border: "0.5px solid rgba(255,255,255,0.06)", borderRadius: 12, padding: "18px 20px", transition: "all 0.3s ease" };
+  const label = { fontSize: 11, color: "rgba(255,255,255,0.5)", display: "block", marginBottom: 6, fontWeight: 400, letterSpacing: "0.1px" };
 
   return (
     <AppLayout>
@@ -417,28 +417,25 @@ function ADNContent() {
 
       <div style={{ background: D.bg, minHeight: "calc(100vh - 64px)", paddingBottom: 40 }}>
         {/* Header */}
-        <div style={{ position: "relative", overflow: "hidden", background: "linear-gradient(180deg, #1a0a2e 0%, " + D.bg + " 100%)", padding: "44px 24px 40px" }}>
+        <div style={{ position: "relative", overflow: "hidden", background: "linear-gradient(180deg, #1a0a2e 0%, #0A0A14 100%)", padding: "44px 24px 40px" }}>
           {/* Orbs */}
           <div className="orb-1" style={{ position: "absolute", top: "-20%", left: "15%", width: 280, height: 280, borderRadius: "50%", background: "radial-gradient(circle, rgba(121,80,242,0.4) 0%, transparent 70%)", filter: "blur(60px)", pointerEvents: "none" }} />
           <div className="orb-2" style={{ position: "absolute", top: "0%", right: "5%", width: 220, height: 220, borderRadius: "50%", background: "radial-gradient(circle, rgba(230,73,128,0.2) 0%, transparent 70%)", filter: "blur(60px)", pointerEvents: "none" }} />
           {/* Scan line */}
           <div className="scan-line" style={{ position: "absolute", left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(121,80,242,0.3), transparent)", pointerEvents: "none" }} />
-          {/* Brackets */}
-          <div style={{ position: "absolute", top: 16, left: 20, width: 16, height: 16, borderTop: "2px solid rgba(121,80,242,0.25)", borderLeft: "2px solid rgba(121,80,242,0.25)" }} />
-          <div style={{ position: "absolute", top: 16, right: 20, width: 16, height: 16, borderTop: "2px solid rgba(121,80,242,0.25)", borderRight: "2px solid rgba(121,80,242,0.25)" }} />
 
           <div style={{ position: "relative", zIndex: 2, maxWidth: 1100, margin: "0 auto" }}>
             {/* Top row: title + save status */}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <div>
-                <h1 style={{ fontSize: 26, fontWeight: 800, color: D.text, marginBottom: 4, letterSpacing: "-0.03em" }}>
+                <h1 style={{ fontSize: 22, fontWeight: 500, color: D.text, marginBottom: 4, letterSpacing: "-0.4px" }}>
                   {isOnboarding ? (en ? "Train your digital clone" : "Entrena a tu clon digital") : (en ? "Your brand DNA" : "ADN de tu marca")}
                 </h1>
                 <p style={{ fontSize: 14, color: D.text2, letterSpacing: "-0.02em" }}>
                   {en ? "Build your complete brand identity" : "Construye tu identidad de marca completa"}
                 </p>
               </div>
-              <div style={{ fontSize: 12, color: saveStatus === "saving" ? "#A78BFA" : saveStatus === "saved" ? "#40C057" : saveStatus === "error" ? "#FCA5A5" : "transparent" }}>
+              <div style={{ fontSize: 12, color: saveStatus === "saving" ? "#A78BFA" : saveStatus === "saved" ? "#5DCAA5" : saveStatus === "error" ? "#E24B4A" : "transparent" }}>
                 {saveStatus === "saving" && (en ? "Saving..." : "Guardando...")}
                 {saveStatus === "saved" && (en ? "\u2713 Saved" : "\u2713 Guardado")}
                 {saveStatus === "error" && (en ? "\u26A0 Error" : "\u26A0 Error")}
@@ -456,23 +453,23 @@ function ADNContent() {
             <div style={{ ...card, marginBottom: 20 }}>
               <button onClick={() => setStep(step === 1 ? 0 : 1)} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", background: "none", border: "none", cursor: "pointer", padding: 0, marginBottom: step === 1 ? 16 : 0 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <div style={{ width: 28, height: 28, borderRadius: "50%", background: stepProgress[0] === 100 ? "rgba(64,192,87,0.15)" : "rgba(121,80,242,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 600, color: stepProgress[0] === 100 ? "#40C057" : "#A78BFA" }}>
+                  <div style={{ width: 26, height: 26, borderRadius: "50%", background: stepProgress[0] === 100 ? "rgba(64,192,87,0.15)" : "rgba(121,80,242,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 600, color: stepProgress[0] === 100 ? "#40C057" : "#A78BFA" }}>
                     {stepProgress[0] === 100 ? "\u2713" : "1"}
                   </div>
-                  <span style={{ fontSize: 15, fontWeight: 700, color: "#fff" }}>{STEPS[0].title}</span>
+                  <span style={{ fontSize: 13, fontWeight: 500, letterSpacing: "-0.1px", color: "#fff" }}>{STEPS[0].title}</span>
                 </div>
                 <span style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", transform: step === 1 ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>{"\u25BC"}</span>
               </button>
               {step === 1 && (
                 <div style={{ animation: "fadeIn 0.3s ease" }}>
                   {/* Hero Card — AI Analyze */}
-                  <div style={{ ...card, background: D.bg2, border: "1.5px solid " + D.purple, padding: "20px 24px", textAlign: "center", marginBottom: 20, position: "relative", overflow: "hidden" }}>
+                  <div style={{ ...card, background: "#10101C", border: "1.5px solid " + D.purple, padding: "18px 20px", textAlign: "center", marginBottom: 20, position: "relative", overflow: "hidden" }}>
                     <div style={{ position: "relative", zIndex: 1, display: "flex", alignItems: "center", gap: 14 }}>
                       <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(121,80,242,0.15)", border: "1px solid rgba(121,80,242,0.3)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={D.purpleLight} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a4 4 0 0 1 4 4c0 1.5-.8 2.8-2 3.4V11h3a3 3 0 0 1 3 3v1a2 2 0 0 1-2 2h-1v3a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-3H6a2 2 0 0 1-2-2v-1a3 3 0 0 1 3-3h3V9.4C8.8 8.8 8 7.5 8 6a4 4 0 0 1 4-4z"/></svg>
                       </div>
                       <div style={{ textAlign: "left" }}>
-                        <h2 style={{ fontSize: 16, fontWeight: 700, color: D.text, marginBottom: 2, letterSpacing: "-0.02em" }}>{en ? "AiStudioBrand builds your DNA in seconds" : "AiStudioBrand construye tu ADN en segundos"}</h2>
+                        <h2 style={{ fontSize: 13, fontWeight: 500, color: D.text, marginBottom: 2, letterSpacing: "-0.1px" }}>{en ? "AiStudioBrand builds your DNA in seconds" : "AiStudioBrand construye tu ADN en segundos"}</h2>
                         <p style={{ fontSize: 13, color: D.text2, lineHeight: 1.5, letterSpacing: "-0.02em", margin: 0 }}>
                           {en ? "Connect your channels and analyze your content to extract tone, audience and personality." : "Conecta tus canales y analiza tu contenido para extraer tono, audiencia y personalidad."}
                         </p>
@@ -484,7 +481,7 @@ function ADNContent() {
                   <div style={{ marginBottom: 24 }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 12 }}>
                       <div>
-                        <div style={{ fontSize: 15, fontWeight: 700, color: D.text, letterSpacing: "-0.02em" }}>
+                        <div style={{ fontSize: 13, fontWeight: 500, letterSpacing: "-0.1px", color: D.text }}>
                           {en ? "Connect your sources" : "Conecta tus fuentes"}
                         </div>
                         <div style={{ fontSize: 12, color: D.text3, marginTop: 2 }}>
@@ -563,10 +560,10 @@ function ADNContent() {
             <div style={{ ...card, marginBottom: 20 }}>
               <button onClick={() => setStep(step === 2 ? 0 : 2)} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", background: "none", border: "none", cursor: "pointer", padding: 0, marginBottom: step === 2 ? 16 : 0 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <div style={{ width: 28, height: 28, borderRadius: "50%", background: stepProgress[1] === 100 ? "rgba(64,192,87,0.15)" : "rgba(121,80,242,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 600, color: stepProgress[1] === 100 ? "#40C057" : "#A78BFA" }}>
+                  <div style={{ width: 26, height: 26, borderRadius: "50%", background: stepProgress[1] === 100 ? "rgba(64,192,87,0.15)" : "rgba(121,80,242,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 600, color: stepProgress[1] === 100 ? "#40C057" : "#A78BFA" }}>
                     {stepProgress[1] === 100 ? "\u2713" : "2"}
                   </div>
-                  <span style={{ fontSize: 15, fontWeight: 700, color: "#fff" }}>{STEPS[1].title}</span>
+                  <span style={{ fontSize: 13, fontWeight: 500, letterSpacing: "-0.1px", color: "#fff" }}>{STEPS[1].title}</span>
                 </div>
                 <span style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", transform: step === 2 ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>{"\u25BC"}</span>
               </button>
@@ -574,7 +571,7 @@ function ADNContent() {
                 <div style={{ animation: "fadeIn 0.3s ease" }}>
                   {/* Card 1 — Identidad */}
                   <div style={{ ...card, marginBottom: 24 }}>
-                    <div style={{ fontSize: 15, fontWeight: 700, color: D.text, marginBottom: 16 }}>{en ? "Identity" : "Identidad"}</div>
+                    <div style={{ fontSize: 13, fontWeight: 500, letterSpacing: "-0.1px", color: D.text, marginBottom: 16 }}>{en ? "Identity" : "Identidad"}</div>
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
                       <AIField label={en ? "Name / account" : "Nombre / cuenta"} value={profile.nombre} originalAIValue={aiOriginal.nombre} onChange={v => setProfile(p => ({...p, nombre: v}))} placeholder="@yourbrand" />
                       <AIField label={en ? "Who you talk to" : "A quién le hablas"} value={profile.audiencia} originalAIValue={aiOriginal.audiencia} onChange={v => setProfile(p => ({...p, audiencia: v}))} placeholder={en ? "Latina women 28-42 in the US" : "Mujeres latinas 28-42 en EE.UU."} />
@@ -583,7 +580,7 @@ function ADNContent() {
 
                   {/* Card 2 — Tu historia */}
                   <div style={{ ...card, marginBottom: 24 }}>
-                    <div style={{ fontSize: 15, fontWeight: 700, color: D.text, marginBottom: 16 }}>{en ? "Your story" : "Tu historia"}</div>
+                    <div style={{ fontSize: 13, fontWeight: 500, letterSpacing: "-0.1px", color: D.text, marginBottom: 16 }}>{en ? "Your story" : "Tu historia"}</div>
                     <AIField
                       label={en ? "What you do and what makes you different" : "Qué haces y qué te hace diferente"}
                       value={profile.descripcion + (profile.propuestaValor ? "\n\n" + profile.propuestaValor : "")}
@@ -600,7 +597,7 @@ function ADNContent() {
 
                   {/* Card 3 — Cómo suenas */}
                   <div style={{ ...card, marginBottom: 24 }}>
-                    <div style={{ fontSize: 15, fontWeight: 700, color: D.text, marginBottom: 16 }}>{en ? "How you sound" : "Cómo suenas"}</div>
+                    <div style={{ fontSize: 13, fontWeight: 500, letterSpacing: "-0.1px", color: D.text, marginBottom: 16 }}>{en ? "How you sound" : "Cómo suenas"}</div>
                     <div style={{ marginBottom: 16 }}>
                       <div style={{ fontSize: 12, color: D.text2, marginBottom: 8 }}>{en ? "Main language" : "Idioma principal"}</div>
                       <ChipSelector
@@ -627,7 +624,7 @@ function ADNContent() {
 
                   {/* Card 4 — Categorías */}
                   <div style={{ ...card, marginBottom: 0 }}>
-                    <div style={{ fontSize: 15, fontWeight: 700, color: D.text, marginBottom: 16 }}>{en ? "Content categories" : "Categorías de contenido"}</div>
+                    <div style={{ fontSize: 13, fontWeight: 500, letterSpacing: "-0.1px", color: D.text, marginBottom: 16 }}>{en ? "Content categories" : "Categorías de contenido"}</div>
                     <ChipSelector
                       mode="multi"
                       en={en}
@@ -657,10 +654,10 @@ function ADNContent() {
             <div style={{ ...card, marginBottom: 20 }}>
               <button onClick={() => setStep(step === 3 ? 0 : 3)} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", background: "none", border: "none", cursor: "pointer", padding: 0, marginBottom: step === 3 ? 16 : 0 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <div style={{ width: 28, height: 28, borderRadius: "50%", background: stepProgress[2] === 100 ? "rgba(64,192,87,0.15)" : "rgba(121,80,242,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 600, color: stepProgress[2] === 100 ? "#40C057" : "#A78BFA" }}>
+                  <div style={{ width: 26, height: 26, borderRadius: "50%", background: stepProgress[2] === 100 ? "rgba(64,192,87,0.15)" : "rgba(121,80,242,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 600, color: stepProgress[2] === 100 ? "#40C057" : "#A78BFA" }}>
                     {stepProgress[2] === 100 ? "\u2713" : "3"}
                   </div>
-                  <span style={{ fontSize: 15, fontWeight: 700, color: "#fff" }}>{STEPS[2].title}</span>
+                  <span style={{ fontSize: 13, fontWeight: 500, letterSpacing: "-0.1px", color: "#fff" }}>{STEPS[2].title}</span>
                 </div>
                 <span style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", transform: step === 3 ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>{"\u25BC"}</span>
               </button>
@@ -668,7 +665,7 @@ function ADNContent() {
                 <div style={{ animation: "fadeIn 0.3s ease" }}>
                   {/* Card 1 — Paleta de marca */}
                   <div style={{ ...card, marginBottom: 24 }}>
-                    <div style={{ fontSize: 15, fontWeight: 700, color: D.text, marginBottom: 16 }}>{en ? "Brand palette" : "Paleta de marca"}</div>
+                    <div style={{ fontSize: 13, fontWeight: 500, letterSpacing: "-0.1px", color: D.text, marginBottom: 16 }}>{en ? "Brand palette" : "Paleta de marca"}</div>
                     <ExtractedPalette
                       en={en}
                       extractedColors={profile.coloresMarca.filter((_, i) => i < (aiOriginal.colores_marca?.length || 0))}
@@ -680,7 +677,7 @@ function ADNContent() {
 
                   {/* Card 2 — Personalidad de marca */}
                   <div style={{ ...card, marginBottom: 24 }}>
-                    <div style={{ fontSize: 15, fontWeight: 700, color: D.text, marginBottom: 16 }}>{en ? "Brand personality" : "Personalidad de marca"}</div>
+                    <div style={{ fontSize: 13, fontWeight: 500, letterSpacing: "-0.1px", color: D.text, marginBottom: 16 }}>{en ? "Brand personality" : "Personalidad de marca"}</div>
                     <AIField
                       label={en ? "How your brand speaks \u2014 and what it avoids" : "C\u00f3mo habla tu marca \u2014 y qu\u00e9 evita"}
                       value={profile.personalidad}
@@ -701,7 +698,7 @@ function ADNContent() {
 
                   {/* Card 3 — Ejemplos de tu voz */}
                   <div style={{ ...card, marginBottom: 24 }}>
-                    <div style={{ fontSize: 15, fontWeight: 700, color: D.text, marginBottom: 4 }}>{en ? "Examples of your ideal voice" : "Ejemplos de tu voz ideal"}</div>
+                    <div style={{ fontSize: 13, fontWeight: 500, letterSpacing: "-0.1px", color: D.text, marginBottom: 4 }}>{en ? "Examples of your ideal voice" : "Ejemplos de tu voz ideal"}</div>
                     <div style={{ fontSize: 12, color: D.text3, marginBottom: 16 }}>{en ? "AI learns your exact style from these examples" : "La IA aprende tu estilo exacto de estos ejemplos"}</div>
                     {profile.ejemplosCopy.map((ej, i) => (
                       <CopyExampleCard
@@ -719,7 +716,7 @@ function ADNContent() {
                   {/* Card 4 — Marcas de referencia (collapsible) */}
                   <div style={{ ...card, marginBottom: 0 }}>
                     <button onClick={() => setShowCompetitors(!showCompetitors)} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", background: "none", border: "none", cursor: "pointer", padding: 0 }}>
-                      <div style={{ fontSize: 15, fontWeight: 700, color: D.text }}>{en ? "Reference brands" : "Marcas de referencia"}</div>
+                      <div style={{ fontSize: 13, fontWeight: 500, letterSpacing: "-0.1px", color: D.text }}>{en ? "Reference brands" : "Marcas de referencia"}</div>
                       <span style={{ fontSize: 10, color: D.text3 }}>{showCompetitors ? "\u25B2" : "\u25BC"}</span>
                     </button>
                     {showCompetitors && (
