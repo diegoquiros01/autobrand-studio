@@ -227,7 +227,7 @@ function ADNContent() {
       const res = await fetch("/api/brands", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ brandId: currentBrandId, userId, payload }),
+        body: JSON.stringify({ brandId: currentBrandId, userId, payload, forceNew: !currentBrandId && new URLSearchParams(window.location.search).get("new") === "true" }),
       });
       const json = await res.json();
       if (json.brandId && !currentBrandId) {

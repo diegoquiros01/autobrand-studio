@@ -47,7 +47,7 @@ function sanitizeTono(tono) {
 // POST: save/update brand profile
 export async function POST(request) {
   try {
-    const { brandId, userId, payload } = await request.json();
+    const { brandId, userId, payload, forceNew } = await request.json();
     if (!userId || !payload) return Response.json({ error: "missing data" }, { status: 400 });
     if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId)) return Response.json({ error: "invalid userId" }, { status: 400 });
 
@@ -61,8 +61,13 @@ export async function POST(request) {
       const { error } = await supabase.from("brand_profiles").update(payload).eq("id", brandId);
       if (error) return Response.json({ error: error.message }, { status: 500 });
       return Response.json({ success: true, brandId });
+    } else if (forceNew) {
+      // Force create new brand (for ?new=true flow)
+      const { data: inserted, error } = await supabase.from("brand_profiles").insert({ ...payload, user_id: userId }).select("id").single();
+      if (error) return Response.json({ error: error.message }, { status: 500 });
+      return Response.json({ success: true, brandId: inserted.id });
     } else {
-      // Check if user already has a profile
+      // No brandId, no forceNew — find existing or create
       const { data: existing } = await supabase.from("brand_profiles").select("id").eq("user_id", userId).limit(1);
       if (existing && existing.length > 0) {
         const { error } = await supabase.from("brand_profiles").update(payload).eq("id", existing[0].id);
