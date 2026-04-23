@@ -191,9 +191,9 @@ export default function AppLayout({ children }) {
             style={{ display: "none", background: "none", border: "none", color: "#fff", fontSize: 22, cursor: "pointer", padding: 4 }}>
             ☰
           </button>
-          {/* Breadcrumb */}
-          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <span style={{ ...theme.topbar.crumb, cursor: "pointer" }} onClick={() => router.push("/")}>AiStudioBrand</span>
+          {/* Logo + Breadcrumb */}
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <img src="/logo.svg" alt="AiStudioBrand" style={{ height: 24, cursor: "pointer" }} onClick={() => router.push("/")} />
             {pageName && (
               <>
                 <span style={{ ...theme.topbar.crumbSep, fontSize: 10 }}>/</span>
@@ -230,11 +230,6 @@ export default function AppLayout({ children }) {
           position: "fixed", top: 64, bottom: 0, left: 0, zIndex: 40,
           overflowY: "auto", transition: "transform 0.3s ease",
         }}>
-          {/* Logo */}
-          <div style={{ padding: "0 8px", marginBottom: 20, cursor: "pointer" }} onClick={() => router.push("/")}>
-            <img src="/logo.svg" alt="AiStudioBrand" style={{ height: 28 }} />
-          </div>
-
           {/* Section label: MARCA */}
           <div style={{ ...theme.sidebar.sectionLabel, marginTop: 4 }}>{en ? "BRAND" : "MARCA"}</div>
 
