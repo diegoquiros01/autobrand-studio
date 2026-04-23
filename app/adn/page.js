@@ -254,14 +254,23 @@ function ADNContent() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ brandId: currentBrandId, userId, payload, forceNew: !currentBrandId && new URLSearchParams(window.location.search).get("new") === "true" }),
       });
+      if (!res.ok) {
+        const errText = await res.text();
+        console.error("Save API error:", res.status, errText);
+        setSaveStatus("error");
+        setTimeout(() => setSaveStatus("idle"), 4000);
+        return;
+      }
       const json = await res.json();
       if (json.brandId && !currentBrandId) {
         brandIdRef.current = json.brandId;
         setBrandId(json.brandId);
         localStorage.setItem("activeBrandId", json.brandId);
+        // Reload sidebar brands
+        window.dispatchEvent(new Event("brandChanged"));
       }
     } catch(e) {
-      console.warn("Save error:", e);
+      console.error("Save fetch error:", e);
       setSaveStatus("error");
       setTimeout(() => setSaveStatus("idle"), 4000);
     }

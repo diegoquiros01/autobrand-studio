@@ -55,6 +55,8 @@ export async function POST(request) {
     if (payload.tono) {
       payload.tono = sanitizeTono(payload.tono);
     }
+    // Log payload for debugging (temporary)
+    console.log("brands POST:", { brandId, userId, forceNew, payloadKeys: Object.keys(payload), tono: payload.tono, tonoType: typeof payload.tono });
 
     if (brandId) {
       // Update existing
@@ -80,6 +82,6 @@ export async function POST(request) {
       }
     }
   } catch(e) {
-    return Response.json({ error: e.message }, { status: 500 });
+    return Response.json({ error: e.message, stack: e.stack?.split('\n')[0] }, { status: 500 });
   }
 }
