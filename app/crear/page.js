@@ -383,6 +383,18 @@ function CrearContent() {
     return () => clearInterval(iv);
   }, []);
 
+  const promptSuggestions = en ? [
+    { icon: "📢", text: "Announce a new product or service" },
+    { icon: "💬", text: "Share a client testimonial or success story" },
+    { icon: "📚", text: "Teach something valuable about your industry" },
+    { icon: "🎉", text: "Celebrate a milestone or achievement" },
+  ] : [
+    { icon: "📢", text: "Anunciar un nuevo producto o servicio" },
+    { icon: "💬", text: "Compartir un testimonio o caso de éxito" },
+    { icon: "📚", text: "Enseñar algo valioso sobre tu industria" },
+    { icon: "🎉", text: "Celebrar un logro o milestone" },
+  ];
+
   const UploadZone = ({ onClick, children }) => (
     <div onClick={onClick}
       style={{ border:"2px dashed rgba(121,80,242,0.3)", borderRadius:12, padding:"28px 20px", textAlign:"center", cursor:"pointer", transition:"all 0.15s", background:"rgba(121,80,242,0.04)" }}
@@ -478,6 +490,30 @@ function CrearContent() {
                   showCounter={false}
                 />
               </div>
+
+            {/* Prompt suggestions */}
+            {!prompt.trim() && (
+              <div style={{ marginBottom: 16 }}>
+                <div style={{ fontSize: 11, color: D.text3, marginBottom: 8 }}>{en ? "Quick start ideas" : "Ideas para empezar"}</div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+                  {promptSuggestions.map((s, i) => (
+                    <button key={i} onClick={() => setPrompt(s.text)}
+                      style={{
+                        display: "flex", alignItems: "center", gap: 8, padding: "10px 12px",
+                        background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(255,255,255,0.08)",
+                        borderRadius: 10, cursor: "pointer", textAlign: "left", transition: "all 0.15s",
+                        color: D.text2, fontSize: 12, fontFamily: "inherit",
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(121,80,242,0.3)"; e.currentTarget.style.background = "rgba(121,80,242,0.06)"; }}
+                      onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"; e.currentTarget.style.background = "rgba(255,255,255,0.03)"; }}
+                    >
+                      <span style={{ fontSize: 16, flexShrink: 0 }}>{s.icon}</span>
+                      <span>{s.text}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Collapsible: Visual References (optional) */}
             <div style={{ marginTop:16 }}>
@@ -690,8 +726,9 @@ function CrearContent() {
                 ) : (
                   <div>
                     <div style={{ fontSize:13, color:D.text2, marginBottom:14 }}>{en ? "Select and edit your favorite copy" : "Selecciona y edita tu copy favorito"}</div>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 10, marginBottom: 10 }}>
                     {copies.map(c => (
-                      <div key={c.id} style={{ background: copySeleccionado===c.id ? "rgba(121,80,242,0.08)" : D.bg3, border: copySeleccionado===c.id ? "1.5px solid " + D.purple : "1px solid " + D.border, borderRadius:12, padding:"14px 16px", marginBottom:10 }}>
+                      <div key={c.id} style={{ background: copySeleccionado===c.id ? "rgba(121,80,242,0.08)" : D.bg3, border: copySeleccionado===c.id ? "1.5px solid " + D.purple : "1px solid " + D.border, borderRadius:12, padding:"14px 16px", minHeight: 200, display: "flex", flexDirection: "column" }}>
                         {editingCopy === c.id ? (
                           <div>
                             <textarea value={editedText} onChange={e => setEditedText(e.target.value)} rows={7}
@@ -700,13 +737,13 @@ function CrearContent() {
                               style={{ padding:"6px 14px", background:D.purple, color:"#fff", border:"none", borderRadius:7, fontSize:12, cursor:"pointer" }}>{en ? "Save edit" : "Guardar edición"}</button>
                           </div>
                         ) : (
-                          <div>
+                          <div style={{ display:"flex", flexDirection:"column", flex:1 }}>
                             <div style={{ fontSize:10, fontWeight:500, color:D.purpleLight, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:6 }}>{en ? "Option" : "Opción"} {c.id}</div>
                             <div style={{ fontSize:13, fontWeight:500, color:D.text, marginBottom:5 }}>{c.hook}</div>
                             <div style={{ fontSize:12, color:D.text2, lineHeight:1.65, marginBottom:5 }}>{c.copy}</div>
                             <div style={{ fontSize:12, color:D.purpleLight, fontWeight:500, marginBottom:5 }}>{c.cta}</div>
                             {c.hashtags && <div style={{ fontSize:11, color:"rgba(167,139,250,0.5)", marginBottom:10 }}>{c.hashtags}</div>}
-                            <div style={{ display:"flex", gap:6 }}>
+                            <div style={{ display:"flex", gap:6, marginTop:"auto", flexWrap:"wrap" }}>
                               <button onClick={() => { setCopySeleccionado(c.id); setEditedText(c.hook + "\n\n" + c.copy + "\n\n" + c.cta + (c.hashtags ? "\n\n" + c.hashtags : "")); }}
                                 style={{ padding:"5px 12px", borderRadius:6, fontSize:11, fontWeight:500, background: copySeleccionado===c.id ? D.purple : "rgba(255,255,255,0.06)", color: copySeleccionado===c.id ? "#fff" : D.text2, border: copySeleccionado===c.id ? "none" : "1px solid rgba(255,255,255,0.1)", cursor:"pointer" }}>
                                 {copySeleccionado===c.id ? (en ? "\u2713 Selected" : "\u2713 Seleccionado") : (en ? "Select" : "Seleccionar")}
@@ -736,6 +773,7 @@ function CrearContent() {
                         )}
                       </div>
                     ))}
+                    </div>
                     <button onClick={() => { guardarFinal(); goToStep(3); }} disabled={savingFinal || !copySeleccionado || !imgAprobada}
                       style={{ width:"100%", padding:13, background: (savingFinal || !copySeleccionado || !imgAprobada) ? "rgba(64,192,87,0.3)" : "linear-gradient(135deg,#40C057,#2F9E44)", color:"#fff", border:"none", borderRadius:10, fontSize:14, fontWeight:500, cursor: (savingFinal || !copySeleccionado || !imgAprobada) ? "not-allowed" : "pointer", marginTop:6, opacity: (!copySeleccionado || !imgAprobada) ? 0.5 : 1 }}>
                       {savingFinal ? (en ? "Saving..." : "Guardando...") : (en ? "Save final art \u2192" : "Guardar arte final \u2192")}

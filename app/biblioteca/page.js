@@ -11,6 +11,7 @@ export default function Biblioteca() {
   const [selected, setSelected] = useState(null);
   const [filter, setFilter] = useState("todas");
   const [page, setPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
   const PER_PAGE = 20;
 
   const [lang, setLang] = useState("es");
@@ -63,7 +64,17 @@ export default function Biblioteca() {
 
   const formatDate = (d) => new Date(d).toLocaleDateString(en ? "en-US" : "es-ES", { day:"numeric", month:"short", year:"numeric" });
 
-  const allFiltered = filter === "todas" ? generaciones : generaciones.filter(g => g.tipo === filter);
+  const searchFiltered = searchQuery.trim()
+    ? generaciones.filter(g => {
+        const q = searchQuery.toLowerCase();
+        const matchPrompt = g.prompt?.toLowerCase().includes(q);
+        const matchCopy = g.propuestas?.[0]?.hook?.toLowerCase().includes(q) ||
+                          g.propuestas?.[0]?.copy?.toLowerCase().includes(q) ||
+                          g.propuestas?.[0]?.hashtags?.toLowerCase().includes(q);
+        return matchPrompt || matchCopy;
+      })
+    : generaciones;
+  const allFiltered = filter === "todas" ? searchFiltered : searchFiltered.filter(g => g.tipo === filter);
   const totalPages = Math.ceil(allFiltered.length / PER_PAGE);
   const filtered = allFiltered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
 
@@ -81,11 +92,34 @@ export default function Biblioteca() {
           </button>
         </div>
 
+        {/* Search */}
+        <div style={{ marginBottom: 16 }}>
+          <div style={{ position: "relative", display: "inline-block", width: "100%", maxWidth: 400 }}>
+            <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", fontSize: 14, color: "rgba(255,255,255,0.3)", pointerEvents: "none" }}>🔍</span>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={e => { setSearchQuery(e.target.value); setPage(1); }}
+              placeholder={en ? "Search by prompt, copy, or hashtags..." : "Buscar por prompt, copy o hashtags..."}
+              style={{
+                width: "100%", maxWidth: 400,
+                background: "rgba(255,255,255,0.04)",
+                border: "0.5px solid rgba(255,255,255,0.08)",
+                borderRadius: 10, padding: "10px 14px 10px 36px",
+                fontSize: 13, color: "#fff", outline: "none",
+                fontFamily: "inherit",
+              }}
+              onFocus={e => e.target.style.borderColor = "#7950F2"}
+              onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.08)"}
+            />
+          </div>
+        </div>
+
         <div style={{ display:"flex", gap:6, marginBottom:20, flexWrap:"wrap" }}>
           {TIPOS.map(t => (
             <button key={t} onClick={() => { setFilter(t); setPage(1); }}
               style={{ padding:"5px 12px", borderRadius:20, fontSize:11.5, border: filter===t ? "1.5px solid " + D.purple : "1px solid rgba(255,255,255,0.1)", background: filter===t ? "rgba(121,80,242,0.12)" : "transparent", color: filter===t ? D.purpleLight : D.text3, fontWeight: filter===t ? 500 : 400, cursor:"pointer" }}>
-              {t === "todas" ? (en ? "All" : "Todas") + " (" + generaciones.length + ")" : t + " (" + generaciones.filter(g => g.tipo === t).length + ")"}
+              {t === "todas" ? (en ? "All" : "Todas") + " (" + searchFiltered.length + ")" : t + " (" + searchFiltered.filter(g => g.tipo === t).length + ")"}
             </button>
           ))}
         </div>
@@ -100,13 +134,28 @@ export default function Biblioteca() {
           <div style={{ background:D.bg3, border:"1px solid " + D.border, borderRadius:14, padding:"60px 24px", textAlign:"center" }}>
             <div style={{ fontSize:40, opacity:0.1, marginBottom:12 }}>◉</div>
             <div style={{ fontSize:15, color:D.text2, fontWeight:500, marginBottom:8 }}>
-              {filter === "todas" ? (en ? "You don't have any pieces yet" : "No tienes piezas todavía") : (en ? "You don't have pieces of type " : "No tienes piezas de tipo ") + filter}
+              {searchQuery.trim()
+                ? (en ? `No pieces matching "${searchQuery}"` : `No hay piezas que coincidan con "${searchQuery}"`)
+                : filter === "todas"
+                  ? (en ? "You don't have any pieces yet" : "No tienes piezas todavía")
+                  : (en ? "You don't have pieces of type " : "No tienes piezas de tipo ") + filter}
             </div>
-            <div style={{ fontSize:13, color:D.text3, marginBottom:20 }}>{en ? "Generate your first piece and it will appear here" : "Genera tu primera pieza y aparecerá aquí"}</div>
-            <button onClick={() => router.push("/crear")}
-              style={{ padding:"11px 24px", background:D.purple, color:"#fff", border:"none", borderRadius:9, fontSize:14, fontWeight:500, cursor:"pointer" }}>
-              {en ? "Create my first piece →" : "Crear mi primera pieza →"}
-            </button>
+            <div style={{ fontSize:13, color:D.text3, marginBottom:20 }}>
+              {searchQuery.trim()
+                ? (en ? "Try a different search term" : "Intenta con otro término de búsqueda")
+                : (en ? "Generate your first piece and it will appear here" : "Genera tu primera pieza y aparecerá aquí")}
+            </div>
+            {searchQuery.trim() ? (
+              <button onClick={() => { setSearchQuery(""); setPage(1); }}
+                style={{ padding:"11px 24px", background:"rgba(255,255,255,0.06)", color:D.text2, border:"1px solid " + D.border, borderRadius:9, fontSize:14, fontWeight:500, cursor:"pointer" }}>
+                {en ? "Clear search" : "Limpiar búsqueda"}
+              </button>
+            ) : (
+              <button onClick={() => router.push("/crear")}
+                style={{ padding:"11px 24px", background:D.purple, color:"#fff", border:"none", borderRadius:9, fontSize:14, fontWeight:500, cursor:"pointer" }}>
+                {en ? "Create my first piece →" : "Crear mi primera pieza →"}
+              </button>
+            )}
           </div>
         ) : (
           <div style={{ display:"grid", gridTemplateColumns: selected ? "1fr 380px" : "1fr", gap:20, alignItems:"start" }}>
