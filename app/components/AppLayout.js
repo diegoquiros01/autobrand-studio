@@ -193,7 +193,7 @@ export default function AppLayout({ children }) {
           </button>
           {/* Logo + Breadcrumb */}
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <img src="/logo.svg" alt="AiStudioBrand" style={{ height: 24, cursor: "pointer" }} onClick={() => router.push("/")} />
+            <img src="/logo.svg" alt="AiStudioBrand" style={{ height: 36, cursor: "pointer" }} onClick={() => router.push("/")} />
             {pageName && (
               <>
                 <span style={{ ...theme.topbar.crumbSep, fontSize: 10 }}>/</span>
