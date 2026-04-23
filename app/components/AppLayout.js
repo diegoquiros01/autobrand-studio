@@ -231,15 +231,8 @@ export default function AppLayout({ children }) {
           overflowY: "auto", transition: "transform 0.3s ease",
         }}>
           {/* Logo */}
-          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "0 8px", marginBottom: 20 }} onClick={() => router.push("/")} >
-            <div style={{
-              width: theme.sidebar.brandMark.size, height: theme.sidebar.brandMark.size,
-              borderRadius: theme.sidebar.brandMark.radius, background: theme.sidebar.brandMark.bg,
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: theme.sidebar.brandMark.fontSize, color: "#fff", fontWeight: 700, flexShrink: 0,
-              cursor: "pointer",
-            }}>Ai</div>
-            <span style={{ fontSize: theme.sidebar.brandName.fontSize, fontWeight: theme.sidebar.brandName.fontWeight, color: "#fff", letterSpacing: theme.sidebar.brandName.letterSpacing, cursor: "pointer" }}>AiStudioBrand</span>
+          <div style={{ padding: "0 8px", marginBottom: 20, cursor: "pointer" }} onClick={() => router.push("/")}>
+            <img src="/logo.svg" alt="AiStudioBrand" style={{ height: 28 }} />
           </div>
 
           {/* Section label: MARCA */}
