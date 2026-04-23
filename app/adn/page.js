@@ -278,7 +278,9 @@ function ADNContent() {
     { key: "ejemplosCopy", done: profile.ejemplosCopy.some(e => e && e.trim()) },
   ];
   const filledCount = progressFields.filter(f => f.done).length;
-  const pct = Math.round((filledCount / progressFields.length) * 100);
+  const rawPct = Math.round((filledCount / progressFields.length) * 100);
+  // Cap at 95% if user hasn't visited all steps yet
+  const pct = (rawPct === 100 && step < 3) ? 95 : rawPct;
 
   // Per-step progress
   const step1Fields = ["instagramUrl"];
