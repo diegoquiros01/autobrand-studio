@@ -28,88 +28,70 @@ export default function AppLayout({ children }) {
   const [dnaSectionOpen, setDnaSectionOpen] = useState(true);
 
   useEffect(() => {
-    // Instant render from localStorage cache
-    const cachedBp = localStorage.getItem("brandProfile");
-    if (cachedBp) {
-      try {
-        const bp = JSON.parse(cachedBp);
-        if (bp.id && bp.nombre) {
-          setActiveBrand({ id: bp.id, nombre: bp.nombre, tono: bp.tono, idioma: bp.idioma });
-          setBrands([{ id: bp.id, nombre: bp.nombre, tono: bp.tono, idioma: bp.idioma }]);
-        }
-      } catch(e) {}
-    }
-
     const init = async () => {
-      // Get auth session
+      // 1. Auth check (but don't block brand loading on it)
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) { router.push("/login"); return; }
       setUser(session.user);
 
-      // Load brands via server API
-      await loadBrands(session.user.id);
+      // 2. Load brands — use activeBrandId first (always works), then try full list by userId
+      await loadBrandsFromAny(session.user.id);
     };
     init();
 
     supabase.auth.onAuthStateChange((_e, session) => {
       if (!session) router.push("/login");
-      else { setUser(session?.user); if (session?.user) loadBrands(session.user.id); }
+      else setUser(session?.user);
     });
 
     const saved = localStorage.getItem("lang");
     if (saved) setLang(saved);
 
-    const handleBrandChanged = () => reloadBrands();
+    const handleBrandChanged = () => loadBrandsFromAny();
     window.addEventListener("brandChanged", handleBrandChanged);
     return () => window.removeEventListener("brandChanged", handleBrandChanged);
   }, []);
 
-  const reloadBrands = async () => {
-    // Load by activeBrandId — always works, no auth needed
-    const bid = localStorage.getItem("activeBrandId");
-    if (bid) {
-      try {
+  // Single function that loads brands — no auth dependency
+  const loadBrandsFromAny = async (userId) => {
+    try {
+      // Step 1: Try loading active brand by ID (always works via server API)
+      const bid = localStorage.getItem("activeBrandId");
+      let activeBrandData = null;
+      if (bid) {
         const res = await fetch("/api/brands?brandId=" + bid);
         const json = await res.json();
         if (json.brand) {
-          const b = json.brand;
-          const item = { id: b.id, nombre: b.nombre, tono: b.tono, idioma: b.idioma };
-          // Update active brand info without clearing the list
-          setActiveBrand(item);
-          setBrands(prev => {
-            const exists = prev.find(x => x.id === b.id);
-            if (exists) return prev.map(x => x.id === b.id ? item : x);
-            return [...prev, item];
-          });
-          localStorage.setItem("brandProfile", JSON.stringify(fullToCache(b)));
+          activeBrandData = json.brand;
+          userId = userId || json.brand.user_id; // get userId from brand if we don't have it
         }
-      } catch(e) {}
-    }
-  };
+      }
 
-  const loadBrands = async (userId) => {
-    try {
-      const res = await fetch("/api/brands?userId=" + userId);
-      const json = await res.json();
-      const list = json.data || [];
+      // Step 2: Try loading all brands by userId
+      let allBrands = [];
+      if (userId) {
+        const res = await fetch("/api/brands?userId=" + userId);
+        const json = await res.json();
+        allBrands = json.data || [];
+      }
 
-      // Only update if we got results — never clear existing brands
-      if (list.length === 0) return;
+      // Step 3: If we got a list, use it. Otherwise use the single active brand.
+      if (allBrands.length > 0) {
+        setBrands(allBrands);
+        const active = activeBrandData
+          ? allBrands.find(b => b.id === activeBrandData.id) || allBrands[0]
+          : allBrands[0];
+        setActiveBrand(active);
+        localStorage.setItem("activeBrandId", active.id);
+      } else if (activeBrandData) {
+        const item = { id: activeBrandData.id, nombre: activeBrandData.nombre, tono: activeBrandData.tono, idioma: activeBrandData.idioma };
+        setBrands([item]);
+        setActiveBrand(item);
+      }
 
-      setBrands(list);
-
-      // Determine active brand
-      const savedId = localStorage.getItem("activeBrandId");
-      const found = savedId ? list.find(b => b.id === savedId) : null;
-      const active = found || list[0];
-      setActiveBrand(active);
-      localStorage.setItem("activeBrandId", active.id);
-
-      // Load full profile into cache
-      const res2 = await fetch("/api/brands?brandId=" + active.id);
-      const json2 = await res2.json();
-      if (json2.brand) {
-        localStorage.setItem("brandProfile", JSON.stringify(fullToCache(json2.brand)));
+      // Step 4: Cache full profile of active brand
+      if (activeBrandData) {
+        localStorage.setItem("brandProfile", JSON.stringify(fullToCache(activeBrandData)));
       }
     } catch(e) { console.warn("loadBrands error:", e); }
   };
