@@ -55,9 +55,6 @@ export async function POST(request) {
     if (payload.tono) {
       payload.tono = sanitizeTono(payload.tono);
     }
-    // Log payload for debugging (temporary)
-    console.log("brands POST:", { brandId, userId, forceNew, payloadKeys: Object.keys(payload), tono: payload.tono, tonoType: typeof payload.tono });
-
     if (brandId) {
       // Update existing
       const { error } = await supabase.from("brand_profiles").update(payload).eq("id", brandId);

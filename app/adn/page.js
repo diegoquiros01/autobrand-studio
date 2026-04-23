@@ -268,6 +268,8 @@ function ADNContent() {
         localStorage.setItem("activeBrandId", json.brandId);
         // Reload sidebar brands
         window.dispatchEvent(new Event("brandChanged"));
+        // Update URL to reflect saved brand (remove ?new=true)
+        window.history.replaceState({}, '', '/adn?brand=' + json.brandId);
       }
     } catch(e) {
       console.error("Save fetch error:", e);
@@ -357,7 +359,8 @@ function ADNContent() {
 
   const analyzeInstagram = async () => {
     const enabledSources = Object.entries(sourceStates).filter(([_, s]) => s.enabled).map(([type]) => type);
-    if (enabledSources.length === 0 && sources.length === 0) return;
+    if (enabledSources.length === 0) return;
+    setAiOriginal({});
     setAnalyzing(true); setAnalyzeProgress(0); setAnalyzeError("");
     const msgs = en
       ? ["Gathering your sources...", "Reading your website...", "Analyzing your visual content...", "Identifying your tone and personality...", "Detecting your audience...", "Building your brand DNA..."]
@@ -371,7 +374,7 @@ function ADNContent() {
       const images = await Promise.all(screenshots.map(async s => ({ data: await toBase64(s.file), mimeType: s.file.type })));
       const res = await fetch("/api/analyze-brand", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ images, instagramUrl: profile.instagramUrl, tiktokUrl: profile.tiktokUrl, webUrl: profile.webUrl, sources }),
+        body: JSON.stringify({ images, instagramUrl: profile.instagramUrl, tiktokUrl: profile.tiktokUrl, webUrl: profile.webUrl, sources: enabledSources }),
       });
       const data = await res.json();
       if (data.profile) {

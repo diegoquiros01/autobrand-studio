@@ -9,6 +9,9 @@ export async function POST(request) {
     const { hook, copy, cta, hashtags, targetLang } = await request.json();
     if (!targetLang) return Response.json({ error: "missing targetLang" }, { status: 400 });
 
+    const ALLOWED_LANGS = ["Español", "English", "Spanglish", "Spanish", "Inglés"];
+    if (!ALLOWED_LANGS.includes(targetLang)) return Response.json({ error: "unsupported language" }, { status: 400 });
+
     const text = [hook, copy, cta, hashtags].filter(Boolean).join("\n---\n");
 
     const msg = await anthropic.messages.create({

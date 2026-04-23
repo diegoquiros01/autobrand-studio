@@ -37,8 +37,6 @@ function CrearContent() {
   const [idiomapieza, setIdiomaPieza] = useState("ADN");
   const [tipo, setTipo] = useState("Comercial");
   const [formato, setFormato] = useState("square");
-  const [skipRefs, setSkipRefs] = useState(false);
-  const [skipTalent, setSkipTalent] = useState(false);
   const [showRefs, setShowRefs] = useState(false);
   const [showTalent, setShowTalent] = useState(false);
 
@@ -324,7 +322,7 @@ function CrearContent() {
 
   const resetAll = () => {
     setStep(1); setMaxStep(1); setPrompt(""); setTipo("Comercial"); setFormato("square"); setIdiomaPieza("ADN");
-    setReferencias([]); setTalentos([]); setSkipRefs(false); setSkipTalent(false);
+    setReferencias([]); setTalentos([]);
     setShowRefs(false); setShowTalent(false);
     setVersiones([]); setCopies([]); setCopySeleccionado(null); setImgAprobada(false);
     setSavedFinal(false); setFeedback(""); setError("");
@@ -738,8 +736,8 @@ function CrearContent() {
                         )}
                       </div>
                     ))}
-                    <button onClick={() => { guardarFinal(); goToStep(3); }} disabled={savingFinal || !copySeleccionado}
-                      style={{ width:"100%", padding:13, background: (savingFinal || !copySeleccionado) ? "rgba(64,192,87,0.3)" : "linear-gradient(135deg,#40C057,#2F9E44)", color:"#fff", border:"none", borderRadius:10, fontSize:14, fontWeight:500, cursor: (savingFinal || !copySeleccionado) ? "not-allowed" : "pointer", marginTop:6, opacity: !copySeleccionado ? 0.5 : 1 }}>
+                    <button onClick={() => { guardarFinal(); goToStep(3); }} disabled={savingFinal || !copySeleccionado || !imgAprobada}
+                      style={{ width:"100%", padding:13, background: (savingFinal || !copySeleccionado || !imgAprobada) ? "rgba(64,192,87,0.3)" : "linear-gradient(135deg,#40C057,#2F9E44)", color:"#fff", border:"none", borderRadius:10, fontSize:14, fontWeight:500, cursor: (savingFinal || !copySeleccionado || !imgAprobada) ? "not-allowed" : "pointer", marginTop:6, opacity: (!copySeleccionado || !imgAprobada) ? 0.5 : 1 }}>
                       {savingFinal ? (en ? "Saving..." : "Guardando...") : (en ? "Save final art \u2192" : "Guardar arte final \u2192")}
                     </button>
                     {error && <div style={{ background:"rgba(220,38,38,0.1)", border:"1px solid rgba(220,38,38,0.2)", borderRadius:8, padding:10, fontSize:11, color:"#FCA5A5", marginTop:8 }}>{error}</div>}
