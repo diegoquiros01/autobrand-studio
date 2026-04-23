@@ -9,6 +9,7 @@ import AIField from '../components/adn/AIField';
 import ChipSelector from '../components/adn/ChipSelector';
 import ExtractedPalette from '../components/adn/ExtractedPalette';
 import CopyExampleCard from '../components/adn/CopyExampleCard';
+import SectionStepper from '../components/adn/SectionStepper';
 
 const D = {
   bg: "#0A0A14", bg2: "#10101C",
@@ -415,7 +416,7 @@ function ADNContent() {
     <AppLayout>
       {showConfetti && <ConfettiEffect />}
 
-      <div style={{ background: D.bg, minHeight: "calc(100vh - 64px)", paddingBottom: 40 }}>
+      <div style={{ background: D.bg, minHeight: "calc(100vh - 64px)", paddingBottom: 100 }}>
         {/* Header */}
         <div style={{ position: "relative", overflow: "hidden", background: "linear-gradient(180deg, #1a0a2e 0%, #0A0A14 100%)", padding: "44px 24px 40px" }}>
           {/* Orbs */}
@@ -425,7 +426,7 @@ function ADNContent() {
           <div className="scan-line" style={{ position: "absolute", left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(121,80,242,0.3), transparent)", pointerEvents: "none" }} />
 
           <div style={{ position: "relative", zIndex: 2, maxWidth: 1100, margin: "0 auto" }}>
-            {/* Top row: title + save status */}
+            {/* Top row: title */}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <div>
                 <h1 style={{ fontSize: 22, fontWeight: 500, color: D.text, marginBottom: 4, letterSpacing: "-0.4px" }}>
@@ -435,12 +436,18 @@ function ADNContent() {
                   {en ? "Build your complete brand identity" : "Construye tu identidad de marca completa"}
                 </p>
               </div>
-              <div style={{ fontSize: 12, color: saveStatus === "saving" ? "#A78BFA" : saveStatus === "saved" ? "#5DCAA5" : saveStatus === "error" ? "#E24B4A" : "transparent" }}>
-                {saveStatus === "saving" && (en ? "Saving..." : "Guardando...")}
-                {saveStatus === "saved" && (en ? "\u2713 Saved" : "\u2713 Guardado")}
-                {saveStatus === "error" && (en ? "\u26A0 Error" : "\u26A0 Error")}
-              </div>
             </div>
+            {/* Section Stepper */}
+            <SectionStepper
+              en={en}
+              steps={STEPS.map((s, i) => ({
+                label: s.title,
+                progress: stepProgress[i],
+                completeLabel: en ? "Complete" : "Completo",
+              }))}
+              currentStep={step - 1}
+              onStepClick={(index) => setStep(index + 1)}
+            />
           </div>
         </div>
 
@@ -450,18 +457,8 @@ function ADNContent() {
           <div>
 
             {/* ═══ STEP 1: Conexión y Análisis IA ═══ */}
-            <div style={{ ...card, marginBottom: 20 }}>
-              <button onClick={() => setStep(step === 1 ? 0 : 1)} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", background: "none", border: "none", cursor: "pointer", padding: 0, marginBottom: step === 1 ? 16 : 0 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <div style={{ width: 26, height: 26, borderRadius: "50%", background: stepProgress[0] === 100 ? "rgba(64,192,87,0.15)" : "rgba(121,80,242,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 600, color: stepProgress[0] === 100 ? "#40C057" : "#A78BFA" }}>
-                    {stepProgress[0] === 100 ? "\u2713" : "1"}
-                  </div>
-                  <span style={{ fontSize: 13, fontWeight: 500, letterSpacing: "-0.1px", color: "#fff" }}>{STEPS[0].title}</span>
-                </div>
-                <span style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", transform: step === 1 ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>{"\u25BC"}</span>
-              </button>
-              {step === 1 && (
-                <div style={{ animation: "fadeIn 0.3s ease" }}>
+            {step === 1 && (
+              <div style={{ animation: "fadeIn 0.4s ease" }}>
                   {/* Hero Card — AI Analyze */}
                   <div style={{ ...card, background: "#10101C", border: "1.5px solid " + D.purple, padding: "18px 20px", textAlign: "center", marginBottom: 20, position: "relative", overflow: "hidden" }}>
                     <div style={{ position: "relative", zIndex: 1, display: "flex", alignItems: "center", gap: 14 }}>
@@ -552,23 +549,12 @@ function ADNContent() {
                       </button>
                     )}
                   </div>
-                </div>
-              )}
-            </div>
+              </div>
+            )}
 
             {/* ═══ STEP 2: Voz y Comunicación ═══ */}
-            <div style={{ ...card, marginBottom: 20 }}>
-              <button onClick={() => setStep(step === 2 ? 0 : 2)} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", background: "none", border: "none", cursor: "pointer", padding: 0, marginBottom: step === 2 ? 16 : 0 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <div style={{ width: 26, height: 26, borderRadius: "50%", background: stepProgress[1] === 100 ? "rgba(64,192,87,0.15)" : "rgba(121,80,242,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 600, color: stepProgress[1] === 100 ? "#40C057" : "#A78BFA" }}>
-                    {stepProgress[1] === 100 ? "\u2713" : "2"}
-                  </div>
-                  <span style={{ fontSize: 13, fontWeight: 500, letterSpacing: "-0.1px", color: "#fff" }}>{STEPS[1].title}</span>
-                </div>
-                <span style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", transform: step === 2 ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>{"\u25BC"}</span>
-              </button>
-              {step === 2 && (
-                <div style={{ animation: "fadeIn 0.3s ease" }}>
+            {step === 2 && (
+              <div style={{ animation: "fadeIn 0.4s ease" }}>
                   {/* Card 1 — Identidad */}
                   <div style={{ ...card, marginBottom: 24 }}>
                     <div style={{ fontSize: 13, fontWeight: 500, letterSpacing: "-0.1px", color: D.text, marginBottom: 16 }}>{en ? "Identity" : "Identidad"}</div>
@@ -646,23 +632,12 @@ function ADNContent() {
                       )}
                     </div>
                   </div>
-                </div>
-              )}
-            </div>
+              </div>
+            )}
 
             {/* ═══ STEP 3: Estilo Visual y Referencias ═══ */}
-            <div style={{ ...card, marginBottom: 20 }}>
-              <button onClick={() => setStep(step === 3 ? 0 : 3)} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", background: "none", border: "none", cursor: "pointer", padding: 0, marginBottom: step === 3 ? 16 : 0 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <div style={{ width: 26, height: 26, borderRadius: "50%", background: stepProgress[2] === 100 ? "rgba(64,192,87,0.15)" : "rgba(121,80,242,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 600, color: stepProgress[2] === 100 ? "#40C057" : "#A78BFA" }}>
-                    {stepProgress[2] === 100 ? "\u2713" : "3"}
-                  </div>
-                  <span style={{ fontSize: 13, fontWeight: 500, letterSpacing: "-0.1px", color: "#fff" }}>{STEPS[2].title}</span>
-                </div>
-                <span style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", transform: step === 3 ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>{"\u25BC"}</span>
-              </button>
-              {step === 3 && (
-                <div style={{ animation: "fadeIn 0.3s ease" }}>
+            {step === 3 && (
+              <div style={{ animation: "fadeIn 0.4s ease" }}>
                   {/* Card 1 — Paleta de marca */}
                   <div style={{ ...card, marginBottom: 24 }}>
                     <div style={{ fontSize: 13, fontWeight: 500, letterSpacing: "-0.1px", color: D.text, marginBottom: 16 }}>{en ? "Brand palette" : "Paleta de marca"}</div>
@@ -731,14 +706,44 @@ function ADNContent() {
                       </div>
                     )}
                   </div>
-                </div>
-              )}
-            </div>
+              </div>
+            )}
 
           </div>
           {/* Right column - Brand Card */}
           <div className="adn-brand-card" style={{ position: "sticky", top: 96, alignSelf: "start" }}>
             <BrandCard profile={profile} dnaStrength={pct} en={en} />
+          </div>
+        </div>
+
+        {/* Sticky Footer */}
+        <div className="adn-footer" style={{ position: "fixed", bottom: 0, left: 220, right: 0, zIndex: 45, background: "rgba(10,10,20,0.95)", backdropFilter: "blur(20px)", borderTop: "0.5px solid rgba(255,255,255,0.06)" }}>
+          <div style={{ maxWidth: 1100, margin: "0 auto", padding: "14px 28px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)" }}>
+              {saveStatus === "saving" && <span style={{ color: "#A78BFA", fontWeight: 500 }}>{en ? "Saving..." : "Guardando..."}</span>}
+              {saveStatus === "saved" && <span style={{ color: "#5DCAA5", fontWeight: 500 }}>{en ? "\u2713 Saved" : "\u2713 Guardado"}</span>}
+              {saveStatus === "error" && <span style={{ color: "#E24B4A", fontWeight: 500 }}>{en ? "\u26A0 Error saving" : "\u26A0 Error al guardar"}</span>}
+              {saveStatus === "idle" && <span>{en ? "Step" : "Paso"} {step} {en ? "of" : "de"} 3</span>}
+            </div>
+            <div style={{ display: "flex", gap: 10 }}>
+              {step > 1 && (
+                <button onClick={() => { setStep(step - 1); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                  style={{ padding: "8px 20px", background: "transparent", border: "0.5px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#fff", fontSize: 12.5, fontWeight: 500, cursor: "pointer" }}>
+                  {en ? "\u2190 Previous" : "\u2190 Anterior"}
+                </button>
+              )}
+              {step < 3 ? (
+                <button onClick={async () => { await handleSave(); setStep(step + 1); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                  style={{ padding: "8px 20px", background: "#7950F2", border: "none", borderRadius: 8, color: "#fff", fontSize: 12.5, fontWeight: 500, cursor: "pointer" }}>
+                  {en ? "Next \u2192" : "Siguiente \u2192"}
+                </button>
+              ) : (
+                <button onClick={() => { handleSave(); router.push("/crear"); }}
+                  style={{ padding: "8px 20px", background: pct >= 91 ? "linear-gradient(135deg,#40C057,#2F9E44)" : "#7950F2", border: "none", borderRadius: 8, color: "#fff", fontSize: 12.5, fontWeight: 500, cursor: "pointer" }}>
+                  {pct >= 91 ? (en ? "Done \u2014 Create \u2192" : "Listo \u2014 Crear \u2192") : (en ? "Next \u2192" : "Siguiente \u2192")}
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -759,6 +764,7 @@ function ADNContent() {
         @media (max-width: 900px) {
           .adn-dashboard { grid-template-columns: 1fr !important; }
           .adn-brand-card { position: static !important; order: -1; margin-bottom: 20px; }
+          .adn-footer { left: 0 !important; }
         }
       `}</style>
     </AppLayout>
