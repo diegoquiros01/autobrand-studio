@@ -426,15 +426,26 @@ function ADNContent() {
           <div className="scan-line" style={{ position: "absolute", left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(121,80,242,0.3), transparent)", pointerEvents: "none" }} />
 
           <div style={{ position: "relative", zIndex: 2, maxWidth: 1100, margin: "0 auto" }}>
-            {/* Top row: title */}
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            {/* Top row: title + progress circle */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
               <div>
                 <h1 style={{ fontSize: 22, fontWeight: 500, color: D.text, marginBottom: 4, letterSpacing: "-0.4px" }}>
                   {isOnboarding ? (en ? "Train your digital clone" : "Entrena a tu clon digital") : (en ? "Your brand DNA" : "ADN de tu marca")}
                 </h1>
                 <p style={{ fontSize: 14, color: D.text2, letterSpacing: "-0.02em" }}>
-                  {en ? "Build your complete brand identity" : "Construye tu identidad de marca completa"}
+                  {STEPS[step - 1].sub}
                 </p>
+              </div>
+              {/* Progress circle */}
+              <div style={{ position: "relative", width: 58, height: 58, flexShrink: 0 }}>
+                <svg width="58" height="58" style={{ transform: "rotate(-90deg)" }}>
+                  <circle cx="29" cy="29" r="25" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="3" />
+                  <circle cx="29" cy="29" r="25" fill="none" stroke={pct >= 91 ? "#40C057" : "#7950F2"} strokeWidth="3" strokeDasharray={2 * Math.PI * 25} strokeDashoffset={2 * Math.PI * 25 * (1 - pct / 100)} strokeLinecap="round" style={{ transition: "stroke-dashoffset 0.6s ease, stroke 0.3s ease" }} />
+                </svg>
+                <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+                  <span style={{ fontSize: 14, fontWeight: 600, color: pct >= 91 ? "#40C057" : D.text, letterSpacing: "-0.03em" }}>{pct}%</span>
+                  <span style={{ fontSize: 8, color: D.text3, textTransform: "uppercase", letterSpacing: "0.4px" }}>ADN</span>
+                </div>
               </div>
             </div>
             {/* Section Stepper */}
