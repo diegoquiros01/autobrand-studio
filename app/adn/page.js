@@ -316,8 +316,9 @@ function ADNContent() {
   ];
   const filledCount = progressFields.filter(f => f.done).length;
   const rawPct = Math.round((filledCount / progressFields.length) * 100);
-  // Cap at 95% if user hasn't visited all steps yet
-  const pct = (rawPct === 100 && step < 3) ? 95 : rawPct;
+  // Only cap progress for NEW brands (brandId was null when loaded) — existing brands show real progress
+  const isNewlyCreated = !brandId && isNewBrand;
+  const pct = (rawPct === 100 && step < 3 && isNewlyCreated) ? 95 : rawPct;
 
   // Per-step progress
   const step1Fields = ["instagramUrl"];
@@ -330,7 +331,7 @@ function ADNContent() {
   };
   const rawStepProgress = [stepPct(step1Fields), stepPct(step2Fields), stepPct(step3Fields)];
   // Don't show 100% for steps the user hasn't visited yet — cap at 95% until they go there
-  const stepProgress = rawStepProgress.map((p, i) => (p === 100 && step < i + 1) ? 95 : p);
+  const stepProgress = rawStepProgress.map((p, i) => (p === 100 && step < i + 1 && isNewlyCreated) ? 95 : p);
 
   // Confetti + ADN saved celebration
   const [showDnaSaved, setShowDnaSaved] = useState(false);
