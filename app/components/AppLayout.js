@@ -257,7 +257,8 @@ export default function AppLayout({ children }) {
             {dnaSectionOpen && (
               <div style={{ paddingLeft: 12, paddingTop: 4, display: "flex", flexDirection: "column", gap: 2 }}>
                 {brands.map(b => {
-                  const isActive = b.id === activeBrand?.id;
+                  const isCreatingNew = pathname === "/adn" && typeof window !== "undefined" && new URLSearchParams(window.location.search).get("new") === "true";
+                  const isActive = !isCreatingNew && b.id === activeBrand?.id;
                   return (
                     <div key={b.id} style={{ display: "flex", alignItems: "center", gap: 0 }}>
                       <button onClick={() => { switchBrand(b); router.push("/adn?brand=" + b.id); setSidebarOpen(false); }}
@@ -296,16 +297,25 @@ export default function AppLayout({ children }) {
                     </div>
                   );
                 })}
-                <button onClick={() => { router.push("/adn?new=true"); setSidebarOpen(false); }}
-                  style={{
-                    display: "flex", alignItems: "center", justifyContent: theme.sidebar.newBrandButton.justifyContent,
-                    gap: 8, padding: theme.sidebar.newBrandButton.padding,
-                    borderRadius: theme.sidebar.newBrandButton.radius, cursor: "pointer", textAlign: "left",
-                    background: "transparent", border: theme.sidebar.newBrandButton.border, transition: "all 0.2s",
-                  }}>
-                  <span style={{ fontSize: 12, color: theme.sidebar.newBrandButton.color }}>+</span>
-                  <span style={{ fontSize: theme.sidebar.newBrandButton.fontSize, color: theme.sidebar.newBrandButton.color }}>{en ? "New brand" : "Nueva marca"}</span>
-                </button>
+                {(() => {
+                  const isCreatingNew = pathname === "/adn" && typeof window !== "undefined" && new URLSearchParams(window.location.search).get("new") === "true";
+                  return (
+                    <button onClick={() => { router.push("/adn?new=true"); setSidebarOpen(false); }}
+                      style={{
+                        display: "flex", alignItems: "center", justifyContent: theme.sidebar.newBrandButton.justifyContent,
+                        gap: 8, padding: theme.sidebar.newBrandButton.padding,
+                        borderRadius: theme.sidebar.newBrandButton.radius, cursor: "pointer", textAlign: "left",
+                        background: isCreatingNew ? theme.accent.tint12 : "transparent",
+                        border: isCreatingNew ? `0.5px solid ${theme.accent.border}` : theme.sidebar.newBrandButton.border,
+                        transition: "all 0.2s",
+                      }}>
+                      <span style={{ fontSize: 12, color: isCreatingNew ? theme.accent.light : theme.sidebar.newBrandButton.color }}>+</span>
+                      <span style={{ fontSize: theme.sidebar.newBrandButton.fontSize, color: isCreatingNew ? theme.accent.light : theme.sidebar.newBrandButton.color, fontWeight: isCreatingNew ? 500 : 400 }}>
+                        {isCreatingNew ? (en ? "Creating new brand..." : "Creando nueva marca...") : (en ? "New brand" : "Nueva marca")}
+                      </span>
+                    </button>
+                  );
+                })()}
               </div>
             )}
           </div>
