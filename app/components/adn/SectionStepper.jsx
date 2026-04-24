@@ -190,7 +190,7 @@ export default function SectionStepper({ steps, currentStep = 0, onStepClick, en
                 >
                   {step.label}
                 </span>
-                <span style={{ fontSize: 10, color: metaColor, lineHeight: 1.2 }}>
+                <span style={{ fontSize: 11, color: metaColor, lineHeight: 1.2 }}>
                   {metaText}
                 </span>
               </div>

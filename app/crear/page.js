@@ -424,7 +424,7 @@ function CrearContent() {
                 <div style={{ display:"inline-flex", alignItems:"center", gap:5, background:"rgba(121,80,242,0.1)", borderRadius:20, padding:"3px 10px", border:"1px solid rgba(121,80,242,0.2)", cursor: step === 1 ? "pointer" : "default", opacity: step === 1 ? 1 : 0.5 }} onClick={() => step === 1 && setBrandDropdownOpen(!brandDropdownOpen)}>
                   <span style={{ width:5, height:5, borderRadius:"50%", background:D.purpleLight, display:"inline-block" }} />
                   <span style={{ fontSize:10, color:D.purpleLight, fontWeight:500 }}>{brandProfile.nombre || (en ? "Your brand" : "Tu marca")}</span>
-                  {allBrands.length > 1 && <span style={{ fontSize:8, color:"rgba(255,255,255,0.3)" }}>▼</span>}
+                  {allBrands.length > 1 && <span style={{ fontSize:10, color:"rgba(255,255,255,0.5)" }}>▼</span>}
                 </div>
                 {brandDropdownOpen && allBrands.length > 1 && (
                   <div style={{ position:"absolute", top:"100%", right:0, marginTop:6, background:"#10101C", border:"0.5px solid rgba(255,255,255,0.06)", borderRadius:12, padding:4, zIndex:100, boxShadow:"0 8px 30px rgba(0,0,0,0.5)", minWidth:180 }}>
@@ -612,10 +612,10 @@ function CrearContent() {
           <div>
             <BackBtn toStep={1} />
             <div style={{ display:"flex", gap:6, marginBottom:12, flexWrap:"wrap" }}>
-              <span style={{ fontSize:10, padding:"3px 10px", borderRadius:12, background:"rgba(121,80,242,0.1)", border:"1px solid rgba(121,80,242,0.2)", color:D.purpleLight }}>{tipo}</span>
-              <span style={{ fontSize:10, padding:"3px 10px", borderRadius:12, background:"rgba(121,80,242,0.1)", border:"1px solid rgba(121,80,242,0.2)", color:D.purpleLight }}>{FORMATOS.find(f => f.key === formato)?.label || (en ? "Square post" : "Post cuadrado")}</span>
-              {referencias.length === 0 && <span style={{ fontSize:10, padding:"3px 10px", borderRadius:12, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", color:D.text3 }}>{en ? "No refs" : "Sin refs"}</span>}
-              {talentos.length === 0 && <span style={{ fontSize:10, padding:"3px 10px", borderRadius:12, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", color:D.text3 }}>{en ? "No talent" : "Sin talento"}</span>}
+              <span style={{ fontSize:11, padding:"3px 10px", borderRadius:12, background:"rgba(121,80,242,0.1)", border:"1px solid rgba(121,80,242,0.2)", color:D.purpleLight }}>{tipo}</span>
+              <span style={{ fontSize:11, padding:"3px 10px", borderRadius:12, background:"rgba(121,80,242,0.1)", border:"1px solid rgba(121,80,242,0.2)", color:D.purpleLight }}>{FORMATOS.find(f => f.key === formato)?.label || (en ? "Square post" : "Post cuadrado")}</span>
+              {referencias.length === 0 && <span style={{ fontSize:11, padding:"3px 10px", borderRadius:12, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", color:D.text3 }}>{en ? "No refs" : "Sin refs"}</span>}
+              {talentos.length === 0 && <span style={{ fontSize:11, padding:"3px 10px", borderRadius:12, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", color:D.text3 }}>{en ? "No talent" : "Sin talento"}</span>}
             </div>
             <div>
               {/* Image area */}
@@ -651,7 +651,7 @@ function CrearContent() {
                       <div key={i} onClick={() => setVersionActiva(i)}
                         style={{ position:"relative", width:40, height:40, borderRadius:6, overflow:"hidden", cursor:"pointer", border: versionActiva === i ? "2px solid " + D.purple : "1px solid rgba(255,255,255,0.1)", flexShrink:0 }}>
                         <img src={"data:" + v.mimeType + ";base64," + v.image} alt="" style={{ width:"100%", height:"100%", objectFit:"cover" }} />
-                        <div style={{ position:"absolute", bottom:1, right:2, fontSize:8, color:"rgba(255,255,255,0.6)" }}>v{i+1}</div>
+                        <div style={{ position:"absolute", bottom:1, right:2, fontSize:10, color:"rgba(255,255,255,0.6)" }}>v{i+1}</div>
                       </div>
                     ))}
                   </div>

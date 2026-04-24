@@ -95,7 +95,7 @@ export default function Biblioteca() {
         {/* Search */}
         <div style={{ marginBottom: 16 }}>
           <div style={{ position: "relative", display: "inline-block", width: "100%", maxWidth: 400 }}>
-            <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", fontSize: 14, color: "rgba(255,255,255,0.3)", pointerEvents: "none" }}>🔍</span>
+            <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", fontSize: 14, color: "rgba(255,255,255,0.5)", pointerEvents: "none" }}>🔍</span>
             <input
               type="text"
               value={searchQuery}
@@ -171,9 +171,9 @@ export default function Biblioteca() {
                     <div style={{ width:"100%", aspectRatio:"1", background:"linear-gradient(135deg,rgba(121,80,242,0.15),rgba(230,73,128,0.1))", display:"flex", alignItems:"center", justifyContent:"center", fontSize:28, opacity:0.3 }}>◉</div>
                   )}
                   <div style={{ padding:"10px 12px" }}>
-                    <div style={{ fontSize:10, color:D.purpleLight, fontWeight:500, marginBottom:3 }}>{g.tipo}</div>
+                    <div style={{ fontSize:11, color:D.purpleLight, fontWeight:500, marginBottom:3 }}>{g.tipo}</div>
                     <div style={{ fontSize:12, color:D.text2, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", marginBottom:3 }}>{g.prompt}</div>
-                    <div style={{ fontSize:10, color:D.text3 }}>{formatDate(g.created_at)}</div>
+                    <div style={{ fontSize:11, color:D.text3 }}>{formatDate(g.created_at)}</div>
                   </div>
                 </div>
               ))}

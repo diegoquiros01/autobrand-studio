@@ -107,7 +107,7 @@ function ReadyPreview({ imageUrl, copy, brandName, pieceType }) {
           </div>
           <div style={{ lineHeight: 1.2 }}>
             <div style={{ fontSize: 11, fontWeight: 500, color: t.text.primary }}>{brandName}</div>
-            {pieceType && <div style={{ fontSize: 9, color: t.textMuted }}>{pieceType}</div>}
+            {pieceType && <div style={{ fontSize: 10.5, color: t.textMuted }}>{pieceType}</div>}
           </div>
         </div>
         {copy && (
@@ -132,7 +132,7 @@ export default function ADNContextPanel({
   const { voz, idioma, audiencia, paleta = [] } = adn;
 
   const sectionHead = {
-    fontSize: 10,
+    fontSize: 10.5,
     color: t.textMuted,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
@@ -158,7 +158,7 @@ export default function ADNContextPanel({
       }}>
         {voz && (
           <div style={{ marginBottom: 7 }}>
-            <div style={{ fontSize: 9, color: t.textMuted, textTransform: 'uppercase', letterSpacing: 0.3, marginBottom: 2 }}>{en ? 'Voice' : 'Voz'}</div>
+            <div style={{ fontSize: 10.5, color: t.textMuted, textTransform: 'uppercase', letterSpacing: 0.3, marginBottom: 2 }}>{en ? 'Voice' : 'Voz'}</div>
             <div style={{ fontSize: 11, color: t.text.primary, lineHeight: 1.4 }}>
               {voz}{idioma && `${en ? ', in ' : ', en '}${idioma.toLowerCase()}`}
             </div>
@@ -167,14 +167,14 @@ export default function ADNContextPanel({
 
         {audiencia && (
           <div style={{ marginBottom: paleta.length > 0 ? 7 : 0 }}>
-            <div style={{ fontSize: 9, color: t.textMuted, textTransform: 'uppercase', letterSpacing: 0.3, marginBottom: 2 }}>{en ? 'Audience' : 'Audiencia'}</div>
+            <div style={{ fontSize: 10.5, color: t.textMuted, textTransform: 'uppercase', letterSpacing: 0.3, marginBottom: 2 }}>{en ? 'Audience' : 'Audiencia'}</div>
             <div style={{ fontSize: 11, color: t.text.primary, lineHeight: 1.4 }}>{audiencia}</div>
           </div>
         )}
 
         {paleta.length > 0 && (
           <div>
-            <div style={{ fontSize: 9, color: t.textMuted, textTransform: 'uppercase', letterSpacing: 0.3, marginBottom: 4 }}>{en ? 'Palette' : 'Paleta'}</div>
+            <div style={{ fontSize: 10.5, color: t.textMuted, textTransform: 'uppercase', letterSpacing: 0.3, marginBottom: 4 }}>{en ? 'Palette' : 'Paleta'}</div>
             <div style={{ display: 'flex', gap: 4 }}>
               {paleta.slice(0, 6).map((color, i) => (
                 <div
@@ -208,12 +208,12 @@ export default function ADNContextPanel({
       )}
 
       {previewState === 'empty' && (
-        <p style={{ fontSize: 10, color: t.textDim, margin: '6px 0 0', textAlign: 'center' }}>
+        <p style={{ fontSize: 10.5, color: t.textDim, margin: '6px 0 0', textAlign: 'center' }}>
           {en ? 'Fills when generating' : 'Se llena al generar'}
         </p>
       )}
       {previewState === 'generating' && (
-        <p style={{ fontSize: 10, color: t.accentLight, margin: '6px 0 0', textAlign: 'center', fontWeight: 500 }}>
+        <p style={{ fontSize: 10.5, color: t.accentLight, margin: '6px 0 0', textAlign: 'center', fontWeight: 500 }}>
           {en ? 'Generating with your DNA…' : 'Generando con tu ADN…'}
         </p>
       )}

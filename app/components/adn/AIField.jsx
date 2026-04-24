@@ -79,7 +79,7 @@ export default function AIField({
         {badge && (
           <span
             style={{
-              fontSize: 9.5,
+              fontSize: 10.5,
               fontWeight: 500,
               padding: '2px 7px',
               borderRadius: 6,

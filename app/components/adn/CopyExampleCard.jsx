@@ -168,7 +168,7 @@ export default function CopyExampleCard({
 
           {source && (
             <div style={{
-              fontSize: 10,
+              fontSize: 11,
               color: t.textMuted,
               display: 'flex',
               alignItems: 'center',
@@ -186,7 +186,7 @@ export default function CopyExampleCard({
                 type="button"
                 onClick={() => onAccept?.(draft || text)}
                 style={{
-                  fontSize: 10,
+                  fontSize: 11,
                   padding: '3px 9px',
                   background: t.accent.solid,
                   color: '#fff',
@@ -202,7 +202,7 @@ export default function CopyExampleCard({
                 type="button"
                 onClick={() => setEditing(true)}
                 style={{
-                  fontSize: 10,
+                  fontSize: 11,
                   padding: '3px 9px',
                   background: 'transparent',
                   border: `0.5px solid ${t.border.default}`,
@@ -217,7 +217,7 @@ export default function CopyExampleCard({
                 type="button"
                 onClick={onDismiss}
                 style={{
-                  fontSize: 10,
+                  fontSize: 11,
                   padding: '3px 9px',
                   background: 'transparent',
                   border: `0.5px solid ${t.border.default}`,
@@ -232,7 +232,7 @@ export default function CopyExampleCard({
           )}
 
           {accepted && (
-            <p style={{ fontSize: 10, color: t.success.solid, margin: '6px 0 0', fontWeight: 500 }}>
+            <p style={{ fontSize: 11, color: t.success.solid, margin: '6px 0 0', fontWeight: 500 }}>
               {en ? '✓ Saved to your DNA' : '✓ Guardado en tu ADN'}
             </p>
           )}

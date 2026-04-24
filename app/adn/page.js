@@ -412,7 +412,7 @@ function ADNContent() {
   });
 
   const card = { background: "#10101C", border: "0.5px solid rgba(255,255,255,0.06)", borderRadius: 12, padding: "18px 20px", transition: "all 0.3s ease" };
-  const label = { fontSize: 11, color: "rgba(255,255,255,0.5)", display: "block", marginBottom: 6, fontWeight: 400, letterSpacing: "0.1px" };
+  const label = { fontSize: 11.5, color: "rgba(255,255,255,0.5)", display: "block", marginBottom: 6, fontWeight: 400, letterSpacing: "0.1px" };
 
   return (
     <AppLayout>
@@ -469,7 +469,7 @@ function ADNContent() {
                 </svg>
                 <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
                   <span style={{ fontSize: 14, fontWeight: 600, color: pct >= 91 ? "#40C057" : D.text, letterSpacing: "-0.03em" }}>{pct}%</span>
-                  <span style={{ fontSize: 8, color: D.text3, textTransform: "uppercase", letterSpacing: "0.4px" }}>ADN</span>
+                  <span style={{ fontSize: 9, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", letterSpacing: "0.4px" }}>ADN</span>
                 </div>
               </div>
             </div>
@@ -755,7 +755,7 @@ function ADNContent() {
         {/* Sticky Footer */}
         <div className="adn-footer" style={{ position: "fixed", bottom: 0, left: 220, right: 0, zIndex: 45, background: "rgba(10,10,20,0.95)", backdropFilter: "blur(20px)", borderTop: "0.5px solid rgba(255,255,255,0.06)" }}>
           <div style={{ maxWidth: 1100, margin: "0 auto", padding: "14px 28px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)" }}>
+            <div style={{ fontSize: 12, color: "rgba(255,255,255,0.5)" }}>
               {saveStatus === "saving" && <span style={{ color: "#A78BFA", fontWeight: 500 }}>{en ? "Saving..." : "Guardando..."}</span>}
               {saveStatus === "saved" && <span style={{ color: "#5DCAA5", fontWeight: 500 }}>{en ? "\u2713 Saved" : "\u2713 Guardado"}</span>}
               {saveStatus === "error" && <span style={{ color: "#E24B4A", fontWeight: 500 }}>{en ? "\u26A0 Error saving" : "\u26A0 Error al guardar"}</span>}

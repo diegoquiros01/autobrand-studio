@@ -57,7 +57,7 @@ export const theme = {
     secondary: 'rgba(255,255,255,0.65)',    // texto en chips reposo, body secundario
     muted:     'rgba(255,255,255,0.5)',     // labels de campo, subtítulos
     hint:      'rgba(255,255,255,0.4)',     // meta (fechas, contadores)
-    dim:       'rgba(255,255,255,0.35)',    // placeholder, estados disabled
+    dim:       'rgba(255,255,255,0.4)',     // placeholder, estados disabled
   },
 
 
@@ -106,12 +106,12 @@ export const theme = {
     h1: { fontSize: 22, fontWeight: 500, letterSpacing: '-0.4px', lineHeight: 1.3 },
     h2: { fontSize: 13, fontWeight: 500, letterSpacing: '-0.1px', lineHeight: 1.3 },
     body: { fontSize: 12.5, fontWeight: 400, lineHeight: 1.5 },
-    label: { fontSize: 11, fontWeight: 400, letterSpacing: '0.1px' },
-    meta: { fontSize: 10.5, fontWeight: 400 },
+    label: { fontSize: 11.5, fontWeight: 400, letterSpacing: '0.1px' },
+    meta: { fontSize: 11, fontWeight: 400 },
     sectionLabel: { fontSize: 10, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.8px' }, // sidebar headers
-    chip: { fontSize: 11.5, fontWeight: 400 },
-    chipOn: { fontSize: 11.5, fontWeight: 500 },
-    tag: { fontSize: 9.5, fontWeight: 500, letterSpacing: '0.2px' }, // AI badges
+    chip: { fontSize: 12, fontWeight: 400 },
+    chipOn: { fontSize: 12, fontWeight: 500 },
+    tag: { fontSize: 10.5, fontWeight: 500, letterSpacing: '0.2px' }, // AI badges
   },
 
 
@@ -158,9 +158,9 @@ export const theme = {
     brandName: { fontSize: 13, fontWeight: 500, letterSpacing: '-0.2px' },
 
     sectionLabel: {
-      fontSize: 10,
+      fontSize: 11,
       fontWeight: 500,
-      color: 'rgba(255,255,255,0.35)',
+      color: 'rgba(255,255,255,0.45)',
       textTransform: 'uppercase',
       letterSpacing: '0.8px',
       padding: '0 8px',
@@ -205,7 +205,7 @@ export const theme = {
       // El background se genera con la paleta de la marca:
       // linear-gradient(135deg, paleta[0], paleta[1])
     },
-    subMeta: { fontSize: 9.5, color: 'rgba(255,255,255,0.4)' },
+    subMeta: { fontSize: 10.5, color: 'rgba(255,255,255,0.5)' },
     statusDot: { size: 6, bg: '#5DCAA5' },
 
     newBrandButton: {
@@ -291,7 +291,7 @@ export const theme = {
     base: {
       padding: '5px 11px',
       radius: 14,
-      fontSize: 11.5,
+      fontSize: 12,
       border: '0.5px solid rgba(255,255,255,0.1)',
       bg: 'transparent',
       color: 'rgba(255,255,255,0.65)',
@@ -329,7 +329,7 @@ export const theme = {
     badgePending: { bg: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.35)' },
     label: { fontSize: 12, fontWeight: 500, color: '#fff' },
     labelMuted: { color: 'rgba(255,255,255,0.5)', fontWeight: 400 },
-    meta: { fontSize: 10, color: 'rgba(255,255,255,0.4)' },
+    meta: { fontSize: 11, color: 'rgba(255,255,255,0.5)' },
     metaDone: { color: '#5DCAA5' },
     metaProg: { color: '#A78BFA' },
     connector: { height: 1, bg: 'rgba(255,255,255,0.08)' },
@@ -355,7 +355,7 @@ export const theme = {
 
   aiTag: {
     base: {
-      fontSize: 9.5,
+      fontSize: 10.5,
       fontWeight: 500,
       padding: '2px 7px',
       radius: 6,
@@ -407,7 +407,7 @@ export const theme = {
   borderFeatured: 'rgba(121,80,242,0.4)',
   borderActive: 'rgba(121,80,242,0.6)',
   textMuted: 'rgba(255,255,255,0.65)',
-  textDim: 'rgba(255,255,255,0.35)',
+  textDim: 'rgba(255,255,255,0.4)',
   accentLight: '#A78BFA',
   accentBg: 'rgba(121,80,242,0.12)',
   successBg: 'rgba(93,202,165,0.14)',

@@ -204,10 +204,10 @@ export default function AppLayout({ children }) {
         </div>
 
         <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8 }}>
-          <button onClick={() => router.push("/pricing")} style={{ padding: "8px 16px", background: "none", border: "none", color: "rgba(255,255,255,0.6)", fontSize: 14, fontWeight: 500, cursor: "pointer", borderRadius: 8, transition: "color 0.2s" }}>
+          <button onClick={() => router.push("/pricing")} style={{ padding: "8px 16px", background: "none", border: "none", color: "rgba(255,255,255,0.7)", fontSize: 14, fontWeight: 500, cursor: "pointer", borderRadius: 8, transition: "color 0.2s" }}>
             {en ? "Pricing" : "Precios"}
           </button>
-          <button onClick={() => router.push("/contacto")} style={{ padding: "8px 16px", background: "none", border: "none", color: "rgba(255,255,255,0.6)", fontSize: 14, fontWeight: 500, cursor: "pointer", borderRadius: 8, transition: "color 0.2s" }}>
+          <button onClick={() => router.push("/contacto")} style={{ padding: "8px 16px", background: "none", border: "none", color: "rgba(255,255,255,0.7)", fontSize: 14, fontWeight: 500, cursor: "pointer", borderRadius: 8, transition: "color 0.2s" }}>
             {en ? "Contact" : "Contacto"}
           </button>
           {/* Language toggle - smaller, theme tokens */}
@@ -251,7 +251,7 @@ export default function AppLayout({ children }) {
               }}>
               <IconDna color={pathname === "/adn" ? theme.accent.light : theme.text.dim} size={theme.sidebar.navItem.iconSize} />
               <span style={{ flex: 1 }}>{en ? "Brand DNA" : "ADN de marca"}</span>
-              <span style={{ fontSize: 9, color: theme.text.dim, transition: "transform 0.2s", transform: dnaSectionOpen ? "rotate(180deg)" : "rotate(0deg)" }}>▼</span>
+              <span style={{ fontSize: 11, color: theme.text.muted, transition: "transform 0.2s", transform: dnaSectionOpen ? "rotate(180deg)" : "rotate(0deg)" }}>▼</span>
             </button>
 
             {dnaSectionOpen && (
@@ -368,7 +368,7 @@ export default function AppLayout({ children }) {
                     Free plan
                   </div>
                 </div>
-                <span style={{ fontSize: 9, color: theme.text.dim, transform: userMenuOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>▲</span>
+                <span style={{ fontSize: 11, color: theme.text.muted, transform: userMenuOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>▲</span>
               </button>
 
               {/* Dropdown */}

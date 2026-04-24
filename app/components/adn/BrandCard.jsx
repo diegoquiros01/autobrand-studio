@@ -41,7 +41,7 @@ export default function BrandCard({ profile, dnaStrength = 0, en = false }) {
       <div style={{ padding: '20px 24px' }}>
         {/* Audience */}
         <div style={{ marginBottom: 16 }}>
-          <div style={{ fontSize: 10, color: t.textMuted, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 6 }}>{en ? 'Audience' : 'Audiencia'}</div>
+          <div style={{ fontSize: 11, color: t.textMuted, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 6 }}>{en ? 'Audience' : 'Audiencia'}</div>
           {audiencia ? (
             <div style={{ fontSize: 12, color: t.text.primary, lineHeight: 1.5 }}>{audiencia}</div>
           ) : emptyPlaceholder(en ? 'Define your audience' : 'Define tu audiencia')}
@@ -49,7 +49,7 @@ export default function BrandCard({ profile, dnaStrength = 0, en = false }) {
 
         {/* Palette */}
         <div style={{ marginBottom: 16 }}>
-          <div style={{ fontSize: 10, color: t.textMuted, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 6 }}>{en ? 'Palette' : 'Paleta'}</div>
+          <div style={{ fontSize: 11, color: t.textMuted, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 6 }}>{en ? 'Palette' : 'Paleta'}</div>
           {coloresMarca.length > 0 ? (
             <div style={{ display: 'flex', gap: 6 }}>
               {coloresMarca.slice(0, 6).map((c, i) => (
@@ -62,12 +62,12 @@ export default function BrandCard({ profile, dnaStrength = 0, en = false }) {
         {/* Categories */}
         {categorias.length > 0 && (
           <div style={{ marginBottom: 16 }}>
-            <div style={{ fontSize: 10, color: t.textMuted, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 6 }}>{en ? 'Categories' : 'Categorías'}</div>
+            <div style={{ fontSize: 11, color: t.textMuted, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 6 }}>{en ? 'Categories' : 'Categorías'}</div>
             <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
               {categorias.slice(0, 5).map(c => (
-                <span key={c} style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, background: 'rgba(255,255,255,0.06)', color: t.textMuted }}>{c}</span>
+                <span key={c} style={{ fontSize: 11, padding: '2px 8px', borderRadius: 10, background: 'rgba(255,255,255,0.06)', color: t.textMuted }}>{c}</span>
               ))}
-              {categorias.length > 5 && <span style={{ fontSize: 10, color: t.textDim }}>+{categorias.length - 5}</span>}
+              {categorias.length > 5 && <span style={{ fontSize: 11, color: t.textDim }}>+{categorias.length - 5}</span>}
             </div>
           </div>
         )}
