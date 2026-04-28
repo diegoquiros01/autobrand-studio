@@ -391,7 +391,7 @@ export default function AppLayout({ children }) {
                                       {en ? "Create piece" : "Crear pieza"}
                                     </button>
                                   )}
-                                  {brands.length > 1 && (
+                                  {(
                                     <button onClick={() => { deleteBrand(b); setExpandedBrandId(null); }}
                                       style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 8px", borderRadius: 4, background: "none", border: "none", cursor: "pointer", width: "100%", textAlign: "left", fontSize: 11, color: "rgba(252,165,165,0.6)" }}
                                       onMouseEnter={e => e.currentTarget.style.background="rgba(220,38,38,0.06)"}
