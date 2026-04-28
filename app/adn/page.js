@@ -383,6 +383,7 @@ function ADNContent() {
       if (data.profile) {
         const ap = data.profile;
         if (ap.tono && !Array.isArray(ap.tono)) ap.tono = [ap.tono];
+        setAnalyzeError(""); // Clear any previous error on success
         setAiOriginal({ ...ap }); // Save AI snapshot
         setProfile(prev => ({ ...prev, ...ap, instagramUrl: prev.instagramUrl, tiktokUrl: prev.tiktokUrl, webUrl: prev.webUrl, canvaUrl: prev.canvaUrl }));
         // Update sourceStates to 'complete' for all analyzed sources
@@ -553,7 +554,7 @@ function ADNContent() {
                           else setSources(prev => prev.filter(s => s !== type));
                         }}
                         onAnalyze={() => {
-                          // Trigger individual source analysis — for now collect enabled sources and analyze all
+                          analyzeInstagram();
                         }}
                       />
                     ))}

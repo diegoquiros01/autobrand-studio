@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../lib/supabase";
 import AppLayout from "../components/AppLayout";
+import FeedbackWidget from "../components/FeedbackWidget";
 
 export default function Biblioteca() {
   const router = useRouter();
@@ -171,7 +172,10 @@ export default function Biblioteca() {
                     <div style={{ width:"100%", aspectRatio:"1", background:"linear-gradient(135deg,rgba(121,80,242,0.15),rgba(230,73,128,0.1))", display:"flex", alignItems:"center", justifyContent:"center", fontSize:28, opacity:0.3 }}>◉</div>
                   )}
                   <div style={{ padding:"10px 12px" }}>
-                    <div style={{ fontSize:11, color:D.purpleLight, fontWeight:500, marginBottom:3 }}>{g.tipo}</div>
+                    <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:3 }}>
+                      <div style={{ fontSize:11, color:D.purpleLight, fontWeight:500 }}>{g.tipo}</div>
+                      {g.rating && <div style={{ fontSize:10, color:"#FBBF24", letterSpacing:1 }}>{"★".repeat(g.rating)}<span style={{ color:"rgba(255,255,255,0.1)" }}>{"★".repeat(5 - g.rating)}</span></div>}
+                    </div>
                     <div style={{ fontSize:12, color:D.text2, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", marginBottom:3 }}>{g.prompt}</div>
                     <div style={{ fontSize:11, color:D.text3 }}>{formatDate(g.created_at)}</div>
                   </div>
@@ -228,6 +232,20 @@ export default function Biblioteca() {
                 )}
 
                 <div style={{ fontSize:10, color:D.text3, marginBottom:14 }}>{formatDate(selected.created_at)}</div>
+
+                <div style={{ marginBottom: 14 }}>
+                  <FeedbackWidget
+                    generacionId={selected.id}
+                    en={en}
+                    initialRating={selected.rating || 0}
+                    initialTags={selected.feedback_tags || []}
+                    initialText={selected.feedback_text || ""}
+                    onSaved={(fb) => {
+                      setGeneraciones(prev => prev.map(g => g.id === selected.id ? { ...g, rating: fb.rating, feedback_text: fb.feedbackText, feedback_tags: fb.feedbackTags } : g));
+                      setSelected(prev => ({ ...prev, rating: fb.rating, feedback_text: fb.feedbackText, feedback_tags: fb.feedbackTags }));
+                    }}
+                  />
+                </div>
 
                 <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
                   {selected.url && (

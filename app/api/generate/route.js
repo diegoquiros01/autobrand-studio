@@ -10,6 +10,44 @@ const supabase = createClient(
 
 const LIMITS = { free: 20, professional: 200, enterprise: 1000 };
 
+async function getUserFeedbackContext(userId) {
+  if (!userId) return "";
+  const { data } = await supabase
+    .from("generaciones")
+    .select("rating, feedback_text, feedback_tags, tipo")
+    .eq("user_id", userId)
+    .not("rating", "is", null)
+    .order("rated_at", { ascending: false })
+    .limit(15);
+  if (!data || data.length === 0) return "";
+
+  const loved = data.filter(d => d.rating >= 4 && (d.feedback_text || (d.feedback_tags && d.feedback_tags.length > 0)));
+  const disliked = data.filter(d => d.rating <= 2 && (d.feedback_text || (d.feedback_tags && d.feedback_tags.length > 0)));
+
+  if (loved.length === 0 && disliked.length === 0) return "";
+
+  let block = "\nAPRENDIZAJES DEL USUARIO (aplícalos al generar):";
+  if (loved.length > 0) {
+    block += "\nLo que le GUSTA:";
+    loved.forEach(d => {
+      const parts = [];
+      if (d.feedback_text) parts.push(d.feedback_text);
+      if (d.feedback_tags && d.feedback_tags.length > 0) parts.push("tags: " + d.feedback_tags.join(", "));
+      block += "\n- " + (d.tipo ? "[" + d.tipo + "] " : "") + parts.join(" — ");
+    });
+  }
+  if (disliked.length > 0) {
+    block += "\nLo que NO le gusta (EVÍTALO):";
+    disliked.forEach(d => {
+      const parts = [];
+      if (d.feedback_text) parts.push(d.feedback_text);
+      if (d.feedback_tags && d.feedback_tags.length > 0) parts.push("tags: " + d.feedback_tags.join(", "));
+      block += "\n- " + (d.tipo ? "[" + d.tipo + "] " : "") + parts.join(" — ");
+    });
+  }
+  return block;
+}
+
 export async function POST(request) {
   const { allowed } = checkRateLimit(request, 20);
   if (!allowed) return Response.json({ error: "Demasiadas solicitudes. Espera un momento." }, { status: 429 });
@@ -57,6 +95,9 @@ ${bp.idioma === "Inglés" ? "IMPORTANT: This brand communicates in English." : "
 INSTRUCCIÓN CLAVE: El copy debe sonar EXACTAMENTE como esta marca — usa su tono, personalidad y habla directamente a su audiencia específica. Si hay ejemplos de copy, imita ese estilo.
 ` : "";
 
+    // Fetch user feedback learnings
+    const feedbackContext = await getUserFeedbackContext(userId);
+
     const idiomaFinal = idiomapieza && idiomapieza !== "ADN" ? idiomapieza : (bp.idioma || "Español");
     const idiomaInstruccion =
       idiomaFinal === "Español" ? "INSTRUCCIÓN OBLIGATORIA: Todo el copy DEBE estar en español. Sin excepciones." :
@@ -73,6 +114,7 @@ INSTRUCCIÓN CLAVE: El copy debe sonar EXACTAMENTE como esta marca — usa su to
           content: `Eres experto en marketing para redes sociales.
 
 ${brandContext}
+${feedbackContext}
 
 Genera 3 propuestas de Instagram tipo "${tipo}" para: "${prompt}"
 

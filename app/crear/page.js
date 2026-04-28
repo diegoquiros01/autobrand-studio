@@ -6,6 +6,7 @@ import { saveImage } from "../../lib/imageStore";
 import AppLayout from "../components/AppLayout";
 import ADNContextPanel from '../components/adn/ADNContextPanel';
 import ChipSelector from '../components/adn/ChipSelector';
+import FeedbackWidget from '../components/FeedbackWidget';
 
 const TIPOS = ["Comercial","Branding","Educativo","Storytelling","Promocional","Posicionamiento"];
 const FORMATOS_DATA = [
@@ -62,6 +63,7 @@ function CrearContent() {
   const [translatingCopy, setTranslatingCopy] = useState(null);
 
   const [savedFinal, setSavedFinal] = useState(false);
+  const [savedPieceId, setSavedPieceId] = useState(null);
   const [error, setError] = useState("");
 
   const [allBrands, setAllBrands] = useState([]);
@@ -311,6 +313,7 @@ function CrearContent() {
       const data = await res.json();
       if (data.success) {
         setSavedFinal(true);
+        if (data.id) setSavedPieceId(data.id);
       } else {
         setError((en ? "Error saving piece: " : "Error guardando pieza: ") + (data.error || (en ? "Try again" : "Intenta de nuevo")));
       }
@@ -325,7 +328,7 @@ function CrearContent() {
     setReferencias([]); setTalentos([]);
     setShowRefs(false); setShowTalent(false);
     setVersiones([]); setCopies([]); setCopySeleccionado(null); setImgAprobada(false);
-    setSavedFinal(false); setFeedback(""); setError("");
+    setSavedFinal(false); setSavedPieceId(null); setFeedback(""); setError("");
   };
 
   const steps = [{n:1,l:"Describe"},{n:2,l:en ? "Image + Copy" : "Imagen + Copy"},{n:3,l:"Final"}];
@@ -790,10 +793,17 @@ function CrearContent() {
           <div>
             <BackBtn toStep={2} />
             {savedFinal && (
-              <div style={{ background:"rgba(64,192,87,0.1)", border:"1px solid rgba(64,192,87,0.3)", borderRadius:10, padding:"12px 16px", marginBottom:16, display:"flex", alignItems:"center", gap:10 }}>
-                <div style={{ width:24, height:24, background:"#40C057", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:12, color:"#fff", flexShrink:0 }}>✓</div>
-                <span style={{ fontSize:13, color:"#86EFAC", fontWeight:500 }}>{en ? "Saved to your library" : "Guardado en tu biblioteca"}</span>
-              </div>
+              <>
+                <div style={{ background:"rgba(64,192,87,0.1)", border:"1px solid rgba(64,192,87,0.3)", borderRadius:10, padding:"12px 16px", marginBottom:12, display:"flex", alignItems:"center", gap:10 }}>
+                  <div style={{ width:24, height:24, background:"#40C057", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:12, color:"#fff", flexShrink:0 }}>✓</div>
+                  <span style={{ fontSize:13, color:"#86EFAC", fontWeight:500 }}>{en ? "Saved to your library" : "Guardado en tu biblioteca"}</span>
+                </div>
+                {savedPieceId && (
+                  <div style={{ marginBottom: 16 }}>
+                    <FeedbackWidget generacionId={savedPieceId} en={en} />
+                  </div>
+                )}
+              </>
             )}
             <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:20 }}>
               <div>

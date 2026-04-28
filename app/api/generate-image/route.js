@@ -15,8 +15,46 @@ const LIMITS = { free: 20, professional: 200, enterprise: 1000 };
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 const claude = new Anthropic();
 
+async function getUserFeedbackContext(userId) {
+  if (!userId) return "";
+  const { data } = await supabase
+    .from("generaciones")
+    .select("rating, feedback_text, feedback_tags, tipo")
+    .eq("user_id", userId)
+    .not("rating", "is", null)
+    .order("rated_at", { ascending: false })
+    .limit(15);
+  if (!data || data.length === 0) return "";
+
+  const loved = data.filter(d => d.rating >= 4 && (d.feedback_text || (d.feedback_tags && d.feedback_tags.length > 0)));
+  const disliked = data.filter(d => d.rating <= 2 && (d.feedback_text || (d.feedback_tags && d.feedback_tags.length > 0)));
+
+  if (loved.length === 0 && disliked.length === 0) return "";
+
+  let block = "\nUSER STYLE LEARNINGS (apply these):";
+  if (loved.length > 0) {
+    block += "\nWhat the user LOVES:";
+    loved.forEach(d => {
+      const parts = [];
+      if (d.feedback_text) parts.push(d.feedback_text);
+      if (d.feedback_tags && d.feedback_tags.length > 0) parts.push("tags: " + d.feedback_tags.join(", "));
+      block += "\n- " + (d.tipo ? "[" + d.tipo + "] " : "") + parts.join(" — ");
+    });
+  }
+  if (disliked.length > 0) {
+    block += "\nWhat the user DISLIKES (AVOID):";
+    disliked.forEach(d => {
+      const parts = [];
+      if (d.feedback_text) parts.push(d.feedback_text);
+      if (d.feedback_tags && d.feedback_tags.length > 0) parts.push("tags: " + d.feedback_tags.join(", "));
+      block += "\n- " + (d.tipo ? "[" + d.tipo + "] " : "") + parts.join(" — ");
+    });
+  }
+  return block;
+}
+
 // ─── STEP 1: Claude generates visual brief ───
-async function generateVisualBrief(prompt, brandProfile, referencias, talentos, editedCopy, idiomapieza, feedback, formato) {
+async function generateVisualBrief(prompt, brandProfile, referencias, talentos, editedCopy, idiomapieza, feedback, formato, userFeedbackContext) {
   const bp = brandProfile || {};
   const brandBlock = [
     bp.nombre ? "Brand: " + bp.nombre : "",
@@ -79,6 +117,7 @@ async function generateVisualBrief(prompt, brandProfile, referencias, talentos, 
 
 BRAND DNA:
 ${brandBlock}
+${userFeedbackContext || ""}
 
 CREATOR'S CONCEPT: ${prompt}
 ${copyNote}
@@ -255,11 +294,14 @@ export async function POST(request) {
     }
   }
 
+  // ─── Fetch user feedback learnings ───
+  const userFeedbackContext = await getUserFeedbackContext(userId);
+
   // ─── STEP 1: Generate visual brief with Claude ───
   let briefResult = null;
   let usedLegacy = false;
   try {
-    briefResult = await generateVisualBrief(prompt, brandProfile, referencias, talentos, editedCopy, idiomapieza, null, formato);
+    briefResult = await generateVisualBrief(prompt, brandProfile, referencias, talentos, editedCopy, idiomapieza, null, formato, userFeedbackContext);
   } catch (err) {
     console.error("STEP 1 failed, using legacy prompt:", err.message);
     usedLegacy = true;
@@ -290,7 +332,7 @@ export async function POST(request) {
           const adjustedBrief = await generateVisualBrief(
             prompt, brandProfile, referencias, talentos, editedCopy, idiomapieza,
             "Previous attempt issues: " + validation.issues + ". Adjustments needed: " + validation.suggested_adjustments,
-            formato
+            formato, userFeedbackContext
           );
           const retryResult = await generateImageFromBrief(adjustedBrief.brief, adjustedBrief.style_notes, referencias, talentos, false);
           if (retryResult) {
