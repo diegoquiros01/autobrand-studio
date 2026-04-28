@@ -92,11 +92,14 @@ export default function BrandCard({ profile, dnaStrength = 0, en = false }) {
           </div>
         </div>
 
-        {/* Ready to create button */}
+        {/* Create piece CTA */}
         {dnaStrength >= 91 && (
           <div style={{ marginTop: 16 }}>
-            <button style={{ width: '100%', padding: 10, background: 'linear-gradient(135deg, #40C057, #2F9E44)', color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
-              {en ? 'Ready to create →' : 'Listo para crear →'}
+            <div style={{ fontSize: 10, color: 'rgba(64,192,87,0.7)', textAlign: 'center', marginBottom: 6 }}>
+              {en ? '✓ DNA saved automatically' : '✓ ADN guardado automáticamente'}
+            </div>
+            <button onClick={() => window.location.href = '/crear'} style={{ width: '100%', padding: 10, background: 'linear-gradient(135deg, #7950F2, #4C1D95)', color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+              {en ? 'Create piece with this DNA →' : 'Crear pieza con este ADN →'}
             </button>
           </div>
         )}

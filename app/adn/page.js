@@ -793,7 +793,7 @@ function ADNContent() {
               ) : (
                 <button onClick={() => { handleSave(); router.push("/crear"); }}
                   style={{ padding: "8px 20px", background: pct >= 91 ? "linear-gradient(135deg,#40C057,#2F9E44)" : "#7950F2", border: "none", borderRadius: 8, color: "#fff", fontSize: 12.5, fontWeight: 500, cursor: "pointer" }}>
-                  {pct >= 91 ? (en ? "Done \u2014 Create \u2192" : "Listo \u2014 Crear \u2192") : (en ? "Next \u2192" : "Siguiente \u2192")}
+                  {pct >= 91 ? (en ? "ADN saved \u2014 Create piece \u2192" : "ADN guardado \u2014 Crear pieza \u2192") : (en ? "Next \u2192" : "Siguiente \u2192")}
                 </button>
               )}
             </div>
