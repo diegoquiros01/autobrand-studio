@@ -45,6 +45,7 @@ export default function AppLayout({ children }) {
   const [lang, setLang] = useState("es");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [dnaSectionOpen, setDnaSectionOpen] = useState(true);
+  const [expandedBrandId, setExpandedBrandId] = useState(null);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -314,6 +315,7 @@ export default function AppLayout({ children }) {
                         {brands.map(b => {
                           const isCreatingNew = pathname === "/adn" && typeof window !== "undefined" && new URLSearchParams(window.location.search).get("new") === "true";
                           const isActiveBrand = !isCreatingNew && b.id === activeBrand?.id;
+                          const isExpanded = expandedBrandId === b.id;
                           const bFields = [
                             !!b.nombre, !!b.descripcion, !!b.audiencia,
                             !!(Array.isArray(b.tono) ? b.tono.filter(Boolean).length : b.tono),
@@ -325,13 +327,20 @@ export default function AppLayout({ children }) {
                           const bPct = Math.round((bFields.filter(Boolean).length / bFields.length) * 100);
                           const bComplete = bPct >= 90;
                           return (
-                            <div key={b.id} style={{ display: "flex", alignItems: "center", gap: 0 }}>
-                              <button onClick={() => { switchBrand(b); router.push("/adn?brand=" + b.id); setSidebarOpen(false); }}
-                                title={en ? "Click to edit DNA" : "Click para editar ADN"}
+                            <div key={b.id}>
+                              <button onClick={() => {
+                                switchBrand(b);
+                                // If incomplete, go straight to editor. If complete, toggle action menu.
+                                if (!bComplete) {
+                                  router.push("/adn?brand=" + b.id); setSidebarOpen(false);
+                                } else {
+                                  setExpandedBrandId(isExpanded ? null : b.id);
+                                }
+                              }}
                                 style={{
-                                  flex: 1, display: "flex", alignItems: "center", gap: 8, padding: "6px 8px",
-                                  borderRadius: 6, cursor: "pointer", textAlign: "left",
-                                  background: isActiveBrand ? "rgba(121,80,242,0.1)" : "transparent",
+                                  width: "100%", display: "flex", alignItems: "center", gap: 8, padding: "6px 8px",
+                                  borderRadius: isExpanded ? "6px 6px 0 0" : 6, cursor: "pointer", textAlign: "left",
+                                  background: isExpanded ? "rgba(121,80,242,0.08)" : isActiveBrand ? "rgba(121,80,242,0.1)" : "transparent",
                                   border: "none", transition: "all 0.2s",
                                 }}>
                                 <div style={{
@@ -359,11 +368,35 @@ export default function AppLayout({ children }) {
                                     {isActiveBrand && <span style={{ color: "rgba(167,139,250,0.6)" }}>{en ? "· active" : "· activa"}</span>}
                                   </div>
                                 </div>
+                                {bComplete && <span style={{ fontSize: 8, color: "rgba(255,255,255,0.2)", transition: "transform 0.2s", transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)" }}>▼</span>}
                               </button>
-                              {brands.length > 1 && (
-                                <button onClick={(e) => { e.stopPropagation(); deleteBrand(b); }}
-                                  style={{ background: "none", border: "none", cursor: "pointer", padding: "4px 6px", color: "rgba(255,255,255,0.12)", fontSize: 13, borderRadius: 4, flexShrink: 0 }}
-                                  title={en ? "Delete" : "Eliminar"}>×</button>
+                              {/* Action menu for completed brands */}
+                              {isExpanded && (
+                                <div style={{ background: "rgba(121,80,242,0.04)", borderRadius: "0 0 6px 6px", padding: "4px 6px", display: "flex", flexDirection: "column", gap: 2, borderTop: "0.5px solid rgba(121,80,242,0.1)" }}>
+                                  <button onClick={() => { router.push("/adn?brand=" + b.id); setSidebarOpen(false); setExpandedBrandId(null); }}
+                                    style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 8px", borderRadius: 4, background: "none", border: "none", cursor: "pointer", width: "100%", textAlign: "left", fontSize: 11, color: "rgba(255,255,255,0.6)" }}
+                                    onMouseEnter={e => e.currentTarget.style.background="rgba(255,255,255,0.04)"}
+                                    onMouseLeave={e => e.currentTarget.style.background="none"}>
+                                    <span style={{ fontSize: 11, width: 16, textAlign: "center" }}>✎</span>
+                                    {en ? "Edit DNA" : "Editar ADN"}
+                                  </button>
+                                  <button onClick={() => { router.push("/crear"); setSidebarOpen(false); setExpandedBrandId(null); }}
+                                    style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 8px", borderRadius: 4, background: "none", border: "none", cursor: "pointer", width: "100%", textAlign: "left", fontSize: 11, color: "#A78BFA" }}
+                                    onMouseEnter={e => e.currentTarget.style.background="rgba(121,80,242,0.08)"}
+                                    onMouseLeave={e => e.currentTarget.style.background="none"}>
+                                    <span style={{ fontSize: 11, width: 16, textAlign: "center" }}>✦</span>
+                                    {en ? "Create piece" : "Crear pieza"}
+                                  </button>
+                                  {brands.length > 1 && (
+                                    <button onClick={() => { deleteBrand(b); setExpandedBrandId(null); }}
+                                      style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 8px", borderRadius: 4, background: "none", border: "none", cursor: "pointer", width: "100%", textAlign: "left", fontSize: 11, color: "rgba(252,165,165,0.6)" }}
+                                      onMouseEnter={e => e.currentTarget.style.background="rgba(220,38,38,0.06)"}
+                                      onMouseLeave={e => e.currentTarget.style.background="none"}>
+                                      <span style={{ fontSize: 11, width: 16, textAlign: "center" }}>×</span>
+                                      {en ? "Delete" : "Eliminar"}
+                                    </button>
+                                  )}
+                                </div>
                               )}
                             </div>
                           );
