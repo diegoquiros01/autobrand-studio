@@ -373,20 +373,24 @@ export default function AppLayout({ children }) {
                               {/* Action menu for completed brands */}
                               {isExpanded && (
                                 <div style={{ background: "rgba(121,80,242,0.04)", borderRadius: "0 0 6px 6px", padding: "4px 6px", display: "flex", flexDirection: "column", gap: 2, borderTop: "0.5px solid rgba(121,80,242,0.1)" }}>
-                                  <button onClick={() => { router.push("/adn?brand=" + b.id); setSidebarOpen(false); setExpandedBrandId(null); }}
-                                    style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 8px", borderRadius: 4, background: "none", border: "none", cursor: "pointer", width: "100%", textAlign: "left", fontSize: 11, color: "rgba(255,255,255,0.6)" }}
-                                    onMouseEnter={e => e.currentTarget.style.background="rgba(255,255,255,0.04)"}
-                                    onMouseLeave={e => e.currentTarget.style.background="none"}>
-                                    <span style={{ fontSize: 11, width: 16, textAlign: "center" }}>✎</span>
-                                    {en ? "Edit DNA" : "Editar ADN"}
-                                  </button>
-                                  <button onClick={() => { router.push("/crear"); setSidebarOpen(false); setExpandedBrandId(null); }}
-                                    style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 8px", borderRadius: 4, background: "none", border: "none", cursor: "pointer", width: "100%", textAlign: "left", fontSize: 11, color: "#A78BFA" }}
-                                    onMouseEnter={e => e.currentTarget.style.background="rgba(121,80,242,0.08)"}
-                                    onMouseLeave={e => e.currentTarget.style.background="none"}>
-                                    <span style={{ fontSize: 11, width: 16, textAlign: "center" }}>✦</span>
-                                    {en ? "Create piece" : "Crear pieza"}
-                                  </button>
+                                  {pathname !== "/adn" && (
+                                    <button onClick={() => { router.push("/adn?brand=" + b.id); setSidebarOpen(false); setExpandedBrandId(null); }}
+                                      style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 8px", borderRadius: 4, background: "none", border: "none", cursor: "pointer", width: "100%", textAlign: "left", fontSize: 11, color: "rgba(255,255,255,0.6)" }}
+                                      onMouseEnter={e => e.currentTarget.style.background="rgba(255,255,255,0.04)"}
+                                      onMouseLeave={e => e.currentTarget.style.background="none"}>
+                                      <span style={{ fontSize: 11, width: 16, textAlign: "center" }}>✎</span>
+                                      {en ? "Edit DNA" : "Editar ADN"}
+                                    </button>
+                                  )}
+                                  {pathname !== "/crear" && (
+                                    <button onClick={() => { router.push("/crear"); setSidebarOpen(false); setExpandedBrandId(null); }}
+                                      style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 8px", borderRadius: 4, background: "none", border: "none", cursor: "pointer", width: "100%", textAlign: "left", fontSize: 11, color: "#A78BFA" }}
+                                      onMouseEnter={e => e.currentTarget.style.background="rgba(121,80,242,0.08)"}
+                                      onMouseLeave={e => e.currentTarget.style.background="none"}>
+                                      <span style={{ fontSize: 11, width: 16, textAlign: "center" }}>✦</span>
+                                      {en ? "Create piece" : "Crear pieza"}
+                                    </button>
+                                  )}
                                   {brands.length > 1 && (
                                     <button onClick={() => { deleteBrand(b); setExpandedBrandId(null); }}
                                       style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 8px", borderRadius: 4, background: "none", border: "none", cursor: "pointer", width: "100%", textAlign: "left", fontSize: 11, color: "rgba(252,165,165,0.6)" }}
