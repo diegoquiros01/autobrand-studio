@@ -259,9 +259,21 @@ export default function AppLayout({ children }) {
                 {brands.map(b => {
                   const isCreatingNew = pathname === "/adn" && typeof window !== "undefined" && new URLSearchParams(window.location.search).get("new") === "true";
                   const isActive = !isCreatingNew && b.id === activeBrand?.id;
+                  // Calculate DNA progress
+                  const dnaFields = [
+                    !!b.nombre, !!b.descripcion, !!b.audiencia,
+                    !!(Array.isArray(b.tono) ? b.tono.filter(Boolean).length : b.tono),
+                    !!b.idioma, !!b.propuesta_valor, !!b.instagram_url,
+                    !!b.personalidad,
+                    !!(b.colores_marca && b.colores_marca.length > 0),
+                    !!(b.ejemplos_copy && b.ejemplos_copy.some(e => e && e.trim())),
+                  ];
+                  const dnaPct = Math.round((dnaFields.filter(Boolean).length / dnaFields.length) * 100);
+                  const dnaComplete = dnaPct >= 90;
                   return (
                     <div key={b.id} style={{ display: "flex", alignItems: "center", gap: 0 }}>
                       <button onClick={() => { switchBrand(b); router.push("/adn?brand=" + b.id); setSidebarOpen(false); }}
+                        title={en ? "Click to edit DNA" : "Click para editar ADN"}
                         style={{
                           flex: 1, display: "flex", alignItems: "center", gap: 8, padding: theme.sidebar.subItem.padding,
                           borderRadius: theme.sidebar.subItem.radius, cursor: "pointer", textAlign: "left",
@@ -274,8 +286,12 @@ export default function AppLayout({ children }) {
                           background: isActive ? "linear-gradient(135deg,#7950F2,#A78BFA)" : "rgba(255,255,255,0.08)",
                           display: "flex", alignItems: "center", justifyContent: "center",
                           fontSize: theme.sidebar.subAvatar.fontSize, fontWeight: theme.sidebar.subAvatar.fontWeight, color: "#fff",
+                          position: "relative",
                         }}>
                           {(b.nombre || "M").charAt(0).toUpperCase()}
+                          {dnaComplete && (
+                            <div style={{ position:"absolute", bottom:-1, right:-1, width:10, height:10, borderRadius:"50%", background:"#40C057", border:"2px solid #0A0A14", display:"flex", alignItems:"center", justifyContent:"center", fontSize:6, color:"#fff" }}>✓</div>
+                          )}
                         </div>
                         <div style={{ overflow: "hidden", flex: 1 }}>
                           <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
@@ -284,8 +300,17 @@ export default function AppLayout({ children }) {
                             </span>
                             {isActive && <span style={{ width: theme.sidebar.statusDot.size, height: theme.sidebar.statusDot.size, borderRadius: "50%", background: theme.sidebar.statusDot.bg, flexShrink: 0, display: "inline-block" }} />}
                           </div>
-                          <div style={{ fontSize: theme.sidebar.subMeta.fontSize, color: theme.sidebar.subMeta.color, marginTop: 1 }}>
-                            {isActive ? (en ? "60% DNA · active" : "60% ADN · activa") : (en ? "View & edit" : "Ver y editar")}
+                          <div style={{ fontSize: theme.sidebar.subMeta.fontSize, color: dnaComplete ? "rgba(64,192,87,0.7)" : theme.sidebar.subMeta.color, marginTop: 1, display: "flex", alignItems: "center", gap: 4 }}>
+                            {dnaComplete ? (
+                              <span>{dnaPct}% ADN {isActive ? (en ? "· active" : "· activa") : ""}</span>
+                            ) : (
+                              <>
+                                <span>{dnaPct}% ADN</span>
+                                <div style={{ flex:1, maxWidth:40, height:2, background:"rgba(255,255,255,0.06)", borderRadius:1, overflow:"hidden" }}>
+                                  <div style={{ height:"100%", width:dnaPct+"%", background: dnaPct > 50 ? "#A78BFA" : "rgba(255,255,255,0.2)", borderRadius:1, transition:"width 0.3s" }} />
+                                </div>
+                              </>
+                            )}
                           </div>
                         </div>
                       </button>

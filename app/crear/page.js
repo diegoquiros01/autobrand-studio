@@ -302,6 +302,8 @@ function CrearContent() {
           copy: copy || { hook: "", copy: prompt, cta: "", hashtags: "" },
           imageBase64: imgData.image,
           mimeType: imgData.mimeType,
+          brandId: brandProfile?.id || null,
+          brandName: brandProfile?.nombre || null,
         }),
       });
       if (!res.ok) {
@@ -420,28 +422,61 @@ function CrearContent() {
       <div className="crear-grid" style={{ display:"grid", gridTemplateColumns:"minmax(340px, 480px) 1fr", height:"calc(100vh - 56px)" }}>
         {/* ═══ LEFT: EDITOR PANEL ═══ */}
         <div style={{ padding:"28px 24px", borderRight:"0.5px solid rgba(255,255,255,0.06)", overflowY:"auto", background:"#0A0A14" }}>
-          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:16 }}>
-            <h1 style={{ fontSize:18, fontWeight:700, color:D.text, letterSpacing:"-0.03em" }}>{en ? "New piece" : "Nueva pieza"}</h1>
-            {brandProfile && (
+          <div style={{ marginBottom:16 }}>
+            <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:10 }}>
+              <h1 style={{ fontSize:18, fontWeight:700, color:D.text, letterSpacing:"-0.03em" }}>{en ? "New piece" : "Nueva pieza"}</h1>
+            </div>
+            {/* Brand context banner */}
+            {brandProfile ? (
               <div style={{ position:"relative" }}>
-                <div style={{ display:"inline-flex", alignItems:"center", gap:5, background:"rgba(121,80,242,0.1)", borderRadius:20, padding:"3px 10px", border:"1px solid rgba(121,80,242,0.2)", cursor: step === 1 ? "pointer" : "default", opacity: step === 1 ? 1 : 0.5 }} onClick={() => step === 1 && setBrandDropdownOpen(!brandDropdownOpen)}>
-                  <span style={{ width:5, height:5, borderRadius:"50%", background:D.purpleLight, display:"inline-block" }} />
-                  <span style={{ fontSize:10, color:D.purpleLight, fontWeight:500 }}>{brandProfile.nombre || (en ? "Your brand" : "Tu marca")}</span>
-                  {allBrands.length > 1 && <span style={{ fontSize:10, color:"rgba(255,255,255,0.5)" }}>▼</span>}
+                <div onClick={() => step === 1 && allBrands.length > 1 && setBrandDropdownOpen(!brandDropdownOpen)}
+                  style={{
+                    display:"flex", alignItems:"center", gap:10, padding:"10px 14px",
+                    background:"rgba(121,80,242,0.06)", border:"0.5px solid rgba(121,80,242,0.2)", borderRadius:10,
+                    cursor: step === 1 && allBrands.length > 1 ? "pointer" : "default",
+                  }}>
+                  <div style={{ width:32, height:32, borderRadius:"50%", background:"linear-gradient(135deg,#7950F2,#4C1D95)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:13, fontWeight:600, color:"#fff", flexShrink:0 }}>
+                    {(brandProfile.nombre || "?")[0].toUpperCase()}
+                  </div>
+                  <div style={{ flex:1 }}>
+                    <div style={{ fontSize:12.5, fontWeight:600, color:D.text, letterSpacing:"-0.02em" }}>{brandProfile.nombre || (en ? "Your brand" : "Tu marca")}</div>
+                    <div style={{ fontSize:10.5, color:D.text3 }}>{en ? "Creating with this brand's DNA" : "Creando con el ADN de esta marca"}</div>
+                  </div>
+                  {allBrands.length > 1 && step === 1 && (
+                    <span style={{ fontSize:10, color:"rgba(255,255,255,0.3)", padding:"4px 8px", background:"rgba(255,255,255,0.04)", borderRadius:4 }}>{en ? "Change" : "Cambiar"}</span>
+                  )}
                 </div>
                 {brandDropdownOpen && allBrands.length > 1 && (
-                  <div style={{ position:"absolute", top:"100%", right:0, marginTop:6, background:"#10101C", border:"0.5px solid rgba(255,255,255,0.06)", borderRadius:12, padding:4, zIndex:100, boxShadow:"0 8px 30px rgba(0,0,0,0.5)", minWidth:180 }}>
+                  <div style={{ position:"absolute", top:"100%", left:0, right:0, marginTop:4, background:"#10101C", border:"0.5px solid rgba(255,255,255,0.1)", borderRadius:10, padding:4, zIndex:100, boxShadow:"0 8px 30px rgba(0,0,0,0.5)" }}>
                     {allBrands.map(b => (
                       <div key={b.id} onClick={() => switchBrandInCrear(b)} style={{
-                        display:"flex", alignItems:"center", gap:8, padding:"8px 10px", borderRadius:6, cursor:"pointer",
-                        background: b.id === brandProfile?.id ? "rgba(121,80,242,0.15)" : "transparent",
-                      }}>
-                        <span style={{ width:5, height:5, borderRadius:"50%", background: b.id === brandProfile?.id ? D.purpleLight : "rgba(255,255,255,0.2)", display:"inline-block" }} />
+                        display:"flex", alignItems:"center", gap:10, padding:"9px 12px", borderRadius:8, cursor:"pointer",
+                        background: b.id === brandProfile?.id ? "rgba(121,80,242,0.12)" : "transparent",
+                      }}
+                        onMouseEnter={e => { if (b.id !== brandProfile?.id) e.currentTarget.style.background="rgba(255,255,255,0.04)"; }}
+                        onMouseLeave={e => { if (b.id !== brandProfile?.id) e.currentTarget.style.background="transparent"; }}
+                      >
+                        <div style={{ width:26, height:26, borderRadius:"50%", background: b.id === brandProfile?.id ? "linear-gradient(135deg,#7950F2,#4C1D95)" : "rgba(255,255,255,0.08)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:600, color:"#fff" }}>
+                          {(b.nombre || "?")[0].toUpperCase()}
+                        </div>
                         <span style={{ fontSize:12, color:"#fff", fontWeight: b.id === brandProfile?.id ? 600 : 400 }}>{b.nombre || (en ? "Unnamed" : "Sin nombre")}</span>
+                        {b.id === brandProfile?.id && <span style={{ fontSize:10, color:"#40C057", marginLeft:"auto" }}>✓</span>}
                       </div>
                     ))}
                   </div>
                 )}
+              </div>
+            ) : (
+              <div style={{ padding:"14px 16px", background:"rgba(220,38,38,0.06)", border:"0.5px solid rgba(220,38,38,0.2)", borderRadius:10, display:"flex", alignItems:"center", gap:10 }}>
+                <div style={{ width:32, height:32, borderRadius:"50%", background:"rgba(220,38,38,0.1)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, flexShrink:0 }}>!</div>
+                <div style={{ flex:1 }}>
+                  <div style={{ fontSize:12.5, fontWeight:500, color:"#FCA5A5" }}>{en ? "No brand DNA selected" : "Sin ADN de marca"}</div>
+                  <div style={{ fontSize:10.5, color:"rgba(255,255,255,0.4)" }}>{en ? "Create a brand DNA first to generate on-brand pieces" : "Crea un ADN de marca primero para generar piezas alineadas"}</div>
+                </div>
+                <button onClick={() => router.push("/adn")}
+                  style={{ padding:"6px 14px", background:"rgba(121,80,242,0.15)", border:"0.5px solid rgba(121,80,242,0.3)", borderRadius:6, color:"#A78BFA", fontSize:11, fontWeight:500, cursor:"pointer", whiteSpace:"nowrap" }}>
+                  {en ? "Create DNA →" : "Crear ADN →"}
+                </button>
               </div>
             )}
           </div>

@@ -444,6 +444,36 @@ function ADNContent() {
       )}
 
       <div style={{ background: D.bg, minHeight: "calc(100vh - 64px)", paddingBottom: 100 }}>
+        {/* Auto-save status banner */}
+        <div style={{
+          background: saveStatus === "saved" ? "rgba(64,192,87,0.08)" : saveStatus === "saving" ? "rgba(121,80,242,0.08)" : saveStatus === "error" ? "rgba(220,38,38,0.08)" : "rgba(255,255,255,0.02)",
+          borderBottom: "0.5px solid " + (saveStatus === "saved" ? "rgba(64,192,87,0.2)" : saveStatus === "error" ? "rgba(220,38,38,0.2)" : "rgba(255,255,255,0.06)"),
+          padding: "8px 24px", display: "flex", alignItems: "center", justifyContent: "space-between",
+          transition: "all 0.3s ease",
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <div style={{
+              width: 7, height: 7, borderRadius: "50%",
+              background: saveStatus === "saved" ? "#40C057" : saveStatus === "saving" ? "#A78BFA" : saveStatus === "error" ? "#E24B4A" : "rgba(255,255,255,0.2)",
+              boxShadow: saveStatus === "saved" ? "0 0 6px rgba(64,192,87,0.5)" : "none",
+            }} />
+            <span style={{ fontSize: 11.5, color: saveStatus === "saved" ? "#86EFAC" : saveStatus === "saving" ? "#A78BFA" : saveStatus === "error" ? "#FCA5A5" : "rgba(255,255,255,0.4)", fontWeight: 500 }}>
+              {saveStatus === "saved" ? (en ? "All changes saved automatically" : "Todos los cambios se guardan automáticamente") :
+               saveStatus === "saving" ? (en ? "Saving changes..." : "Guardando cambios...") :
+               saveStatus === "error" ? (en ? "Error saving — will retry" : "Error al guardar — reintentando") :
+               (en ? "Changes save automatically" : "Los cambios se guardan automáticamente")}
+            </span>
+          </div>
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            {pct >= 50 && (
+              <button onClick={() => router.push("/crear")}
+                style={{ padding: "5px 14px", background: pct >= 91 ? "rgba(64,192,87,0.15)" : "rgba(121,80,242,0.1)", border: "0.5px solid " + (pct >= 91 ? "rgba(64,192,87,0.3)" : "rgba(121,80,242,0.2)"), borderRadius: 6, color: pct >= 91 ? "#86EFAC" : "#A78BFA", fontSize: 11, fontWeight: 500, cursor: "pointer" }}>
+                {en ? "Create piece →" : "Crear pieza →"}
+              </button>
+            )}
+          </div>
+        </div>
+
         {/* Header */}
         <div style={{ position: "relative", overflow: "hidden", background: "linear-gradient(180deg, #1a0a2e 0%, #0A0A14 100%)", padding: "44px 24px 40px" }}>
           {/* Orbs */}
@@ -757,11 +787,10 @@ function ADNContent() {
         {/* Sticky Footer */}
         <div className="adn-footer" style={{ position: "fixed", bottom: 0, left: 220, right: 0, zIndex: 45, background: "rgba(10,10,20,0.95)", backdropFilter: "blur(20px)", borderTop: "0.5px solid rgba(255,255,255,0.06)" }}>
           <div style={{ maxWidth: 1100, margin: "0 auto", padding: "14px 28px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,0.5)" }}>
-              {saveStatus === "saving" && <span style={{ color: "#A78BFA", fontWeight: 500 }}>{en ? "Saving..." : "Guardando..."}</span>}
-              {saveStatus === "saved" && <span style={{ color: "#5DCAA5", fontWeight: 500 }}>{en ? "\u2713 Saved" : "\u2713 Guardado"}</span>}
-              {saveStatus === "error" && <span style={{ color: "#E24B4A", fontWeight: 500 }}>{en ? "\u26A0 Error saving" : "\u26A0 Error al guardar"}</span>}
-              {saveStatus === "idle" && <span>{en ? "Step" : "Paso"} {step} {en ? "of" : "de"} 3</span>}
+            <div style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", display: "flex", alignItems: "center", gap: 8 }}>
+              <span>{en ? "Step" : "Paso"} {step} {en ? "of" : "de"} 3</span>
+              <span style={{ color: "rgba(255,255,255,0.15)" }}>|</span>
+              <span style={{ fontSize: 11, color: pct >= 91 ? "#40C057" : "#A78BFA" }}>{pct}% {en ? "complete" : "completo"}</span>
             </div>
             <div style={{ display: "flex", gap: 10 }}>
               {step > 1 && (

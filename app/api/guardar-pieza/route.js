@@ -9,7 +9,7 @@ const supabase = createClient(
 
 export async function POST(request) {
   try {
-    const { userId, prompt, tipo, copy, imageBase64, mimeType } = await request.json();
+    const { userId, prompt, tipo, copy, imageBase64, mimeType, brandId, brandName } = await request.json();
     
     if (!userId || !imageBase64) {
       return Response.json({ error: "Missing data" }, { status: 400 });
@@ -32,13 +32,17 @@ export async function POST(request) {
       return Response.json({ error: uploadError.message }, { status: 500 });
     }
 
-    const { data: inserted, error: insertError } = await supabase.from("generaciones").insert({
+    const insertData = {
       user_id: userId,
       prompt: prompt,
       tipo: tipo,
       propuestas: [copy],
       imagen_url: fileName,
-    }).select("id").single();
+    };
+    if (brandId) insertData.brand_id = brandId;
+    if (brandName) insertData.brand_name = brandName;
+
+    const { data: inserted, error: insertError } = await supabase.from("generaciones").insert(insertData).select("id").single();
 
     if (insertError) {
       console.error("Insert error:", insertError);

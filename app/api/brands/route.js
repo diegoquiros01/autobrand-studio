@@ -18,8 +18,8 @@ export async function GET(request) {
     return Response.json({ brand: data, error: error?.message || null });
   }
 
-  // List all brands for user
-  const { data, error } = await supabase.from("brand_profiles").select("id, nombre, tono, idioma").eq("user_id", userId);
+  // List all brands for user (include fields needed for DNA progress calculation)
+  const { data, error } = await supabase.from("brand_profiles").select("id, nombre, tono, idioma, descripcion, audiencia, propuesta_valor, instagram_url, personalidad, colores_marca, ejemplos_copy").eq("user_id", userId);
   return Response.json({ data, error: error?.message || null, count: data?.length || 0 });
 }
 

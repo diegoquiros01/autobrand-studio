@@ -11,6 +11,7 @@ export default function Biblioteca() {
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(null);
   const [filter, setFilter] = useState("todas");
+  const [brandFilter, setBrandFilter] = useState("todas");
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const PER_PAGE = 20;
@@ -65,8 +66,12 @@ export default function Biblioteca() {
 
   const formatDate = (d) => new Date(d).toLocaleDateString(en ? "en-US" : "es-ES", { day:"numeric", month:"short", year:"numeric" });
 
+  // Collect unique brands from pieces
+  const brands = [...new Map(generaciones.filter(g => g.brand_name).map(g => [g.brand_id || g.brand_name, { id: g.brand_id, name: g.brand_name }])).values()];
+
+  const brandFiltered = brandFilter === "todas" ? generaciones : generaciones.filter(g => (g.brand_id || g.brand_name) === brandFilter);
   const searchFiltered = searchQuery.trim()
-    ? generaciones.filter(g => {
+    ? brandFiltered.filter(g => {
         const q = searchQuery.toLowerCase();
         const matchPrompt = g.prompt?.toLowerCase().includes(q);
         const matchCopy = g.propuestas?.[0]?.hook?.toLowerCase().includes(q) ||
@@ -74,7 +79,7 @@ export default function Biblioteca() {
                           g.propuestas?.[0]?.hashtags?.toLowerCase().includes(q);
         return matchPrompt || matchCopy;
       })
-    : generaciones;
+    : brandFiltered;
   const allFiltered = filter === "todas" ? searchFiltered : searchFiltered.filter(g => g.tipo === filter);
   const totalPages = Math.ceil(allFiltered.length / PER_PAGE);
   const filtered = allFiltered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
@@ -116,6 +121,28 @@ export default function Biblioteca() {
           </div>
         </div>
 
+        {/* Brand filter tabs */}
+        {brands.length > 0 && (
+          <div style={{ display:"flex", gap:6, marginBottom:12, flexWrap:"wrap" }}>
+            <button onClick={() => { setBrandFilter("todas"); setPage(1); }}
+              style={{ padding:"6px 14px", borderRadius:8, fontSize:12, border: brandFilter==="todas" ? "0.5px solid rgba(121,80,242,0.4)" : "0.5px solid rgba(255,255,255,0.08)", background: brandFilter==="todas" ? "rgba(121,80,242,0.1)" : "transparent", color: brandFilter==="todas" ? "#A78BFA" : D.text3, fontWeight: brandFilter==="todas" ? 500 : 400, cursor:"pointer", display:"flex", alignItems:"center", gap:6 }}>
+              {en ? "All brands" : "Todas las marcas"} <span style={{ fontSize:10, opacity:0.6 }}>({generaciones.length})</span>
+            </button>
+            {brands.map(b => {
+              const count = generaciones.filter(g => (g.brand_id || g.brand_name) === (b.id || b.name)).length;
+              const active = brandFilter === (b.id || b.name);
+              return (
+                <button key={b.id || b.name} onClick={() => { setBrandFilter(b.id || b.name); setPage(1); }}
+                  style={{ padding:"6px 14px", borderRadius:8, fontSize:12, border: active ? "0.5px solid rgba(121,80,242,0.4)" : "0.5px solid rgba(255,255,255,0.08)", background: active ? "rgba(121,80,242,0.1)" : "transparent", color: active ? "#A78BFA" : D.text3, fontWeight: active ? 500 : 400, cursor:"pointer", display:"flex", alignItems:"center", gap:6 }}>
+                  <span style={{ width:14, height:14, borderRadius:"50%", background:"linear-gradient(135deg,#7950F2,#4C1D95)", display:"inline-flex", alignItems:"center", justifyContent:"center", fontSize:8, fontWeight:700, color:"#fff" }}>{(b.name||"?")[0].toUpperCase()}</span>
+                  {b.name} <span style={{ fontSize:10, opacity:0.6 }}>({count})</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Type filter tabs */}
         <div style={{ display:"flex", gap:6, marginBottom:20, flexWrap:"wrap" }}>
           {TIPOS.map(t => (
             <button key={t} onClick={() => { setFilter(t); setPage(1); }}
@@ -177,7 +204,12 @@ export default function Biblioteca() {
                       {g.rating && <div style={{ fontSize:10, color:"#FBBF24", letterSpacing:1 }}>{"★".repeat(g.rating)}<span style={{ color:"rgba(255,255,255,0.1)" }}>{"★".repeat(5 - g.rating)}</span></div>}
                     </div>
                     <div style={{ fontSize:12, color:D.text2, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", marginBottom:3 }}>{g.prompt}</div>
-                    <div style={{ fontSize:11, color:D.text3 }}>{formatDate(g.created_at)}</div>
+                    <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+                      <div style={{ fontSize:11, color:D.text3 }}>{formatDate(g.created_at)}</div>
+                      {g.brand_name && (
+                        <div style={{ fontSize:9.5, color:"rgba(167,139,250,0.6)", background:"rgba(121,80,242,0.08)", padding:"2px 6px", borderRadius:4, maxWidth:80, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{g.brand_name}</div>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}
