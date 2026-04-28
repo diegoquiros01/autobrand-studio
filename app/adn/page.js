@@ -333,14 +333,17 @@ function ADNContent() {
   // Don't show 100% for steps the user hasn't visited yet — cap at 95% until they go there
   const stepProgress = rawStepProgress.map((p, i) => (p === 100 && step < i + 1 && isNewlyCreated) ? 95 : p);
 
-  // Confetti + ADN saved celebration
+  // Confetti + ADN saved celebration — only on first-time completion, not on reload
   const [showDnaSaved, setShowDnaSaved] = useState(false);
+  const prevPctRef = useRef(null);
   useEffect(() => {
-    if (pct === 100 && !showConfetti) {
+    // Only celebrate when pct transitions TO 100 from a lower value (not on initial load at 100)
+    if (pct === 100 && prevPctRef.current !== null && prevPctRef.current < 100 && !showConfetti) {
       setShowDnaSaved(true);
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 4000);
     }
+    prevPctRef.current = pct;
   }, [pct]);
 
   // --- Navigation ---
