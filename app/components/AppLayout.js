@@ -230,152 +230,172 @@ export default function AppLayout({ children }) {
           position: "fixed", top: 64, bottom: 0, left: 0, zIndex: 40,
           overflowY: "auto", transition: "transform 0.3s ease",
         }}>
-          {/* Section label: MARCA */}
-          <div style={{ ...theme.sidebar.sectionLabel, marginTop: 4 }}>{en ? "BRAND" : "MARCA"}</div>
+          {/* ═══ FLOW STEPS ═══ */}
+          {(() => {
+            // Calculate DNA progress for active brand
+            const ab = activeBrand || {};
+            const dnaFields = [
+              !!ab.nombre, !!ab.descripcion, !!ab.audiencia,
+              !!(Array.isArray(ab.tono) ? ab.tono.filter(Boolean).length : ab.tono),
+              !!ab.idioma, !!ab.propuesta_valor, !!ab.instagram_url,
+              !!ab.personalidad,
+              !!(ab.colores_marca && ab.colores_marca.length > 0),
+              !!(ab.ejemplos_copy && ab.ejemplos_copy.some(e => e && e.trim())),
+            ];
+            const dnaPct = brands.length > 0 ? Math.round((dnaFields.filter(Boolean).length / dnaFields.length) * 100) : 0;
+            const dnaComplete = dnaPct >= 90;
+            const hasBrands = brands.length > 0;
 
-          {/* Brand DNA section */}
-          <div style={{ marginBottom: 4 }}>
-            <button onClick={() => setDnaSectionOpen(!dnaSectionOpen)}
-              style={{
-                display: "flex", alignItems: "center", gap: 10, padding: pathname === "/adn" ? `${theme.sidebar.navItem.padding.split(' ')[0]} ${theme.sidebar.navItem.padding.split(' ')[1]}` : theme.sidebar.navItem.padding,
-                borderRadius: pathname === "/adn" ? theme.sidebar.navItemActive.borderRadius : theme.sidebar.navItem.radius,
-                fontSize: theme.sidebar.navItem.fontSize,
-                fontWeight: pathname === "/adn" ? theme.sidebar.navItemActive.fontWeight : 400,
-                color: pathname === "/adn" ? theme.sidebar.navItemActive.color : theme.sidebar.navItem.color,
-                background: pathname === "/adn" ? theme.sidebar.navItemActive.background : "transparent",
-                boxShadow: pathname === "/adn" ? theme.sidebar.navItemActive.boxShadow : "none",
-                paddingLeft: pathname === "/adn" ? theme.sidebar.navItemActive.paddingLeft : undefined,
-                marginLeft: pathname === "/adn" ? theme.sidebar.navItemActive.marginLeft : 0,
-                border: "none",
-                cursor: "pointer", textAlign: "left", width: "100%", transition: "all 0.2s",
-              }}>
-              <IconDna color={pathname === "/adn" ? theme.accent.light : theme.text.dim} size={theme.sidebar.navItem.iconSize} />
-              <span style={{ flex: 1 }}>{en ? "Brand DNA" : "ADN de marca"}</span>
-              <span style={{ fontSize: 11, color: theme.text.muted, transition: "transform 0.2s", transform: dnaSectionOpen ? "rotate(180deg)" : "rotate(0deg)" }}>▼</span>
-            </button>
+            // Flow steps definition
+            const flowSteps = [
+              { num: 1, label: en ? "Brand DNA" : "ADN de marca", path: "/adn", done: dnaComplete, current: pathname === "/adn", meta: hasBrands ? (dnaComplete ? (en ? "Complete" : "Completo") : dnaPct + "%") : (en ? "Start here" : "Empieza aquí") },
+              { num: 2, label: en ? "Create" : "Crear pieza", path: "/crear", done: false, current: pathname === "/crear", meta: dnaComplete ? (en ? "Ready" : "Listo") : (en ? "Needs DNA" : "Necesita ADN"), disabled: !dnaComplete },
+              { num: 3, label: en ? "Library" : "Biblioteca", path: "/biblioteca", done: false, current: pathname === "/biblioteca", meta: en ? "Your pieces" : "Tus piezas" },
+            ];
 
-            {dnaSectionOpen && (
-              <div style={{ paddingLeft: 12, paddingTop: 4, display: "flex", flexDirection: "column", gap: 2 }}>
-                {brands.map(b => {
-                  const isCreatingNew = pathname === "/adn" && typeof window !== "undefined" && new URLSearchParams(window.location.search).get("new") === "true";
-                  const isActive = !isCreatingNew && b.id === activeBrand?.id;
-                  // Calculate DNA progress
-                  const dnaFields = [
-                    !!b.nombre, !!b.descripcion, !!b.audiencia,
-                    !!(Array.isArray(b.tono) ? b.tono.filter(Boolean).length : b.tono),
-                    !!b.idioma, !!b.propuesta_valor, !!b.instagram_url,
-                    !!b.personalidad,
-                    !!(b.colores_marca && b.colores_marca.length > 0),
-                    !!(b.ejemplos_copy && b.ejemplos_copy.some(e => e && e.trim())),
-                  ];
-                  const dnaPct = Math.round((dnaFields.filter(Boolean).length / dnaFields.length) * 100);
-                  const dnaComplete = dnaPct >= 90;
-                  return (
-                    <div key={b.id} style={{ display: "flex", alignItems: "center", gap: 0 }}>
-                      <button onClick={() => { switchBrand(b); router.push("/adn?brand=" + b.id); setSidebarOpen(false); }}
-                        title={en ? "Click to edit DNA" : "Click para editar ADN"}
-                        style={{
-                          flex: 1, display: "flex", alignItems: "center", gap: 8, padding: theme.sidebar.subItem.padding,
-                          borderRadius: theme.sidebar.subItem.radius, cursor: "pointer", textAlign: "left",
-                          background: isActive ? theme.sidebar.subItemActive.background : "transparent",
-                          border: "none", transition: "all 0.2s",
-                        }}>
-                        <div style={{
-                          width: theme.sidebar.subAvatar.size, height: theme.sidebar.subAvatar.size,
-                          borderRadius: theme.sidebar.subAvatar.radius, flexShrink: 0,
-                          background: isActive ? "linear-gradient(135deg,#7950F2,#A78BFA)" : "rgba(255,255,255,0.08)",
-                          display: "flex", alignItems: "center", justifyContent: "center",
-                          fontSize: theme.sidebar.subAvatar.fontSize, fontWeight: theme.sidebar.subAvatar.fontWeight, color: "#fff",
-                          position: "relative",
-                        }}>
-                          {(b.nombre || "M").charAt(0).toUpperCase()}
-                          {dnaComplete && (
-                            <div style={{ position:"absolute", bottom:-1, right:-1, width:10, height:10, borderRadius:"50%", background:"#40C057", border:"2px solid #0A0A14", display:"flex", alignItems:"center", justifyContent:"center", fontSize:6, color:"#fff" }}>✓</div>
-                          )}
-                        </div>
-                        <div style={{ overflow: "hidden", flex: 1 }}>
-                          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                            <span style={{ fontSize: theme.sidebar.subItem.fontSize, fontWeight: isActive ? 500 : 400, color: isActive ? theme.sidebar.subItemActive.color : theme.sidebar.subItem.color, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                              {b.nombre || (en ? "Unnamed" : "Sin nombre")}
-                            </span>
-                            {isActive && <span style={{ width: theme.sidebar.statusDot.size, height: theme.sidebar.statusDot.size, borderRadius: "50%", background: theme.sidebar.statusDot.bg, flexShrink: 0, display: "inline-block" }} />}
-                          </div>
-                          <div style={{ fontSize: theme.sidebar.subMeta.fontSize, color: dnaComplete ? "rgba(64,192,87,0.7)" : theme.sidebar.subMeta.color, marginTop: 1, display: "flex", alignItems: "center", gap: 4 }}>
-                            {dnaComplete ? (
-                              <span>{dnaPct}% ADN {isActive ? (en ? "· active" : "· activa") : ""}</span>
-                            ) : (
-                              <>
-                                <span>{dnaPct}% ADN</span>
-                                <div style={{ flex:1, maxWidth:40, height:2, background:"rgba(255,255,255,0.06)", borderRadius:1, overflow:"hidden" }}>
-                                  <div style={{ height:"100%", width:dnaPct+"%", background: dnaPct > 50 ? "#A78BFA" : "rgba(255,255,255,0.2)", borderRadius:1, transition:"width 0.3s" }} />
-                                </div>
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      </button>
-                      {brands.length > 1 && (
-                        <button onClick={(e) => { e.stopPropagation(); deleteBrand(b); }}
-                          style={{ background: "none", border: "none", cursor: "pointer", padding: "6px 8px", color: "rgba(255,255,255,0.15)", fontSize: 14, borderRadius: 6, flexShrink: 0 }}
-                          title={en ? "Delete" : "Eliminar"}>×</button>
-                      )}
-                    </div>
-                  );
-                })}
-                {(() => {
-                  const isCreatingNew = pathname === "/adn" && typeof window !== "undefined" && new URLSearchParams(window.location.search).get("new") === "true";
-                  return (
-                    <button onClick={() => { router.push("/adn?new=true"); setSidebarOpen(false); }}
+            return (
+              <div style={{ marginTop: 4, marginBottom: 8 }}>
+                {flowSteps.map((s, i) => (
+                  <div key={s.num}>
+                    {/* Step row */}
+                    <button onClick={() => { if (s.num === 1) { setDnaSectionOpen(!dnaSectionOpen); } if (!s.disabled) { router.push(s.path); setSidebarOpen(false); } }}
                       style={{
-                        display: "flex", alignItems: "center", justifyContent: theme.sidebar.newBrandButton.justifyContent,
-                        gap: 8, padding: theme.sidebar.newBrandButton.padding,
-                        borderRadius: theme.sidebar.newBrandButton.radius, cursor: "pointer", textAlign: "left",
-                        background: isCreatingNew ? theme.accent.tint12 : "transparent",
-                        border: isCreatingNew ? `0.5px solid ${theme.accent.border}` : theme.sidebar.newBrandButton.border,
+                        display: "flex", alignItems: "center", gap: 10, width: "100%", textAlign: "left",
+                        padding: "8px 10px", borderRadius: 8, border: "none", cursor: s.disabled ? "default" : "pointer",
+                        background: s.current ? theme.sidebar.navItemActive.background : "transparent",
+                        opacity: s.disabled ? 0.4 : 1,
                         transition: "all 0.2s",
                       }}>
-                      <span style={{ fontSize: 12, color: isCreatingNew ? theme.accent.light : theme.sidebar.newBrandButton.color }}>+</span>
-                      <span style={{ fontSize: theme.sidebar.newBrandButton.fontSize, color: isCreatingNew ? theme.accent.light : theme.sidebar.newBrandButton.color, fontWeight: isCreatingNew ? 500 : 400 }}>
-                        {isCreatingNew ? (en ? "Creating new brand..." : "Creando nueva marca...") : (en ? "New brand" : "Nueva marca")}
-                      </span>
+                      {/* Step number circle */}
+                      <div style={{
+                        width: 24, height: 24, borderRadius: "50%", flexShrink: 0,
+                        background: s.current ? "#7950F2" : s.done ? "#40C057" : "rgba(255,255,255,0.06)",
+                        border: s.current ? "none" : s.done ? "none" : "1px solid rgba(255,255,255,0.12)",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        fontSize: 11, fontWeight: 600, color: (s.current || s.done) ? "#fff" : "rgba(255,255,255,0.35)",
+                        transition: "all 0.3s",
+                      }}>
+                        {s.done ? "✓" : s.num}
+                      </div>
+                      {/* Label + meta */}
+                      <div style={{ flex: 1, overflow: "hidden" }}>
+                        <div style={{ fontSize: 12.5, fontWeight: s.current ? 600 : 400, color: s.current ? "#fff" : s.disabled ? "rgba(255,255,255,0.3)" : "rgba(255,255,255,0.7)", letterSpacing: "-0.02em" }}>
+                          {s.label}
+                        </div>
+                        <div style={{ fontSize: 10, color: s.done ? "rgba(64,192,87,0.7)" : s.current ? "rgba(167,139,250,0.8)" : "rgba(255,255,255,0.25)", marginTop: 1 }}>
+                          {s.meta}
+                        </div>
+                      </div>
+                      {/* Expand arrow for step 1 */}
+                      {s.num === 1 && hasBrands && (
+                        <span style={{ fontSize: 9, color: "rgba(255,255,255,0.2)", transition: "transform 0.2s", transform: dnaSectionOpen ? "rotate(180deg)" : "rotate(0deg)" }}>▼</span>
+                      )}
                     </button>
-                  );
-                })()}
+
+                    {/* Connector line between steps */}
+                    {i < flowSteps.length - 1 && (
+                      <div style={{ display: "flex", paddingLeft: 21, height: 16 }}>
+                        <div style={{
+                          width: 1.5,
+                          height: "100%",
+                          background: flowSteps[i].done ? "rgba(64,192,87,0.3)" : "rgba(255,255,255,0.06)",
+                          transition: "background 0.3s",
+                        }} />
+                      </div>
+                    )}
+
+                    {/* Brand sub-items under step 1 (ADN) */}
+                    {s.num === 1 && dnaSectionOpen && (
+                      <div style={{ paddingLeft: 20, paddingTop: 2, paddingBottom: 2, display: "flex", flexDirection: "column", gap: 1 }}>
+                        {/* Connector into sub-items */}
+                        <div style={{ display: "flex", paddingLeft: 1, height: 4 }}>
+                          <div style={{ width: 1.5, height: "100%", background: "rgba(255,255,255,0.06)" }} />
+                        </div>
+                        {brands.map(b => {
+                          const isCreatingNew = pathname === "/adn" && typeof window !== "undefined" && new URLSearchParams(window.location.search).get("new") === "true";
+                          const isActiveBrand = !isCreatingNew && b.id === activeBrand?.id;
+                          const bFields = [
+                            !!b.nombre, !!b.descripcion, !!b.audiencia,
+                            !!(Array.isArray(b.tono) ? b.tono.filter(Boolean).length : b.tono),
+                            !!b.idioma, !!b.propuesta_valor, !!b.instagram_url,
+                            !!b.personalidad,
+                            !!(b.colores_marca && b.colores_marca.length > 0),
+                            !!(b.ejemplos_copy && b.ejemplos_copy.some(e => e && e.trim())),
+                          ];
+                          const bPct = Math.round((bFields.filter(Boolean).length / bFields.length) * 100);
+                          const bComplete = bPct >= 90;
+                          return (
+                            <div key={b.id} style={{ display: "flex", alignItems: "center", gap: 0 }}>
+                              <button onClick={() => { switchBrand(b); router.push("/adn?brand=" + b.id); setSidebarOpen(false); }}
+                                title={en ? "Click to edit DNA" : "Click para editar ADN"}
+                                style={{
+                                  flex: 1, display: "flex", alignItems: "center", gap: 8, padding: "6px 8px",
+                                  borderRadius: 6, cursor: "pointer", textAlign: "left",
+                                  background: isActiveBrand ? "rgba(121,80,242,0.1)" : "transparent",
+                                  border: "none", transition: "all 0.2s",
+                                }}>
+                                <div style={{
+                                  width: 22, height: 22, borderRadius: "50%", flexShrink: 0,
+                                  background: isActiveBrand ? "linear-gradient(135deg,#7950F2,#A78BFA)" : "rgba(255,255,255,0.06)",
+                                  display: "flex", alignItems: "center", justifyContent: "center",
+                                  fontSize: 10, fontWeight: 600, color: "#fff", position: "relative",
+                                }}>
+                                  {(b.nombre || "M").charAt(0).toUpperCase()}
+                                  {bComplete && (
+                                    <div style={{ position:"absolute", bottom:-1, right:-1, width:9, height:9, borderRadius:"50%", background:"#40C057", border:"1.5px solid #0A0A14", display:"flex", alignItems:"center", justifyContent:"center", fontSize:5, color:"#fff" }}>✓</div>
+                                  )}
+                                </div>
+                                <div style={{ overflow: "hidden", flex: 1 }}>
+                                  <div style={{ fontSize: 11.5, fontWeight: isActiveBrand ? 500 : 400, color: isActiveBrand ? "#fff" : "rgba(255,255,255,0.55)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                    {b.nombre || (en ? "Unnamed" : "Sin nombre")}
+                                  </div>
+                                  <div style={{ fontSize: 9.5, color: bComplete ? "rgba(64,192,87,0.6)" : "rgba(255,255,255,0.25)", marginTop: 1, display: "flex", alignItems: "center", gap: 3 }}>
+                                    <span>{bPct}%</span>
+                                    {!bComplete && (
+                                      <div style={{ flex:1, maxWidth:32, height:2, background:"rgba(255,255,255,0.06)", borderRadius:1, overflow:"hidden" }}>
+                                        <div style={{ height:"100%", width:bPct+"%", background: bPct > 50 ? "#A78BFA" : "rgba(255,255,255,0.15)", borderRadius:1, transition:"width 0.3s" }} />
+                                      </div>
+                                    )}
+                                    {isActiveBrand && <span style={{ color: "rgba(167,139,250,0.6)" }}>{en ? "· active" : "· activa"}</span>}
+                                  </div>
+                                </div>
+                              </button>
+                              {brands.length > 1 && (
+                                <button onClick={(e) => { e.stopPropagation(); deleteBrand(b); }}
+                                  style={{ background: "none", border: "none", cursor: "pointer", padding: "4px 6px", color: "rgba(255,255,255,0.12)", fontSize: 13, borderRadius: 4, flexShrink: 0 }}
+                                  title={en ? "Delete" : "Eliminar"}>×</button>
+                              )}
+                            </div>
+                          );
+                        })}
+                        {(() => {
+                          const isCreatingNew = pathname === "/adn" && typeof window !== "undefined" && new URLSearchParams(window.location.search).get("new") === "true";
+                          return (
+                            <button onClick={() => { router.push("/adn?new=true"); setSidebarOpen(false); }}
+                              style={{
+                                display: "flex", alignItems: "center", gap: 6, padding: "5px 8px",
+                                borderRadius: 6, cursor: "pointer", textAlign: "left",
+                                background: isCreatingNew ? "rgba(121,80,242,0.1)" : "transparent",
+                                border: "none", transition: "all 0.2s",
+                              }}>
+                              <div style={{ width: 22, height: 22, borderRadius: "50%", background: "rgba(255,255,255,0.04)", border: "1px dashed rgba(255,255,255,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: "rgba(255,255,255,0.3)" }}>+</div>
+                              <span style={{ fontSize: 11, color: isCreatingNew ? "#A78BFA" : "rgba(255,255,255,0.3)", fontWeight: isCreatingNew ? 500 : 400 }}>
+                                {isCreatingNew ? (en ? "Creating..." : "Creando...") : (en ? "New brand" : "Nueva marca")}
+                              </span>
+                            </button>
+                          );
+                        })()}
+                        {/* Connector out of sub-items */}
+                        <div style={{ display: "flex", paddingLeft: 1, height: 6 }}>
+                          <div style={{ width: 1.5, height: "100%", background: "rgba(255,255,255,0.06)" }} />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
-            )}
-          </div>
-
-          {/* Section label: TRABAJO */}
-          <div style={{ ...theme.sidebar.sectionLabel, marginTop: 12 }}>{en ? "WORK" : "TRABAJO"}</div>
-
-          {/* Nav items */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            {navItems.map(item => {
-              const active = pathname === item.path;
-              const iconColor = active ? theme.accent.light : theme.text.dim;
-              return (
-                <button key={item.path} onClick={() => { router.push(item.path); setSidebarOpen(false); }}
-                  style={{
-                    display: "flex", alignItems: "center", gap: 10,
-                    padding: active ? `${theme.sidebar.navItem.padding.split(' ')[0]} ${theme.sidebar.navItem.padding.split(' ')[1]}` : theme.sidebar.navItem.padding,
-                    borderRadius: active ? theme.sidebar.navItemActive.borderRadius : theme.sidebar.navItem.radius,
-                    fontSize: theme.sidebar.navItem.fontSize,
-                    fontWeight: active ? theme.sidebar.navItemActive.fontWeight : 400,
-                    color: active ? theme.sidebar.navItemActive.color : theme.sidebar.navItem.color,
-                    background: active ? theme.sidebar.navItemActive.background : "transparent",
-                    boxShadow: active ? theme.sidebar.navItemActive.boxShadow : "none",
-                    paddingLeft: active ? theme.sidebar.navItemActive.paddingLeft : undefined,
-                    marginLeft: active ? theme.sidebar.navItemActive.marginLeft : 0,
-                    marginBottom: theme.sidebar.navItem.marginBottom,
-                    border: "none",
-                    cursor: "pointer", textAlign: "left", width: "100%", transition: "all 0.2s",
-                  }}>
-                  {renderNavIcon(item.icon, iconColor)}
-                  {item.label}
-                </button>
-              );
-            })}
-          </div>
+            );
+          })()}
 
           {/* Bottom - user row */}
           <div style={{ marginTop: "auto", display: "flex", flexDirection: "column", gap: 2 }}>
